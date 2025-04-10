@@ -4,6 +4,6 @@ FROM gcc:latest
 COPY . .
 WORKDIR /usr/src/app
 # Compile the CPP project, add more files and flags as needed
-RUN g++ -o app main.cpp
+RUN g++ -o app src/main.cpp
 # Run the compiled project
 CMD ["./app"]
