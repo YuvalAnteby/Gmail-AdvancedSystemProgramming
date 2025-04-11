@@ -1,0 +1,16 @@
+# This dockerfile is for solely running tests of .cpp files
+# author: Yuval Anteby
+
+# Use the official GCC image from Docker
+FROM gcc:latest
+# Add CMake to the container
+RUN apt-get update && apt-get install -y cmake
+# Copy and set the project in the container
+WORKDIR /usr/src/mytests
+COPY . .
+RUN mkdir build
+WORKDIR /usr/src/mytests/build
+# Compile the CPP tests, add more files and flags as needed
+RUN cmake .. && make
+# Run the tests
+CMD ["./runTests"]

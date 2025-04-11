@@ -1,0 +1,15 @@
+# This dockerfile is for solely running the project itself - not for tests
+# author: Yuval Anteby
+
+# Use the official GCC image from Docker
+FROM gcc:latest
+# Add CMake to the container
+RUN apt-get update && apt-get install -y cmake
+# Copy and set the project in the container
+WORKDIR /usr/src/app
+COPY . .
+WORKDIR /usr/src/app/build
+# Compile the CPP project, add more files and flags as needed
+RUN cmake .. && make
+# Run the compiled project
+CMD ["./app"]
