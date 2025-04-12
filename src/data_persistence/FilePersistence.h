@@ -20,8 +20,8 @@ public:
     FilePersistence();
     
     // Bits related functions from interface
-    std::vector<bool> loadBitArray() override;
-    void saveBitArray(const std::vector<bool>& bits) override;
+    std::vector<std::vector<bool>> loadBitArray() override;
+    void saveBitArray(const std::vector<std::vector<bool>>& bits) override;
 
     // Blacklisted URLs related functions from interface
     std::vector<std::string> loadBlacklist() override;

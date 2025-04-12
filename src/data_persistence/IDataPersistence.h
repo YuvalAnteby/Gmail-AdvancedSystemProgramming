@@ -18,13 +18,13 @@ public:
      * Load the bit array which represents the Bloom Filter.
      * @param vector of bit array to save.
      */
-    virtual void saveBitArray(const std::vector<bool>& bits) = 0;
+    virtual void saveBitArray(const std::vector<std::vector<bool>>& bits) = 0;
 
     /**
      * Load the bit array which represents the Bloom Filter.
      * @return A vector of booleans, each represents a bit in the Bloom Filter.
      */
-    virtual std::vector<bool> loadBitArray() = 0;
+    virtual std::vector<std::vector<bool>> loadBitArray() = 0;
 
     /**
      * Save the list of blacklisted URLs.alignas
