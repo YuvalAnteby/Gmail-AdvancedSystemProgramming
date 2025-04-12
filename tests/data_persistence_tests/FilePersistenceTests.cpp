@@ -22,7 +22,15 @@ TEST(loadBitArray, LoadingNoFileExistsBloomFilter) {
  * Expecting to have no errors.
  */
 TEST(loadBitArray, LoadingEmptyBloomFilter) {
-
+    // Make sure the file exists and empty
+    std::ofstream file(testBitsPath.c_str());
+    file.close();
+    FilePersistence fp;
+    std::vector<std::vector<bool>> loadedBits;
+    // Try to load
+    loadedBits = fp.loadBitArray();
+    
+    EXPECT_TRUE(loadedBits.empty());
 }
 
 /**
@@ -30,7 +38,15 @@ TEST(loadBitArray, LoadingEmptyBloomFilter) {
  * Expecting to have no errors.
  */
 TEST(loadBlacklist, LoadingEmptyUrls) {
+    // Make sure the file exists and empty
+    std::ofstream file(testUrlsPath.c_str());
+    file.close();
+    FilePersistence fp;
+    std::vector<std::string> loadedUrls;
+    // Try to load
+    loadedUrls = fp.loadBlacklist();
 
+    EXPECT_TRUE(loadedUrls.empty());
 }
 
 /**
@@ -38,7 +54,7 @@ TEST(loadBlacklist, LoadingEmptyUrls) {
  * Expecting to have new file created and no errors.
  */
 TEST(loadBlacklist, LoadingNoFileExistsUrls) {
-
+//TODO
 }
 
 /**
@@ -46,7 +62,14 @@ TEST(loadBlacklist, LoadingNoFileExistsUrls) {
  * Expecting to have the same value of text.
  */
 TEST(saveBitArray, SavingBloomFilterCorrectly) {
-
+    FilePersistence fp;
+    // Create default value for the test and save it to the file
+    std::vector<std::vector<bool>> bits = {{1, 0, 1, 1, 0}, {0,0,1,1,1}};
+    fp.saveBitArray(bits);
+    // Load the file
+    std::vector<std::vector<bool>> loaded = fp.loadBitArray();
+    
+    EXPECT_EQ(bits, loaded);
 }
 
 /**
@@ -54,7 +77,18 @@ TEST(saveBitArray, SavingBloomFilterCorrectly) {
  * Expecting to have the same value of text.
  */
 TEST(saveBlacklist, SavingUrlsCorrectly) {
+    FilePersistence fp;
+    // Create default values for the test and save them to the file
+    std::vector<std::string> urls = {
+        "www.example.com",
+        "www.test.com",
+        "www.site.com"
+    };
+    fp.saveBlacklist(urls);
+    // Load the file
+    std::vector<std::string> loaded = fp.loadBlacklist();
 
+    EXPECT_EQ(urls, loaded);
 }
 
 /**
@@ -62,7 +96,7 @@ TEST(saveBlacklist, SavingUrlsCorrectly) {
  * Expecting to have the new text in the file.
  */
 TEST(saveBitArray, OverwriteExistingBloomFilterFile) {
-
+//TODO
 }
 
 /**
@@ -70,7 +104,7 @@ TEST(saveBitArray, OverwriteExistingBloomFilterFile) {
  * Expecting to have the new text in the file.
  */
 TEST(saveBlacklist, OverwriteExistingUrlsFile) {
-
+//TODO
 }
 
 /**
@@ -78,7 +112,7 @@ TEST(saveBlacklist, OverwriteExistingUrlsFile) {
  * Expecting an error to be thrown.
  */
 TEST(saveBitArray, EmptyBitsInput) {
-
+//TODO
 }
 
 /**
@@ -86,5 +120,5 @@ TEST(saveBitArray, EmptyBitsInput) {
  * Expecting an error to be thrown.
  */
 TEST(saveBlacklist, EmptyUrlInput) {
-
+//TODO
 }
