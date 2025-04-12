@@ -1,4 +1,4 @@
-// author: Yuval Anteby
+// Author(s): Yuval Anteby
 #ifndef FILE_PERSISTENCE_H
 #define FILE_PERSISTENCE_H
 

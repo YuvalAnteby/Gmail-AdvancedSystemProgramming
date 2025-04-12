@@ -1,4 +1,4 @@
-// author: Yuval Anteby
+// Author(s): Yuval Anteby
 #ifndef IFILE_PERSISTENCE_H
 #define IFILE_PERSISTENCE_H
 #include <vector>
