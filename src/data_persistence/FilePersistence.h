@@ -22,10 +22,12 @@ public:
     // Bits related functions from interface
     std::vector<std::vector<bool>> loadBitArrays() override;
     void appendBitArray(const std::vector<bool>& bits) override;
+    bool isBitArrayInBloomFilter(const std::vector<bool>& bits) override;
 
     // Blacklisted URLs related functions from interface
     std::vector<std::string> loadBlacklist() override;
     void appendBlacklistedUrl(const std::string& url) override;
+    bool isUrlBlacklisted(const std::string& url) override;
 };
 
 #endif

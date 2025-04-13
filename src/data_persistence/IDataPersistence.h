@@ -27,7 +27,14 @@ public:
     virtual std::vector<std::vector<bool>> loadBitArrays() = 0;
 
     /**
-     * Save the blacklisted URL to file
+     * Check if a given bit array is in the bloom filter.
+     * @param bits vector of bits to be checked.
+     * @return true if the bit array is saved in the bloom filter, otherwise false.
+     */
+    virtual bool isBitArrayInBloomFilter(const std::vector<bool>& bits) = 0;
+
+    /**
+     * Save the blacklisted URL.
      * @param urls The URL to save.
      */
     virtual void appendBlacklistedUrl(const std::string& url) = 0;
@@ -38,7 +45,12 @@ public:
      */
     virtual std::vector<std::string> loadBlacklist() = 0;
 
-    // TODO: a function to check if a bit array/ string exists in file - true/false only
-    // TODO: a function to search for a specific bit array/ string in file - returns only this one if exists. otherwise null
+    /**
+     * Check if a given URL is blacklisted and saved.
+     * @param url The URL as a string to check if blacklisted.
+     * @return true if the URL is saved in blacklist, otherwise false.
+     */
+    virtual bool isUrlBlacklisted(const std::string& url) = 0;
+    
 };
 #endif

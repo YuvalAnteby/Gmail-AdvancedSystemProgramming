@@ -49,6 +49,28 @@ void FilePersistence::appendBitArray(const std::vector<bool>& bits) {
     file.close();
 }
 
+bool FilePersistence::isBitArrayInBloomFilter(const std::vector<bool>& bits) {
+    std::ifstream file(bitArrayPath.c_str());
+    if (!file.is_open()) {
+        std::ofstream createFile(bitArrayPath.c_str());
+        return false;
+    }
+    std::string line;
+    while(std::getline(file, line)) {
+        std::vector<bool> fileBits;
+        // Convert each character in the line to a boolean value representing 1,0
+        for (char c : line) {
+            fileBits.push_back(c == '1');
+        }
+        // Check if the given bits array is equal to a bit array from the file, if it is return true
+        if(bits == fileBits) {
+            return true;
+        }
+    }
+    file.close();
+    return false;
+}
+
 std::vector<std::string> FilePersistence::loadBlacklist() {
     std::ifstream file(blacklistPath.c_str());
     // If the file doesn't exist, create it and return an empty file.
@@ -79,3 +101,21 @@ void FilePersistence::appendBlacklistedUrl(const std::string& url) {
     file.close();
 }
 
+bool FilePersistence::isUrlBlacklisted(const std::string& url) {
+    std::ifstream file(blacklistPath.c_str());
+    // If the file doesn't exist, create it and return an empty file.
+    if (!file.is_open()) {
+        std::ofstream createFile(blacklistPath.c_str());
+        return false;
+    }
+    // Read from the file
+    std::string line;
+    while (std::getline(file, line)) {
+        // Check if the given URL is equal to a URL from the file, if it is return true
+        if(url == line) {
+            return true;
+        }
+    }
+    file.close();
+    return false;
+}
