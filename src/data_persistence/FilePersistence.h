@@ -25,7 +25,7 @@ public:
 
     // Blacklisted URLs related functions from interface
     std::vector<std::string> loadBlacklist() override;
-    void appendBlacklistedUrl(const std::string& urls) override;
+    void appendBlacklistedUrl(const std::string& url) override;
 };
 
 #endif
