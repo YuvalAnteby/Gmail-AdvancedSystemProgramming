@@ -8,7 +8,11 @@ RUN apt-get update && apt-get install -y cmake
 # Copy and set the project in the container
 WORKDIR /usr/src/app
 COPY . .
+
+# Ensures a clean build folder
+RUN rm -rf build && mkdir build
 WORKDIR /usr/src/app/build
+
 # Compile the CPP project, add more files and flags as needed
 RUN cmake .. && make
 # Run the compiled project

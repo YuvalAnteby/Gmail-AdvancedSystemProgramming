@@ -17,10 +17,13 @@ FetchContent_MakeAvailable(googletest)
 
 # For compiling the tests
 add_executable(
-  runTests tests/test_main.cpp
+  runTests
+  tests/test_main.cpp
   tests/data_persistence_tests/FilePersistenceTests.cpp
+  src/data_persistence/FilePersistence.cpp
 )
 # For compiling the project itself
 add_executable(app src/main.cpp)
 
+include_directories(src)
 target_link_libraries(runTests gtest_main)
