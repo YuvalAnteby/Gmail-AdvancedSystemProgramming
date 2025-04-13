@@ -7,7 +7,8 @@
  * Constructor
  */
 FilePersistence::FilePersistence() {
-    
+    // Create the data folder in case it doesn't exist yet
+    std::system("mkdir -p data");
 }
 
 std::vector<std::vector<bool>> FilePersistence::loadBitArrays() {
