@@ -18,24 +18,27 @@ public:
      * Load the bit array which represents the Bloom Filter.
      * @param vector of bit array to save.
      */
-    virtual void saveBitArray(const std::vector<std::vector<bool>>& bits) = 0;
+    virtual void appendBitArray(const std::vector<bool>& bits) = 0;
 
     /**
-     * Load the bit array which represents the Bloom Filter.
-     * @return A vector of booleans, each represents a bit in the Bloom Filter.
+     * Load the entire bits arrays which represents the Bloom Filter.
+     * @return A vector of a vector of bools, each element represents a bit array.
      */
-    virtual std::vector<std::vector<bool>> loadBitArray() = 0;
+    virtual std::vector<std::vector<bool>> loadBitArrays() = 0;
 
     /**
-     * Save the list of blacklisted URLs.alignas
-     * @param urls The list of URLs to save.
+     * Save the blacklisted URL to file
+     * @param urls The URL to save.
      */
-    virtual void saveBlacklist(const std::vector<std::string>& urls) = 0;
+    virtual void appendBlacklistedUrl(const std::string& url) = 0;
 
     /**
      * Load the list of blacklisted URLs (used for false-positive checks).
      * @return A vector of blacklisted URLs.
      */
     virtual std::vector<std::string> loadBlacklist() = 0;
+
+    // TODO: a function to check if a bit array/ string exists in file - true/false only
+    // TODO: a function to search for a specific bit array/ string in file - returns only this one if exists. otherwise null
 };
 #endif
