@@ -17,13 +17,12 @@ private:
     size_t hash2(const std::string& str) const;
 
 public:
-    BloomFilter(size_t size, int numHashes, IDataPersistence* persistence);
+
+    BloomFilter(size_t size, int numHashes);
 
     void add(const std::string& url);
     bool mightContain(const std::string& url) const;
     bool isReallyBlacklisted(const std::string& url) const;
-    void updateConfig(size_t newSize, int newNumHashes);
-    void loadExistingData();
 };
 
 #endif
