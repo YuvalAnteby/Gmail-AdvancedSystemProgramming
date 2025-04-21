@@ -1,3 +1,4 @@
+
 #include "BloomFilter.h"
 #include "data_persistence/FilePersistence.h"
 #include <iostream>
@@ -44,8 +45,7 @@ int main() {
             }
             // Update the configuration with the new size and number of hash functions
             filter.updateConfig(newSize, newNumHashes);
-            std::cout << "Configuration updated!" << std::endl;
-            continue;  // Restart the loop with the new configuration
+            continue;
         }
 
         // If the line is too short or doesn't start with 1 or 2, print false and continue
@@ -54,13 +54,15 @@ int main() {
             continue;
         }
 
-        // Extract the URL (skip the first 2 characters, which are the number and space)
+        // Extract the URL , skip the first 2 characters, which are the number and spac. 
         std::string url = line.substr(2);
         
+        ///TODO: Continue writing them in a folder. (yuval)
         // If the input starts with '1', add the URL to the filter
         if (line[0] == '1') {
             filter.add(url);
         } 
+        ///TODO: Change the second according to the rules in the exercise.(ROI)
         // If the input starts with '2', check if the URL might be blacklisted
         else if (line[0] == '2') {
             bool maybe = filter.mightContain(url);
