@@ -26,4 +26,5 @@ add_executable(
 add_executable(app src/main.cpp)
 
 include_directories(src)
+include_directories(src/data_persistence)
 target_link_libraries(runTests gtest_main)
