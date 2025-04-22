@@ -45,10 +45,8 @@ bool processLine(const std::string& line, int& hash1, int& hash2) {
             hash2 = 0; 
         }
 
-        std::cout << std::endl;
         return true;
     }
-
     // If there aren't exactly two or three numbers, print false
     std::cout << "false" << std::endl;
     return false;
@@ -121,10 +119,7 @@ bool isValidLine(const std::string& line) {
  * @param filter bloom filter object reference
  */
 void handleUserChoice(const std::string& line, int hash1, int hash2) {
-    if (line.size() < 3) {
-        std::cout << "false" << std::endl;
-        return;
-    }
+
     // Extract URL after command and space
 
     std::string url = line.substr(2);
@@ -150,18 +145,23 @@ int main() {
     // TODO: use here bloom filter object by Roee
     //BloomFilter filter;
     std::string line;
-    bool firstLineFlag = true;
+
+    // Step 1: Wait for initial configuration input (2 or 3 numbers)
     while (true) {
-        std::getline(std::cin, line);  
-        // Skip to next line if the first line was invalid
-        if (firstLineFlag && !processLine(line, hash1, hash2)) {
-            continue;
+        std::getline(std::cin, line);
+        if (processLine(line, hash1, hash2)) {
+            break; 
         }
-        firstLineFlag = false;
+        // If not valid, processLine will already print the error
+    }
+
+    // Step 2: Process user commands (lines starting with 1 or 2 followed by a URL)
+    while (true) {
+        std::getline(std::cin, line); 
         if (isValidLine(line)) {
             handleUserChoice(line, hash1, hash2);
         } else {
-            std::cout << "false" << std::endl;
+            std::cout << "false" << std::endl; 
         }
     }
 
