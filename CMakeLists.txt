@@ -28,3 +28,9 @@ add_executable(app src/main.cpp)
 include_directories(src)
 include_directories(src/data_persistence)
 target_link_libraries(runTests gtest_main)
+
+add_executable(app
+    src/main.cpp
+    src/bloom_filter/BloomFilter.cpp
+    src/data_persistence/FilePersistence.cpp
+)
