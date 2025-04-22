@@ -12,7 +12,7 @@ int main()
     size_t size;
     int numHashes;
 
-    // Receive the initial configuration (array size and number of hash functions)
+    // Receive the initial configuration (array size and number of hash functions).
     std::string firstLine;
     std::getline(std::cin, firstLine);
     std::istringstream configStream(firstLine);
@@ -35,11 +35,12 @@ int main()
     filter.loadExistingData();
 
     std::string line;
+    // Continuously read lines from standard input until EOF or an invalid line is encountered
     while (true)
     {
         std::getline(std::cin, line);
 
-        // If the line contains a new configuration (size and number of hash functions), update the configuration
+        // If the line contains a new configuration (size and number of hash functions), update the configuration.
         std::istringstream newConfigStream(line);
         size_t newSize;
         int newNumHashes;
