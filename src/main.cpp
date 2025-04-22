@@ -1,8 +1,5 @@
-#include "data_persistence/FilePersistence.h"
 #include <iostream>
 #include <sstream>
-#include <sstream>
-#include <iostream>
 #include <cctype>
 #include <algorithm>
 #include <regex>
@@ -10,37 +7,53 @@
 /**
  * Processes a line of input.
  * @param line line of the user's input
+ * @param hash1 reference to the first hash number
+ * @param hash2 reference to the second hash number
  * @return true if valid numbers were found and no invalid characters existed between them.
  * Otherwise, returns false, prints "FALSE"
  */
-bool processLine(const std::string& line) {
+bool processLine(const std::string& line, int& hash1, int& hash2) {
     std::istringstream iss(line);
     std::string token;
     bool hasDigits = false;
-    std::vector<int> intsResult;
-    while (iss >> token) {
+    std::vector<int> numbers;
+     // Read all tokens and check if they are valid numbers
+     while (iss >> token) {
         // Skip entire line if it starts with letters
-        if (!hasDigits && std::any_of(token.begin(), token.end(), ::isalpha))
-            return {};
+        if (std::any_of(token.begin(), token.end(), ::isalpha)) {
+            std::cout << "false" << std::endl;
+            return false;
+        }
 
         // If token is not all digits, it's invalid
         if (!std::all_of(token.begin(), token.end(), ::isdigit)) {
             std::cout << "false" << std::endl;
-            return {};
+            return false;
         }
 
-        hasDigits = true;
+        // Convert string to number and add it to the list
+        numbers.push_back(std::stoi(token));
     }
 
-    // If numbers were found, print newline and return true
-    if (hasDigits) {
+    // Check if we have exactly two or three numbers
+    if (numbers.size() == 2 || numbers.size() == 3) {
+        // Assign the second and third numbers to HASH1 and HASH2
+        hash1 = numbers[1];  
+        if (numbers.size() > 2) {
+            hash2 = numbers[2];  
+        } else {
+            hash2 = 0; 
+        }
+
         std::cout << std::endl;
         return true;
     }
 
-    // No numbers found, line is ignored
-    return {};
+    // If there aren't exactly two or three numbers, print false
+    std::cout << "false" << std::endl;
+    return false;
 }
+
 /**
  * Check if the URL is valid using a basic regex pattern.
  * @param url string of a URL to be checked
@@ -103,15 +116,18 @@ bool isValidLine(const std::string& line) {
  * - If it starts with '1', add the URL
  * - If it starts with '2', check against the blacklist
  * @param line string of the user's choice of command & the url string
+ * @param hash1 reference to the first hash number
+ * @param hash2 reference to the second hash number
  * @param filter bloom filter object reference
  */
-void handleUserChoice(const std::string& line) {
+void handleUserChoice(const std::string& line, int hash1, int hash2) {
     if (line.size() < 3) {
         std::cout << "false" << std::endl;
         return;
     }
+    // Extract URL after command and space
 
-    std::string url = line.substr(2);  // Extract URL after command and space
+    std::string url = line.substr(2);
 
     if (!isValidURL(url)) {
         std::cout << "false" << std::endl;
@@ -130,18 +146,20 @@ void handleUserChoice(const std::string& line) {
  * Main loop that reads and processes input lines.
  */
 int main() {
+    int hash1=0 , hash2=0 ;
     // TODO: use here bloom filter object by Roee
     //BloomFilter filter;
     std::string line;
     bool firstLineFlag = true;
-    while (std::getline(std::cin, line)) {
+    while (true) {
+        std::getline(std::cin, line);  
         // Skip to next line if the first line was invalid
-        if (firstLineFlag && !processLine(line)) {
+        if (firstLineFlag && !processLine(line, hash1, hash2)) {
             continue;
         }
         firstLineFlag = false;
         if (isValidLine(line)) {
-            handleUserChoice(line);
+            handleUserChoice(line, hash1, hash2);
         } else {
             std::cout << "false" << std::endl;
         }
