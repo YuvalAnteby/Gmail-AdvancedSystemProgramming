@@ -133,7 +133,5 @@ void FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
         // End the line (new number)
         file << '\n';
     }
-    // End the line (new bit array)
-    file << '\n';
     file.close();
 }

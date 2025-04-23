@@ -7,6 +7,14 @@
 const std::string testBitsPath = "data/bloom_bits.txt";
 const std::string testUrlsPath = "data/blacklist.txt";
 const std::string testConfigIntsPath = "data/config_bloom.txt";
+/**
+ * Delete files upon finishing the test
+ */
+void deleteFiles() {
+    std::remove(testBitsPath.c_str());
+    std::remove(testUrlsPath.c_str());
+    std::remove(testConfigIntsPath.c_str());
+}
 
 /**
  * Test for the case of trying to load data from the Bloom Filter file but it doesn't exist.
@@ -36,6 +44,7 @@ TEST(loadBlacklist, LoadingNoFileExistsUrls)
     std::vector<std::string> result = fp.loadBlacklist();
     // Expect to receive a new empty file
     EXPECT_TRUE(result.empty());
+    deleteFiles();
 }
 
 /**
@@ -51,8 +60,8 @@ TEST(loadBitArrays, LoadingEmptyBloomFilter)
     std::vector<std::vector<bool>> loadedBits;
     // Try to load
     loadedBits = fp.loadBitArrays();
-
     EXPECT_TRUE(loadedBits.empty());
+    deleteFiles();
 }
 
 /**
@@ -70,6 +79,7 @@ TEST(loadBlacklist, LoadingEmptyUrls)
     loadedUrls = fp.loadBlacklist();
 
     EXPECT_TRUE(loadedUrls.empty());
+    deleteFiles();
 }
 
 /**
@@ -94,6 +104,7 @@ TEST(appendBitArray, AppendingBloomFilter)
     std::vector<std::vector<bool>> loaded = fp.loadBitArrays();
     // We expect the file to include all bits
     EXPECT_EQ(originalBits, loaded);
+    deleteFiles();
 }
 
 /**
@@ -118,6 +129,7 @@ TEST(appendBlacklistedUrl, AppendingUrl)
     std::vector<std::string> loaded = fp.loadBlacklist();
     // We expect the file to include all URLs
     EXPECT_EQ(originalUrls, loaded);
+    deleteFiles();
 }
 
 /**
@@ -131,6 +143,7 @@ TEST(appendBitArray, EmptyBitsInput)
     FilePersistence fp;
     // Expect invalid argument error to be thrown when trying to save
     EXPECT_THROW(fp.appendBitArray(bits), std::invalid_argument);
+    deleteFiles();
 }
 
 /**
@@ -144,6 +157,7 @@ TEST(appendBlacklistedUrl, EmptyUrlInput)
     FilePersistence fp;
     // Expect invalid argument error to be thrown when trying to save
     EXPECT_THROW(fp.appendBlacklistedUrl(url), std::invalid_argument);
+    deleteFiles();
 }
 
 /**
@@ -159,6 +173,7 @@ TEST(loadConfigInts, LoadingNoFileExistsConfigBloomFilter)
     std::vector<std::vector<bool>> result = fp->loadBitArrays();
     // Expect to receive a new empty file
     EXPECT_TRUE(result.empty());
+    deleteFiles();
 }
 
 /**
@@ -176,6 +191,7 @@ TEST(loadConfigInts, LoadingEmptyConfigFile)
     loadedInts = fp->loadConfigInts();
 
     EXPECT_TRUE(loadedInts.empty());
+    deleteFiles();
 }
 
 /**
@@ -194,6 +210,7 @@ TEST(appendConfigInts, AppendingConfigInts)
     std::vector<int> loaded = fp->loadConfigInts();
     // We expect the file to include all integers
     EXPECT_EQ(originalInts, loaded);
+    deleteFiles();
 }
 
 
@@ -207,5 +224,6 @@ TEST(appendConfigInts, EmptyConfigIntsInput)
     std::vector<int> ints = {};
     IDataPersistence *fp = new FilePersistence();
     // Expect invalid argument error to be thrown when trying to save
-    EXPECT_THROW(fp->appendBitArray(bits), std::invalid_argument);
+    EXPECT_THROW(fp->appendConfigInts(ints), std::invalid_argument);
+    deleteFiles();
 }
