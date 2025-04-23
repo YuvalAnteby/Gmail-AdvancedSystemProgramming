@@ -7,51 +7,37 @@
 /**
  * Processes a line of input.
  * @param line line of the user's input
- * @param hash1 reference to the first hash number
- * @param hash2 reference to the second hash number
  * @return true if valid numbers were found and no invalid characters existed between them.
  * Otherwise, returns false, prints "FALSE"
  */
-bool processLine(const std::string& line, int& hash1, int& hash2) {
+bool processLine(const std::string& line) {
     std::istringstream iss(line);
     std::string token;
     bool hasDigits = false;
-    std::vector<int> numbers;
-     // Read all tokens and check if they are valid numbers
-     while (iss >> token) {
+    std::vector<int> intsResult;
+    while (iss >> token) {
         // Skip entire line if it starts with letters
-        if (std::any_of(token.begin(), token.end(), ::isalpha)) {
-            std::cout << "false" << std::endl;
-            return false;
-        }
+        if (!hasDigits && std::any_of(token.begin(), token.end(), ::isalpha))
+            return {};
 
         // If token is not all digits, it's invalid
         if (!std::all_of(token.begin(), token.end(), ::isdigit)) {
             std::cout << "false" << std::endl;
-            return false;
+            return {};
         }
 
-        // Convert string to number and add it to the list
-        numbers.push_back(std::stoi(token));
+        hasDigits = true;
     }
 
-    // Check if we have exactly two or three numbers
-    if (numbers.size() == 2 || numbers.size() == 3) {
-        // Assign the second and third numbers to HASH1 and HASH2
-        hash1 = numbers[1];  
-        if (numbers.size() > 2) {
-            hash2 = numbers[2];  
-        } else {
-            hash2 = 0; 
-        }
-
+    // If numbers were found, print newline and return true
+    if (hasDigits) {
+        std::cout << std::endl;
         return true;
     }
-    // If there aren't exactly two or three numbers, print false
-    std::cout << "false" << std::endl;
-    return false;
-}
 
+    // No numbers found, line is ignored
+    return {};
+}
 /**
  * Check if the URL is valid using a basic regex pattern.
  * @param url string of a URL to be checked
@@ -114,15 +100,15 @@ bool isValidLine(const std::string& line) {
  * - If it starts with '1', add the URL
  * - If it starts with '2', check against the blacklist
  * @param line string of the user's choice of command & the url string
- * @param hash1 reference to the first hash number
- * @param hash2 reference to the second hash number
  * @param filter bloom filter object reference
  */
-void handleUserChoice(const std::string& line, int hash1, int hash2) {
+void handleUserChoice(const std::string& line, BloomFilter& filter) {
+    if (line.size() < 3) {
+        std::cout << "false" << std::endl;
+        return;
+    }
 
-    // Extract URL after command and space
-
-    std::string url = line.substr(2);
+    std::string url = line.substr(2);  // Extract URL after command and space
 
     if (!isValidURL(url)) {
         std::cout << "false" << std::endl;
@@ -141,27 +127,20 @@ void handleUserChoice(const std::string& line, int hash1, int hash2) {
  * Main loop that reads and processes input lines.
  */
 int main() {
-    int hash1=0 , hash2=0 ;
     // TODO: use here bloom filter object by Roee
     //BloomFilter filter;
     std::string line;
-
-    // Step 1: Wait for initial configuration input (2 or 3 numbers)
-    while (true) {
-        std::getline(std::cin, line);
-        if (processLine(line, hash1, hash2)) {
-            break; 
+    bool firstLineFlag = true;
+    while (std::getline(std::cin, line)) {
+        // Skip to next line if the first line was invalid
+        if (firstLineFlag && !processLine(line)) {
+            continue;
         }
-        // If not valid, processLine will already print the error
-    }
-
-    // Step 2: Process user commands (lines starting with 1 or 2 followed by a URL)
-    while (true) {
-        std::getline(std::cin, line); 
+        firstLineFlag = false;
         if (isValidLine(line)) {
-            handleUserChoice(line, hash1, hash2);
+            handleUserChoice(line, filter);
         } else {
-            std::cout << "false" << std::endl; 
+            std::cout << "false" << std::endl;
         }
     }
 
