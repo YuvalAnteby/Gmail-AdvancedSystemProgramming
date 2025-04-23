@@ -15,7 +15,7 @@ public:
     virtual ~IDataPersistence() = default;
 
     /**
-     * Load the bit array which represents the Bloom Filter.
+     * Insert the new bit array.
      * @param vector of bit array to save.
      */
     virtual void appendBitArray(const std::vector<bool>& bits) = 0;
@@ -27,7 +27,7 @@ public:
     virtual std::vector<std::vector<bool>> loadBitArrays() = 0;
 
     /**
-     * Save the blacklisted URL.
+     * Insert the blacklisted URL.
      * @param urls The URL to save.
      */
     virtual void appendBlacklistedUrl(const std::string& url) = 0;

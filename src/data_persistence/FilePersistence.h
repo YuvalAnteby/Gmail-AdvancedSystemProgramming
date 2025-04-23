@@ -14,7 +14,7 @@ private:
     // Default paths for the .txt files.
     const std::string bitArrayPath = "data/bloom_bits.txt";
     const std::string blacklistPath = "data/blacklist.txt";
-    const std::string blacklistPath = "data/config_bloom.txt";
+    const std::string configIntsPath = "data/config_bloom.txt";
 
 public:
     // Default Constructor

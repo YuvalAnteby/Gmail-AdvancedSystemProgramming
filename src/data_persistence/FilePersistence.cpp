@@ -11,6 +11,10 @@ FilePersistence::FilePersistence() {
     std::system("mkdir -p data");
 }
 
+/**
+ * Load the entire bits arrays which represents the Bloom Filter.
+ * @return A vector of a vector of bools, each element represents a bit array.
+ */
 std::vector<std::vector<bool>> FilePersistence::loadBitArrays() {
     std::ifstream file(bitArrayPath.c_str());
     // If the file doesn't exist, create it and return an empty file.
@@ -21,7 +25,7 @@ std::vector<std::vector<bool>> FilePersistence::loadBitArrays() {
     // Read from the file and convert to the correct variable type (from a string)
     std::vector<std::vector<bool>> loadedBitsArrays;
     std::string line;
-    while(std::getline(file, line)) {
+    while (std::getline(file, line)) {
         std::vector<bool> bitsArray;
         // Convert each character in the line to a boolean value representing 1,0
         for (char c : line) {
@@ -33,7 +37,11 @@ std::vector<std::vector<bool>> FilePersistence::loadBitArrays() {
     return loadedBitsArrays;
 }
 
-void FilePersistence::appendBitArray(const std::vector<bool>& bits) {
+/**
+ * Insert the new bit array to the .txt file.
+ * @param vector of bit array to save.
+ */
+void FilePersistence::appendBitArray(const std::vector<bool> &bits) {
     // If the input is empty, throw an exception - invalid argument
     if (bits.empty()) {
         throw std::invalid_argument("Can't add an empty bit array");
@@ -41,7 +49,7 @@ void FilePersistence::appendBitArray(const std::vector<bool>& bits) {
 
     std::ofstream file(bitArrayPath.c_str(), std::ios::app);
     // Convert each bool to 1/0 chars and add to the file
-    for (bool bit: bits) {
+    for (bool bit : bits) {
         file << (bit ? '1' : '0');
     }
     // End the line (new bit array)
@@ -49,28 +57,10 @@ void FilePersistence::appendBitArray(const std::vector<bool>& bits) {
     file.close();
 }
 
-bool FilePersistence::isBitArrayInBloomFilter(const std::vector<bool>& bits) {
-    std::ifstream file(bitArrayPath.c_str());
-    if (!file.is_open()) {
-        std::ofstream createFile(bitArrayPath.c_str());
-        return false;
-    }
-    std::string line;
-    while(std::getline(file, line)) {
-        std::vector<bool> fileBits;
-        // Convert each character in the line to a boolean value representing 1,0
-        for (char c : line) {
-            fileBits.push_back(c == '1');
-        }
-        // Check if the given bits array is equal to a bit array from the file, if it is return true
-        if(bits == fileBits) {
-            return true;
-        }
-    }
-    file.close();
-    return false;
-}
-
+/**
+ * Load the list of blacklisted URLs (used for false-positive checks) from the .txt file.
+ * @return A vector of blacklisted URLs.
+ */
 std::vector<std::string> FilePersistence::loadBlacklist() {
     std::ifstream file(blacklistPath.c_str());
     // If the file doesn't exist, create it and return an empty file.
@@ -88,7 +78,11 @@ std::vector<std::string> FilePersistence::loadBlacklist() {
     return loadedUrls;
 }
 
-void FilePersistence::appendBlacklistedUrl(const std::string& url) {
+/**
+ * Insert the blacklisted URL to the .txt file.
+ * @param urls The URL to save.
+ */
+void FilePersistence::appendBlacklistedUrl(const std::string &url) {
     // If the input is empty, throw an exception - invalid argument
     if (url.empty()) {
         throw std::invalid_argument("Can't add an empty string URL");
@@ -101,21 +95,45 @@ void FilePersistence::appendBlacklistedUrl(const std::string& url) {
     file.close();
 }
 
-bool FilePersistence::isUrlBlacklisted(const std::string& url) {
-    std::ifstream file(blacklistPath.c_str());
+/**
+ * Save the config ints, given by the user's input.
+ * @param vector first int is bit array size (first int in the input), the rest are how many times to run hash function
+ */
+std::vector<int> FilePersistence::loadConfigInts() {
+    std::ifstream file(configIntsPath.c_str());
     // If the file doesn't exist, create it and return an empty file.
     if (!file.is_open()) {
-        std::ofstream createFile(blacklistPath.c_str());
-        return false;
+        std::ofstream createFile(configIntsPath.c_str());
+        return {};
     }
-    // Read from the file
+    // Read from the file and convert to the correct variable type (from a string)
+    std::vector<int> loadedConfigInts;
     std::string line;
     while (std::getline(file, line)) {
-        // Check if the given URL is equal to a URL from the file, if it is return true
-        if(url == line) {
-            return true;
-        }
+        loadedConfigInts.push_back(std::stoi(line));
     }
     file.close();
-    return false;
+    return loadedConfigInts;
+}
+
+/**
+* Load the config ints, given in a previous input of the user.
+* @return A vector where the first int is bit array size (first int in the input), the rest are how many times to run hash function
+*/
+void FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
+    // If the input is empty, throw an exception - invalid argument
+    if (configInts.empty()) {
+        throw std::invalid_argument("Can't add an empty config array");
+    }
+
+    std::ofstream file(configIntsPath.c_str(), std::ios::app);
+    
+    for (int num : configInts) {
+        file << num;
+        // End the line (new number)
+        file << '\n';
+    }
+    // End the line (new bit array)
+    file << '\n';
+    file.close();
 }
