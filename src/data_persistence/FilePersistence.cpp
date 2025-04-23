@@ -97,7 +97,7 @@ void FilePersistence::appendBlacklistedUrl(const std::string &url) {
 
 /**
  * Save the config ints, given by the user's input.
- * @param vector first int is bit array size (first int in the input), the rest are how many times to run hash function
+ * @param vector int array of how many times to run hash functions
  */
 std::vector<int> FilePersistence::loadConfigInts() {
     std::ifstream file(configIntsPath.c_str());
@@ -109,6 +109,9 @@ std::vector<int> FilePersistence::loadConfigInts() {
     // Read from the file and convert to the correct variable type (from a string)
     std::vector<int> loadedConfigInts;
     std::string line;
+    // Skip the first line (the bit array size)
+    std::getline(file, line);
+    // Get the ints
     while (std::getline(file, line)) {
         loadedConfigInts.push_back(std::stoi(line));
     }
@@ -149,7 +152,8 @@ int FilePersistence::getBitSizeConfig() {
     }
     // Get the first int from the file
     std::string line;
+    std::getline(file, line);
     int result = std::stoi(line);
     file.close();
-    return result
+    return result;
 }
