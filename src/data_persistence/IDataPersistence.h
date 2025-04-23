@@ -15,7 +15,7 @@ public:
     virtual ~IDataPersistence() = default;
 
     /**
-     * Load the bit array which represents the Bloom Filter.
+     * Insert the new bit array.
      * @param vector of bit array to save.
      */
     virtual void appendBitArray(const std::vector<bool>& bits) = 0;
@@ -27,14 +27,7 @@ public:
     virtual std::vector<std::vector<bool>> loadBitArrays() = 0;
 
     /**
-     * Check if a given bit array is in the bloom filter.
-     * @param bits vector of bits to be checked.
-     * @return true if the bit array is saved in the bloom filter, otherwise false.
-     */
-    virtual bool isBitArrayInBloomFilter(const std::vector<bool>& bits) = 0;
-
-    /**
-     * Save the blacklisted URL.
+     * Insert the blacklisted URL.
      * @param urls The URL to save.
      */
     virtual void appendBlacklistedUrl(const std::string& url) = 0;
@@ -44,13 +37,18 @@ public:
      * @return A vector of blacklisted URLs.
      */
     virtual std::vector<std::string> loadBlacklist() = 0;
+    
 
     /**
-     * Check if a given URL is blacklisted and saved.
-     * @param url The URL as a string to check if blacklisted.
-     * @return true if the URL is saved in blacklist, otherwise false.
+     * Save the config ints, given by the user's input.
+     * @param vector first int is bit array size (first int in the input), the rest are how many times to run hash function
      */
-    virtual bool isUrlBlacklisted(const std::string& url) = 0;
-    
+    virtual void appendConfigInts(const std::vector<int>& configInts) = 0;
+
+    /**
+     * Load the config ints, given in a previous input of the user.
+     * @return A vector where the first int is bit array size (first int in the input), the rest are how many times to run hash function
+     */
+    virtual std::vector<int> loadConfigInts() = 0;
 };
 #endif
