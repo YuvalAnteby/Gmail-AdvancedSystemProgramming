@@ -3,14 +3,17 @@
 #include <fstream>
 #include "data_persistence/FilePersistence.h"
 
+// Default paths for the .txt files.
 const std::string testBitsPath = "data/bloom_bits.txt";
 const std::string testUrlsPath = "data/blacklist.txt";
+const std::string testConfigIntsPath = "data/config_bloom.txt";
 
 /**
  * Test for the case of trying to load data from the Bloom Filter file but it doesn't exist.
  * Expecting to have new file created and no errors.
  */
-TEST(loadBitArrays, LoadingNoFileExistsBloomFilter) {
+TEST(loadBitArrays, LoadingNoFileExistsBloomFilter)
+{
     FilePersistence fp;
     // Make sure the file is deleted (if it exists)
     std::remove(testBitsPath.c_str());
@@ -97,7 +100,8 @@ TEST(appendBitArray, AppendingBloomFilter)
  * Test appending new string URL to the URLs file.
  * Expecting to have all URLs in file.
  */
-TEST(appendBlacklistedUrl, AppendingUrl) {
+TEST(appendBlacklistedUrl, AppendingUrl)
+{
     // Delete old version of the file
     std::remove(testUrlsPath.c_str());
     FilePersistence fp;
@@ -140,4 +144,68 @@ TEST(appendBlacklistedUrl, EmptyUrlInput)
     FilePersistence fp;
     // Expect invalid argument error to be thrown when trying to save
     EXPECT_THROW(fp.appendBlacklistedUrl(url), std::invalid_argument);
+}
+
+/**
+ * Test for the case of trying to load data from the Bloom Filter config file but it doesn't exist.
+ * Expecting to have new file created and no errors.
+ */
+TEST(loadConfigInts, LoadingNoFileExistsConfigBloomFilter)
+{
+    IDataPersistence *fp = new FilePersistence();
+    // Make sure the file is deleted (if it exists)
+    std::remove(testConfigIntsPath.c_str());
+    // Load from a file that doesn’t exist
+    std::vector<std::vector<bool>> result = fp->loadBitArrays();
+    // Expect to receive a new empty file
+    EXPECT_TRUE(result.empty());
+}
+
+/**
+ * Test for the case of trying to load empty data file of the config ints.
+ * Expecting to have no errors.
+ */
+TEST(loadConfigInts, LoadingEmptyConfigFile)
+{
+    // Make sure the file exists and empty
+    std::ofstream file(testConfigIntsPath.c_str());
+    file.close();
+    IDataPersistence *fp = new FilePersistence();
+    std::vector<int> loadedInts;
+    // Try to load
+    loadedInts = fp->loadConfigInts();
+
+    EXPECT_TRUE(loadedInts.empty());
+}
+
+/**
+ * Test appending new ints arrays to the bloom filter config file.
+ * Expecting to have the entire ints array in file (exactly as before insertion).
+ */
+TEST(appendConfigInts, AppendingConfigInts)
+{
+    // Delete old version of the file
+    std::remove(testConfigIntsPath.c_str());
+    IDataPersistence *fp = new FilePersistence();
+    // Create the original values for the test and save them to the file
+    std::vector<int> originalInts = {8, 1, 2, 4, 5};
+    fp->appendConfigInts(originalInts);
+    // Load the file
+    std::vector<int> loaded = fp->loadConfigInts();
+    // We expect the file to include all integers
+    EXPECT_EQ(originalInts, loaded);
+}
+
+
+/**
+ * Test the saving funcionality when the input of the bloom filter config integers is empty.
+ * Expecting an error to be thrown.
+ */
+TEST(appendConfigInts, EmptyConfigIntsInput)
+{
+    // Create the empty bit array and try to save it
+    std::vector<int> ints = {};
+    IDataPersistence *fp = new FilePersistence();
+    // Expect invalid argument error to be thrown when trying to save
+    EXPECT_THROW(fp->appendBitArray(bits), std::invalid_argument);
 }
