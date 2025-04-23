@@ -50,5 +50,11 @@ public:
      * @return A vector where the first int is bit array size (first int in the input), the rest are how many times to run hash function
      */
     virtual std::vector<int> loadConfigInts() = 0;
+
+    /**
+     * Get from the config the size of the bit array.
+     * @return an int representing the bit array size
+     */
+    virtual int getBitSizeConfig() = 0;
 };
 #endif

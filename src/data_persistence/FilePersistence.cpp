@@ -135,3 +135,21 @@ void FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
     }
     file.close();
 }
+
+/**
+* Get from the config the size of the bit array.
+* @return an int representing the bit array size
+*/
+int FilePersistence::getBitSizeConfig() {
+    std::ifstream file(configIntsPath.c_str());
+    // If the file doesn't exist, create it and return an empty file.
+    if (!file.is_open()) {
+        std::ofstream createFile(configIntsPath.c_str());
+        return {};
+    }
+    // Get the first int from the file
+    std::string line;
+    int result = std::stoi(line);
+    file.close();
+    return result
+}
