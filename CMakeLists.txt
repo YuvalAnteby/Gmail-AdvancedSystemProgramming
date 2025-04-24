@@ -30,6 +30,7 @@ file(GLOB_RECURSE SRC_FILES
 src/*.cpp
 src/utils/*.cpp
 src/bloom/*.cpp
+src/bloom/commands/*.cpp
 src/bloom/hash/*.cpp
 src/data_persistence/*.cpp
 )
