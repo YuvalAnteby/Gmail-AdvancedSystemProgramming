@@ -18,6 +18,8 @@ FetchContent_MakeAvailable(googletest)
 file(GLOB_RECURSE TEST_FILES
 src/utils/*.cpp
 src/bloom/*.cpp
+src/bloom/commands/*.cpp
+src/bloom/hash/*.cpp
 src/data_persistence/*.cpp
 tests/*.cpp
 tests/utils_tests/*.cpp

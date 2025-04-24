@@ -1,6 +1,6 @@
 // Unit tests for CheckUrlCommand-related logic
 #include <gtest/gtest.h>
-#include "bloom/CheckUrlCommand.h"
+#include "bloom/commands/CheckUrlCommand.h"
 #include "bloom/hash/Hasher.h"
 #include <memory>
 #include <sstream>

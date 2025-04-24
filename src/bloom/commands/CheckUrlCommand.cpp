@@ -1,6 +1,6 @@
 // Author(s): Yuval Anteby
 #include "CheckUrlCommand.h"
-#include "hash/Hasher.h"
+#include "bloom/hash/Hasher.h"
 #include <iostream>
 #include <vector>
 #include <string>

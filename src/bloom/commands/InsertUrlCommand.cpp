@@ -1,6 +1,6 @@
 // Author(s): Yuval Anteby
 #include "InsertUrlCommand.h"
-#include "hash/Hasher.h"
+#include "bloom/hash/Hasher.h"
 
 // Default constructor
 InsertUrlCommand::InsertUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size)
