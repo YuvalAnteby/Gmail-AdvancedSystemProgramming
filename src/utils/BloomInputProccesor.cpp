@@ -16,7 +16,7 @@
  */
 std::string processFirstInt(std::string& line) {
     std::string numString = "";
-    int i; // save counter to know the number's length (including the whitespace)
+    int i = 0; // save counter to know the number's length (including the whitespace)
     // Extract digits at the beginning
     while (i < line.length() && std::isdigit(line[i])) {
         numString.push_back(line[i]);
