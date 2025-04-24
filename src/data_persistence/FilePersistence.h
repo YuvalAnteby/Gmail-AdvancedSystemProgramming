@@ -31,6 +31,7 @@ public:
     // Config related function
     std::vector<int> loadConfigInts();
     void appendConfigInts(const std::vector<int>& configInts);
+    int getBitSizeConfig();
 };
 
 #endif

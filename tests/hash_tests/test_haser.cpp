@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../hash/Hasher.h"
+#include "bloom/hash/Hasher.h"
 
 // Test that hashN(1) is consistent for the same base string
 TEST(HasherTest, HashN1Consistency) {

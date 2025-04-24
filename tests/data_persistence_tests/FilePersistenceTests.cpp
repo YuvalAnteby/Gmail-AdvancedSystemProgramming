@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include "data_persistence/FilePersistence.h"
+#include <iostream> // TODO: remove
 
 // Default paths for the .txt files.
 const std::string testBitsPath = "data/bloom_bits.txt";
@@ -208,7 +209,10 @@ TEST(appendConfigInts, AppendingConfigInts)
     std::vector<int> originalInts = {8, 1, 2, 4, 5};
     fp->appendConfigInts(originalInts);
     // Load the file
-    std::vector<int> loaded = fp->loadConfigInts();
+    std::vector<int> loaded = {};
+    loaded.push_back(fp->getBitSizeConfig());
+    std::vector<int> ints = fp->loadConfigInts();
+    loaded.insert(loaded.end(), ints.begin(), ints.end());
     // We expect the file to include all integers
     EXPECT_EQ(originalInts, loaded);
     deleteFiles();
