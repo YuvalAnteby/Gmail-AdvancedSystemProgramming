@@ -15,15 +15,26 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# For compiling the tests
-add_executable(
-  runTests
-  tests/test_main.cpp
-  tests/data_persistence_tests/FilePersistenceTests.cpp
-  src/data_persistence/FilePersistence.cpp
-)
 # For compiling the project itself
-add_executable(app src/main.cpp)
+file(GLOB_RECURSE TEST_FILES
+
+src/utils/*.cpp
+src/bloom/*.cpp
+src/data_persistence/*.cpp
+tests/*.cpp
+tests/utils_tests/*.cpp
+)
+# For compiling the tests
+add_executable(runTests ${TEST_FILES})
+
+# For compiling the project itself
+file(GLOB_RECURSE SRC_FILES
+src/*.cpp
+src/utils/*.cpp
+src/bloom/*.cpp
+src/data_persistence/*.cpp
+)
+add_executable(app ${SRC_FILES})
 
 include_directories(src)
 include_directories(src/data_persistence)
