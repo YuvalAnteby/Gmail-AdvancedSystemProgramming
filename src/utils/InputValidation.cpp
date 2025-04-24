@@ -70,16 +70,17 @@ bool containsOnlyDigitsAndWhitespace(const std::string& line) {
  */
 bool hasValidCommandStructure(const std::string& line) {
     std::istringstream iss(line);
-    std::string token;
-    bool first = true;
-
-    while (iss >> token) {
-        if (!first && token != "1" && token != "2")
-            return false;
-        first = false;
-    }
-
-    return !first;
+    std::string command, url;
+    // No command number was provided
+    if (!(iss >> command)) 
+        return false;
+    // If the command doesnt start with 1 or 2 its invalid
+    if (command != "1" && command != "2") 
+        return false;
+    // require at least a second token (the URL)
+    if (!(iss >> url)) 
+        return false; 
+    return true;
 } 
 
 /**
