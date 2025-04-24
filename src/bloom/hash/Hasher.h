@@ -2,6 +2,7 @@
 #define HASHER_H
 
 #include <string>
+#include <vector>
 
 /**
  * @class Hasher

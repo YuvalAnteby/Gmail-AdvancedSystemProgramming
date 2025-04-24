@@ -1,10 +1,10 @@
 // Author(s): Yuval Anteby
 #include "InsertUrlCommand.h"
-#include "Hash/Hasher.h"
+#include "hash/Hasher.h"
 
 // Default constructor
-InsertUrlCommand::InsertUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size): url(url), persistence(persistence) configInts(configInts) size(size) {
-}
+InsertUrlCommand::InsertUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size)
+: url(url), persistence(persistence), configInts(configInts), size(size) {}
 
 /**
  * Excute the insertion command.
@@ -13,10 +13,10 @@ InsertUrlCommand::InsertUrlCommand(const std::string& url, IDataPersistence& per
 void InsertUrlCommand::execute() {
     persistence.appendBlacklistedUrl(url);
     std::vector<int> insertConfing = {size};
-    insercofing.insert(insercofing.end(), original.begin(), original.end());    
-    persistence.appendConfigInts(insercofing);
-    Hasher hasher;
-    persistence.appendBitArray(hasher->buildHashedArray(url, size, configInts));
+    insertConfing.insert(insertConfing.end(), configInts.begin(), configInts.end());
+    persistence.appendConfigInts(insertConfing);
+    Hasher hasher(url);
+    persistence.appendBitArray(hasher.buildHashedArray(url, size, configInts));
     /// TODO: implement insertion to the bloom filter here
     /// Example:
     //std::vector<bool> bits = getHashFunctions::hashUrlToBits(url);  

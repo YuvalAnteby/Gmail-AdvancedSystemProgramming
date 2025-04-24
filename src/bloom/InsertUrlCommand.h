@@ -13,6 +13,8 @@ class InsertUrlCommand : public IBloomCommand {
 private:
     std::string url;
     IDataPersistence& persistence;
+    std::vector<int> configInts;
+    int size; 
 
 public:
     /**
