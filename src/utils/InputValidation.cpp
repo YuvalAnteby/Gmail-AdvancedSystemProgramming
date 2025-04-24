@@ -45,7 +45,7 @@ bool isValidFirstLine(const std::string& line) {
  * @return true if the URL is of a valid regex
  */
 bool isValidURL(const std::string& url) {
-    const std::regex pattern(R"(^(http|https):\/\/[a-zA-Z0-9\-\.]+\.[a-z]{2,}([\/\w\.-])\/?$)");
+    const std::regex pattern(R"(^((https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,})(\/\S*)?$)");
     return std::regex_match(url, pattern);
 }
 
