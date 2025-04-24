@@ -47,8 +47,9 @@ bool possiblyContains(
  */
 void CheckUrlCommand::execute() {
     if(possiblyContains(url, persistence->getBitSizeConfig, persistence->loadConfigInts(), persistence->loadBitArrays()) == true){
-        std::cout << "true" << std::endl;
-        
+        std::cout << "true ";
+        // TODO: check if the  url is in the data
+
     }
      else {
     std::cout << "false" << std::endl;
