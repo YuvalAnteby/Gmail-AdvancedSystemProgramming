@@ -14,23 +14,24 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# For compiling the tests (exclude main.cpp)
+# For compiling the project itself
 file(GLOB_RECURSE TEST_FILES
-  src/*.cpp
-  src/bloom/*.cpp
-  src/data_persistence/*.cpp
-  src/hash/*.cpp
-  tests/bloom_test/*.cpp
-  tests/*.cpp
+
+src/utils/*.cpp
+src/bloom/*.cpp
+src/data_persistence/*.cpp
+tests/*.cpp
+tests/utils_tests/*.cpp
 )
-list(FILTER TEST_FILES EXCLUDE REGEX ".*main.cpp$")
+# For compiling the tests
 add_executable(runTests ${TEST_FILES})
 
 # For compiling the project itself
 file(GLOB_RECURSE SRC_FILES
-  src/*.cpp
-  src/bloom/*.cpp
-  src/data_persistence/*.cpp
+src/*.cpp
+src/utils/*.cpp
+src/bloom/*.cpp
+src/data_persistence/*.cpp
 )
 add_executable(app ${SRC_FILES})
 
