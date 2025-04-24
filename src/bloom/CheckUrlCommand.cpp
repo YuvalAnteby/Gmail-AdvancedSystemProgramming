@@ -1,6 +1,6 @@
 // Author(s): Yuval Anteby
 #include "CheckUrlCommand.h"
-#include "Hash/HashFunctions.h"
+#include "hash/Hasher.h"
 
 // Default constructor
 CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence) : url(url), persistence(persistence), result(false) {}
@@ -40,7 +40,16 @@ bool possiblyContains(
 
     return false;
 }
-
+//  This function checks if the given url matches any string in the list
+bool matchesURL(const std::string& url, const std::vector<std::string>& list) {
+    // check each string in the vector
+    for (const auto& str : list) {
+        if (str == url) {
+            return true;// Match found
+        }
+    }
+    return false;
+}
 /**
  * Excute the check URL command.
  * Will call relevant functions to check if a given URL is in the blooom filter.
@@ -48,7 +57,13 @@ bool possiblyContains(
 void CheckUrlCommand::execute() {
     if(possiblyContains(url, persistence->getBitSizeConfig, persistence->loadConfigInts(), persistence->loadBitArrays()) == true){
         std::cout << "true ";
-        // TODO: check if the  url is in the data
+        // check its a false positives by checking the url in the data.
+       if (matchesURL(url, persistence->loadBlacklist())){
+       return true;
+       else{
+        return false;
+       }
+    }
 
     }
      else {
