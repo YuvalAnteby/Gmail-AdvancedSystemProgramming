@@ -15,6 +15,13 @@ private:
     IDataPersistence& persistence;
     bool result;
 
+    bool possiblyContains(
+        const std::string& url,
+        int size,
+        const std::vector<int>& counts,
+        const std::vector<std::vector<bool>>& candidates
+    );
+
 public:
     /**
      * Constructor
