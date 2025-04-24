@@ -80,4 +80,5 @@ void handleUserChoice(const std::string& line, int firstInt, std::vector<int> co
         CheckUrlCommand checkUrlCommand(url, *dataSource);
         invoker.runCommand(checkUrlCommand);
     }
+    delete dataSource;
 }
