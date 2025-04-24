@@ -5,8 +5,7 @@
 
 /**
  * @class Hasher
- * @brief A class that performs recursive hashing on a base string value.
- *
+ * A class that performs recursive hashing on a base string value.
  * This class allows repeated application of std::hash on a given base string.
  * It is useful when simulating Bloom filter behavior or when applying multiple
  * hash functions by iterating a single hash function multiple times.
@@ -20,7 +19,7 @@ public:
     Hasher(const std::string& base);
 
     /**
-     * @brief Computes the hash value of the base string after applying the hash function n times.
+     * Computes the hash value of the base string after applying the hash function n times.
      *
      * For example:
      * - hashN(1) = hash(base)
@@ -31,6 +30,8 @@ public:
      * @return The final hash value after n recursive hash applications.
      */
     size_t hashN(int n) const;
+
+    std::vector<bool> buildHashedArray(const std::string& url, int size, const std::vector<int>& counts);
 
 private:
     std::string baseValue; ///< The base string used for hashing.
