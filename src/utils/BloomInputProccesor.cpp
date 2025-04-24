@@ -55,6 +55,7 @@ std::vector<int> processConfigInts(const std::string& newLine) {
  * @param line string of the user's choice of command & the url string
  */
 void handleUserChoice(const std::string& line, int firstInt, std::vector<int> configInts) {
+    std::cout << handleUserChoice << std::endl;
     // Make sure the line's length is more than 3 to access the URL
     if (line.size() < 3) {
         return;

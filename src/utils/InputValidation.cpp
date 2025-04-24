@@ -92,6 +92,7 @@ bool hasValidCommandStructure(const std::string& line) {
  * @return true if the line is valid (has choice & valid URL), otherwise false
  */
 bool isValidLine(const std::string& line) {
+    std::cout << "is line empty? -" << line.empty() << "contains only digits & spaces? -" <<  containsOnlyDigitsAndWhitespace(line) << "has valid command struct? -" << hasValidCommandStructure(line) << std::endl; // TODO: remove debug print
     return !line.empty() &&
            containsOnlyDigitsAndWhitespace(line) &&
            hasValidCommandStructure(line);

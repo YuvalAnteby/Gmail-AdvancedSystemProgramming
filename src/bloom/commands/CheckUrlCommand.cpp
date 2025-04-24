@@ -8,7 +8,9 @@
 
 // Default constructor
 CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence)
-    : url(url), persistence(persistence), result(false) {}
+    : url(url), persistence(persistence), result(false) {
+        std::cout << "check URL created" << std::endl; // TODO: remove debug print
+    }
 
 /**
  * Checks if a hashed representation of a string is possibly contained in a Bloom filter.

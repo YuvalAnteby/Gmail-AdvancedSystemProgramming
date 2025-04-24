@@ -15,8 +15,9 @@ int main() {
     bool firstLineFlag = true; // true if we're waiting for first line input
     while (std::getline(std::cin, line)) {
         std::cout << "while start" << std::endl; // TODO: remove debug print
+        std::cout << "flag: " << firstLineFlag << std::endl; // TODO: remove debug print
         // Skip to next line if the first line was invalid
-        if (firstLineFlag && !isValidFirstLine(line)) {
+        if (firstLineFlag && !containsOnlyDigitsAndWhitespace(line) && !isValidFirstLine(line)) {
             continue;
         }
         int firstInt;
@@ -31,7 +32,7 @@ int main() {
         
         // Update the first line flag - we can wait for user's command
         firstLineFlag = false;
-        if (isValidLine(line) && !firstLineFlag) {
+        if (hasValidCommandStructure(line) && !firstLineFlag) {
             handleUserChoice(line, firstInt, configInts);
         }
     }

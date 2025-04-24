@@ -1,10 +1,13 @@
 // Author(s): Yuval Anteby
+#include <iostream> //TODO: remove
 #include "InsertUrlCommand.h"
 #include "bloom/hash/Hasher.h"
 
 // Default constructor
 InsertUrlCommand::InsertUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size)
-: url(url), persistence(persistence), configInts(configInts), size(size) {}
+: url(url), persistence(persistence), configInts(configInts), size(size) {
+    std::cout << "insert URL created" << std::endl; // TODO: remove debug print
+}
 
 /**
  * Excute the insertion command.
