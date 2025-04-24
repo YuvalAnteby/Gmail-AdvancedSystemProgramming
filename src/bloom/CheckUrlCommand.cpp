@@ -58,11 +58,12 @@ void CheckUrlCommand::execute() {
     if(possiblyContains(url, persistence->getBitSizeConfig, persistence->loadConfigInts(), persistence->loadBitArrays()) == true){
         std::cout << "true ";
         // check its a false positives by checking the url in the data.
-       if matchesURL(url, persistence->loadBlacklist()) == true;
+       if (matchesURL(url, persistence->loadBlacklist())){
        return true;
        else{
         return false;
        }
+    }
 
     }
      else {
