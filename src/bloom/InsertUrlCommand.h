@@ -13,6 +13,8 @@ class InsertUrlCommand : public IBloomCommand {
 private:
     std::string url;
     IDataPersistence& persistence;
+    std::vector<int> configInts;
+    int size; 
 
 public:
     /**
@@ -20,7 +22,7 @@ public:
      * @param url a URL to be inserted to the bloom filter
      * @param persistence reference to the data management tool to insert to (e.g. .txt file or DB)
      */
-    InsertUrlCommand(const std::string& url, IDataPersistence& persistence);
+    InsertUrlCommand(const std::string& url, IDataPersistence& persistence,const std::vector<int>& configInts, int size);
     // excute insertion command 
     void execute() override;
 };
