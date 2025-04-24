@@ -21,5 +21,7 @@ std::vector<int> processConfigInts(const std::string& newLine);
  * - If it starts with '1', add the URL
  * - If it starts with '2', check against the blacklist
  * @param line string of the user's choice of command & the url string
+ * @param firstInt
+ * @param configInts
  */
-void handleUserChoice(const std::string& line);
+void handleUserChoice(const std::string& line, int firstInt, std::vector<int> configInts);

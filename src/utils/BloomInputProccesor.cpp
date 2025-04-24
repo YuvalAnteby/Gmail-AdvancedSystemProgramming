@@ -54,7 +54,7 @@ std::vector<int> processConfigInts(const std::string& newLine) {
  * - If it starts with '2', check against the blacklist
  * @param line string of the user's choice of command & the url string
  */
-void handleUserChoice(const std::string& line) {
+void handleUserChoice(const std::string& line, int firstInt, std::vector<int> configInts) {
     // Make sure the line's length is more than 3 to access the URL
     if (line.size() < 3) {
         return;
@@ -74,7 +74,7 @@ void handleUserChoice(const std::string& line) {
 
     // Check what option the user chose, execute the correct command
     if (line[0] == '1') {
-        InsertUrlCommand insertUrlCommand(url, *dataSource);
+        InsertUrlCommand insertUrlCommand(url, *dataSource, configInts, firstInt);
         invoker.runCommand(insertUrlCommand);
     } else if (line[0] == '2') {
         CheckUrlCommand checkUrlCommand(url, *dataSource);

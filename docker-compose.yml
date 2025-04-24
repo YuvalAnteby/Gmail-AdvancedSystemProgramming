@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: gmail_app
+    stdin_open: true     # <-- keeps stdin open
+    tty: true            # <-- allocates a pseudo-TTY
 
   gtest:
     build:

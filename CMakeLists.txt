@@ -16,7 +16,6 @@ FetchContent_MakeAvailable(googletest)
 
 # For compiling the project itself
 file(GLOB_RECURSE TEST_FILES
-
 src/utils/*.cpp
 src/bloom/*.cpp
 src/data_persistence/*.cpp
@@ -31,6 +30,7 @@ file(GLOB_RECURSE SRC_FILES
 src/*.cpp
 src/utils/*.cpp
 src/bloom/*.cpp
+src/bloom/hash/*.cpp
 src/data_persistence/*.cpp
 )
 add_executable(app ${SRC_FILES})
