@@ -18,7 +18,7 @@ FetchContent_MakeAvailable(googletest)
 # For compiling the tests
 add_executable(
   runTests
-  tests/test_main.cpp
+  tests/check_url_tests/url_tests.cpp
   tests/data_persistence_tests/FilePersistenceTests.cpp
   src/data_persistence/FilePersistence.cpp
 )
