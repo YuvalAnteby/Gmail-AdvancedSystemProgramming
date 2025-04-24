@@ -10,7 +10,7 @@
  * @return true if valid numbers were found and no invalid characters existed between them.
  * Otherwise, returns false, prints "FALSE"
  */
-bool processLine(const std::string& line) {
+bool isValidFirstLine(const std::string& line) {
     std::istringstream iss(line);
     std::string token;
     bool hasDigits = false;
@@ -38,6 +38,7 @@ bool processLine(const std::string& line) {
     // No numbers found, line is ignored
     return {};
 }
+
 /**
  * Check if the URL is valid using a basic regex pattern.
  * @param url string of a URL to be checked
@@ -79,7 +80,7 @@ bool hasValidCommandStructure(const std::string& line) {
     }
 
     return !first;
-}
+} 
 
 /**
  * Validate line before processing:
