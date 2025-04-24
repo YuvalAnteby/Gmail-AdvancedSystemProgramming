@@ -1,6 +1,6 @@
 // Author(s): Yuval Anteby
 #include "CheckUrlCommand.h"
-#include "Hash/HashFunctions.h"
+#include "Hash/Hasher.h"
 
 // Default constructor
 CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence) : url(url), persistence(persistence), result(false) {}
