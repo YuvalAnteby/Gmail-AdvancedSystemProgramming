@@ -6,10 +6,10 @@
 #include <string>
 #include <algorithm>
 
+
 // Default constructor
 CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence)
     : url(url), persistence(persistence), result(false) {
-        std::cout << "check URL created" << std::endl; // TODO: remove debug print
     }
 
 /**
@@ -21,6 +21,10 @@ bool CheckUrlCommand::possiblyContains(
     const std::vector<int>& counts,
     const std::vector<std::vector<bool>>& candidates
 ) {
+    // There are no bits in file
+    if(candidates.size() == 0) {
+        return false;
+    }
     Hasher hasher(url);
     std::vector<bool> hashedArray = hasher.buildHashedArray(url, size, counts);
 
@@ -42,10 +46,7 @@ bool CheckUrlCommand::possiblyContains(
 /**
  * Checks if the given url matches any string in the list.
  */
-bool CheckUrlCommand::matchesURL(
-    const std::string& url,
-    const std::vector<std::string>& list
-) {
+bool CheckUrlCommand::matchesURL(const std::string& url, const std::vector<std::string>& list) {
     return std::find(list.begin(), list.end(), url) != list.end();
 }
 
@@ -54,17 +55,21 @@ bool CheckUrlCommand::matchesURL(
  * Prints "true " if possibly contains and checks blacklist for true/false result.
  */
 void CheckUrlCommand::execute() {
+    std::cout << "----- DEBUG: executing check option -----" << std::endl; // TODO: remove debug print
     if (possiblyContains(url,
         persistence.getBitSizeConfig(),
         persistence.loadConfigInts(),
         persistence.loadBitArrays()) == true) {
         std::cout << "true ";
         if (matchesURL(url, persistence.loadBlacklist())) {
+            std::cout << "true" << std::endl;
             result = true;
         } else {
             result = false;
+            std::cout << "false" << std::endl;
         }
     } else {
+        std::cout << "false" << std::endl;
         result = false;
     }
 }

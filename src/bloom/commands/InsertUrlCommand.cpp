@@ -6,7 +6,7 @@
 // Default constructor
 InsertUrlCommand::InsertUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size)
 : url(url), persistence(persistence), configInts(configInts), size(size) {
-    std::cout << "insert URL created" << std::endl; // TODO: remove debug print
+
 }
 
 /**
@@ -20,9 +20,4 @@ void InsertUrlCommand::execute() {
     persistence.appendConfigInts(insertConfing);
     Hasher hasher(url);
     persistence.appendBitArray(hasher.buildHashedArray(url, size, configInts));
-    /// TODO: implement insertion to the bloom filter here
-    /// Example:
-    //std::vector<bool> bits = getHashFunctions::hashUrlToBits(url);  
-    //persistence.appendBitArray(bits);
-    //persistence.appendBlacklistedUrl(url);
 }
