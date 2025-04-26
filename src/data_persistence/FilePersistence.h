@@ -12,9 +12,10 @@
 class FilePersistence : public IDataPersistence {
 private:
     // Default paths for the .txt files.
-    const std::string bitArrayPath = "data/bloom_bits.txt";
-    const std::string blacklistPath = "data/blacklist.txt";
-    const std::string configIntsPath = "data/config_bloom.txt";
+    const std::string bitArrayPath = "/usr/src/app/data/bloom_bits.txt";
+    const std::string blacklistPath = "/usr/src/app/data/blacklist.txt";
+    const std::string configIntsPath = "/usr/src/app/data/config_bloom.txt";
+
 
 public:
     // Default Constructor
