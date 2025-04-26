@@ -13,6 +13,8 @@ class CheckUrlCommand : public IBloomCommand {
 private:
     std::string url;
     IDataPersistence& persistence;
+    std::vector<int> configInts;
+    int size; 
     bool result;
 
     bool possiblyContains(
@@ -21,6 +23,7 @@ private:
         const std::vector<int>& counts,
         const std::vector<std::vector<bool>>& candidates
     );
+
     bool matchesURL(const std::string& url, const std::vector<std::string>& list);
 
 public:
@@ -30,6 +33,13 @@ public:
      * @param persistence reference to the data management tool to check with (e.g. .txt file or DB)
      */
     CheckUrlCommand(const std::string& url, IDataPersistence& persistence);
+
+    /**
+     * Constructor
+     * @param url a URL we want to check if is in the bloom filter
+     * @param persistence reference to the data management tool to check with (e.g. .txt file or DB)
+     */
+    CheckUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size);
     /**
     * Excute the check URL command.
     * Will call relevant functions to check if a given URL is in the blooom filter.

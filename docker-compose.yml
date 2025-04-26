@@ -4,9 +4,16 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: gmail_app
+    stdin_open: true     # <-- keeps stdin open
+    tty: true            # <-- allocates a pseudo-TTY
+    volumes:
+      - app_data:/usr/src/app  # <-- only the "data" folder is persisted between runs
 
   gtest:
     build:
       context: .
       dockerfile: Dockerfile.test
     container_name: gmail_tests
+
+volumes:
+  app_data:   # <-- define the named volume

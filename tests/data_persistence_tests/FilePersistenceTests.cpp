@@ -8,6 +8,7 @@
 const std::string testBitsPath = "data/bloom_bits.txt";
 const std::string testUrlsPath = "data/blacklist.txt";
 const std::string testConfigIntsPath = "data/config_bloom.txt";
+
 /**
  * Delete files upon finishing the test
  */
@@ -21,8 +22,8 @@ void deleteFiles() {
  * Test for the case of trying to load data from the Bloom Filter file but it doesn't exist.
  * Expecting to have new file created and no errors.
  */
-TEST(loadBitArrays, LoadingNoFileExistsBloomFilter)
-{
+TEST(loadBitArrays, LoadingNoFileExistsBloomFilter){
+    void deleteFiles();
     IDataPersistence *fp = new FilePersistence();
     // Make sure the file is deleted (if it exists)
     std::remove(testBitsPath.c_str());
@@ -36,8 +37,8 @@ TEST(loadBitArrays, LoadingNoFileExistsBloomFilter)
  * Test for the case of trying to load data from the URLs file but it doesn't exist.
  * Expecting to have new file created and no errors.
  */
-TEST(loadBlacklist, LoadingNoFileExistsUrls)
-{
+TEST(loadBlacklist, LoadingNoFileExistsUrls) {
+    void deleteFiles();
     IDataPersistence *fp = new FilePersistence();
     // Make sure the file is deleted (if it exists)
     std::remove(testUrlsPath.c_str());
@@ -52,8 +53,8 @@ TEST(loadBlacklist, LoadingNoFileExistsUrls)
  * Test for the case of trying to load empty data file of the Bloom Filter.
  * Expecting to have no errors.
  */
-TEST(loadBitArrays, LoadingEmptyBloomFilter)
-{
+TEST(loadBitArrays, LoadingEmptyBloomFilter) {
+    void deleteFiles();
     // Make sure the file exists and empty
     std::ofstream file(testBitsPath.c_str());
     file.close();
@@ -69,8 +70,8 @@ TEST(loadBitArrays, LoadingEmptyBloomFilter)
  * Test for the case of trying to load empty data file of the blacklisted URLs file.
  * Expecting to have no errors.
  */
-TEST(loadBlacklist, LoadingEmptyUrls)
-{
+TEST(loadBlacklist, LoadingEmptyUrls) {
+    void deleteFiles();
     // Make sure the file exists and empty
     std::ofstream file(testUrlsPath.c_str());
     file.close();
@@ -88,8 +89,8 @@ TEST(loadBlacklist, LoadingEmptyUrls)
  * Test appending new bits arrays to the bloom filter file.
  * Expecting to have all bits arrays in file.
  */
-TEST(appendBitArray, AppendingBloomFilter)
-{
+TEST(appendBitArray, AppendingBloomFilter) {
+    void deleteFiles();
     // Delete old version of the file
     std::remove(testBitsPath.c_str());
     IDataPersistence *fp = new FilePersistence();
@@ -98,8 +99,7 @@ TEST(appendBitArray, AppendingBloomFilter)
         {1, 0, 1, 1, 0},
         {0, 0, 1, 1, 1},
         {1, 0, 0, 0, 0, 0, 0, 0}};
-    for (const std::vector<bool> &bits : originalBits)
-    {
+    for (const std::vector<bool> &bits : originalBits) {
         fp->appendBitArray(bits);
     }
     // Load the file
@@ -113,8 +113,8 @@ TEST(appendBitArray, AppendingBloomFilter)
  * Test appending new string URL to the URLs file.
  * Expecting to have all URLs in file.
  */
-TEST(appendBlacklistedUrl, AppendingUrl)
-{
+TEST(appendBlacklistedUrl, AppendingUrl) {
+    void deleteFiles();
     // Delete old version of the file
     std::remove(testUrlsPath.c_str());
     IDataPersistence *fp = new FilePersistence();
@@ -138,8 +138,8 @@ TEST(appendBlacklistedUrl, AppendingUrl)
  * Test the saving funcionality when the input of the bloom filter bits is empty.
  * Expecting an error to be thrown.
  */
-TEST(appendBitArray, EmptyBitsInput)
-{
+TEST(appendBitArray, EmptyBitsInput) {
+    void deleteFiles();
     // Create the empty bit array and try to save it
     std::vector<bool> bits = {};
     IDataPersistence *fp = new FilePersistence();
@@ -152,8 +152,8 @@ TEST(appendBitArray, EmptyBitsInput)
  * Test the saving funcionality when the input of a URL is empty.
  * Expecting an error to be thrown.
  */
-TEST(appendBlacklistedUrl, EmptyUrlInput)
-{
+TEST(appendBlacklistedUrl, EmptyUrlInput) {
+    void deleteFiles();
     // Create the empty urls array and try to save it
     std::string url = "";
     IDataPersistence *fp = new FilePersistence();
@@ -166,8 +166,8 @@ TEST(appendBlacklistedUrl, EmptyUrlInput)
  * Test for the case of trying to load data from the Bloom Filter config file but it doesn't exist.
  * Expecting to have new file created and no errors.
  */
-TEST(loadConfigInts, LoadingNoFileExistsConfigBloomFilter)
-{
+TEST(loadConfigInts, LoadingNoFileExistsConfigBloomFilter) {
+    void deleteFiles();
     IDataPersistence *fp = new FilePersistence();
     // Make sure the file is deleted (if it exists)
     std::remove(testConfigIntsPath.c_str());
@@ -182,8 +182,8 @@ TEST(loadConfigInts, LoadingNoFileExistsConfigBloomFilter)
  * Test for the case of trying to load empty data file of the config ints.
  * Expecting to have no errors.
  */
-TEST(loadConfigInts, LoadingEmptyConfigFile)
-{
+TEST(loadConfigInts, LoadingEmptyConfigFile) {
+    void deleteFiles();
     // Make sure the file exists and empty
     std::ofstream file(testConfigIntsPath.c_str());
     file.close();
@@ -200,8 +200,8 @@ TEST(loadConfigInts, LoadingEmptyConfigFile)
  * Test appending new ints arrays to the bloom filter config file.
  * Expecting to have the entire ints array in file (exactly as before insertion).
  */
-TEST(appendConfigInts, AppendingConfigInts)
-{
+TEST(appendConfigInts, AppendingConfigInts) {
+    void deleteFiles();
     // Delete old version of the file
     std::remove(testConfigIntsPath.c_str());
     IDataPersistence *fp = new FilePersistence();
@@ -222,8 +222,8 @@ TEST(appendConfigInts, AppendingConfigInts)
  * Test the saving funcionality when the input of the bloom filter config integers is empty.
  * Expecting an error to be thrown.
  */
-TEST(appendConfigInts, EmptyConfigIntsInput)
-{
+TEST(appendConfigInts, EmptyConfigIntsInput) {
+    void deleteFiles();
     // Create the empty bit array and try to save it
     std::vector<int> ints = {};
     IDataPersistence *fp = new FilePersistence();
