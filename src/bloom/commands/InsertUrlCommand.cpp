@@ -1,5 +1,4 @@
 // Author(s): Yuval Anteby
-#include <iostream> //TODO: remove
 #include "InsertUrlCommand.h"
 #include "bloom/hash/Hasher.h"
 
