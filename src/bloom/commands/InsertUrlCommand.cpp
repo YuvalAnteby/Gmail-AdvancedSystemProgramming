@@ -14,10 +14,9 @@ InsertUrlCommand::InsertUrlCommand(const std::string& url, IDataPersistence& per
  * Will call relevant functions to insert the new URL to the blooom filter.
  */
 void InsertUrlCommand::execute() {
+    // Insert URL
     persistence.appendBlacklistedUrl(url);
-    std::vector<int> insertConfing = {size};
-    insertConfing.insert(insertConfing.end(), configInts.begin(), configInts.end());
-    persistence.appendConfigInts(insertConfing);
+    // Hash and insert the bit array
     Hasher hasher(url);
     persistence.appendBitArray(hasher.buildHashedArray(url, size, configInts));
 }

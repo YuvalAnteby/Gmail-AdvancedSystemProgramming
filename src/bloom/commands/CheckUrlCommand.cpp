@@ -1,4 +1,4 @@
-// Author(s): Yuval Anteby
+// Author(s): Yuval Anteby, Roee Chaim
 #include "CheckUrlCommand.h"
 #include "bloom/hash/Hasher.h"
 #include <iostream>
@@ -8,9 +8,13 @@
 
 
 // Default constructor
-CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence)
-    : url(url), persistence(persistence), result(false) {
+CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size)
+    : url(url), persistence(persistence), configInts(configInts), size(size), result(false) {
     }
+
+// Constructor for tests
+CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence)
+    : url(url), persistence(persistence), result(false) {}
 
 /**
  * Checks if a hashed representation of a string is possibly contained in a Bloom filter.
@@ -21,10 +25,6 @@ bool CheckUrlCommand::possiblyContains(
     const std::vector<int>& counts,
     const std::vector<std::vector<bool>>& candidates
 ) {
-    // There are no bits in file
-    if(candidates.size() == 0) {
-        return false;
-    }
     Hasher hasher(url);
     std::vector<bool> hashedArray = hasher.buildHashedArray(url, size, counts);
 
@@ -56,10 +56,9 @@ bool CheckUrlCommand::matchesURL(const std::string& url, const std::vector<std::
  */
 void CheckUrlCommand::execute() {
     //std::cout << "----- DEBUG: executing check option -----" << std::endl; // TODO: remove debug print
-    if (possiblyContains(url,
-        persistence.getBitSizeConfig(),
-        persistence.loadConfigInts(),
-        persistence.loadBitArrays()) == true) {
+    std::vector<std::vector<bool>> bitsArrays = persistence.loadBitArrays();
+
+    if (possiblyContains(url, size, configInts, bitsArrays) == true) {
         std::cout << "true ";
         if (matchesURL(url, persistence.loadBlacklist())) {
             std::cout << "true" << std::endl;

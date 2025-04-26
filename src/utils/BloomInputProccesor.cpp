@@ -54,7 +54,7 @@ std::vector<int> processConfigInts(const std::string& newLine) {
  * - If it starts with '2', check against the blacklist
  * @param line string of the user's choice of command & the url string
  */
-void handleUserChoice(const std::string& line, int firstInt, const std::vector<int> configInts) {
+void handleUserChoice(const std::string& line, int firstInt, const std::vector<int> configInts, IDataPersistence& dataSource) {
     //std::cout << "----- DEBUG: handleUserChoice -----" << std::endl; // TODO: remove debug print
     // Make sure the line's length is more than 3 to access the URL
     if (line.size() < 3) {
@@ -67,8 +67,6 @@ void handleUserChoice(const std::string& line, int firstInt, const std::vector<i
         //std::cout << "false" << std::endl;
         return;
     }
-    // Create the data persistence object according to data source (this time we use files)
-    IDataPersistence* dataSource = new FilePersistence();
     // Create the invoker for the commands
     BloomCommandInvoker invoker;
     // TODO: add to commands' constructors the config ints vector and the bit array size int
@@ -76,12 +74,11 @@ void handleUserChoice(const std::string& line, int firstInt, const std::vector<i
     // Check what option the user chose, execute the correct command
     if (line[0] == '1') {
         //std::cout << "----- DEBUG: chosen 1 -----" << std::endl; // TODO: remove debug print
-        InsertUrlCommand insertUrlCommand(url, *dataSource, configInts, firstInt);
+        InsertUrlCommand insertUrlCommand(url, dataSource, configInts, firstInt);
         invoker.runCommand(insertUrlCommand);
     } else if (line[0] == '2') {
         //std::cout << "----- DEBUG: chosen 2 -----" << std::endl; // TODO: remove debug print
-        CheckUrlCommand checkUrlCommand(url, *dataSource);
+        CheckUrlCommand checkUrlCommand(url, dataSource, configInts, firstInt);
         invoker.runCommand(checkUrlCommand);
     }
-    delete dataSource;
 }

@@ -42,6 +42,7 @@ std::vector<std::vector<bool>> FilePersistence::loadBitArrays() {
  * @param vector of bit array to save.
  */
 void FilePersistence::appendBitArray(const std::vector<bool> &bits) {
+    std::cout << "DEBUG: started appending bit array" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (bits.empty()) {
         throw std::invalid_argument("Can't add an empty bit array");
@@ -54,6 +55,7 @@ void FilePersistence::appendBitArray(const std::vector<bool> &bits) {
     }
     // End the line (new bit array)
     file << '\n';
+    std::cout << "DEBUG: finished appending bit array" << std::endl; //TODO: remove debug print
     file.close();
 }
 
@@ -83,6 +85,7 @@ std::vector<std::string> FilePersistence::loadBlacklist() {
  * @param urls The URL to save.
  */
 void FilePersistence::appendBlacklistedUrl(const std::string &url) {
+    std::cout << "DEBUG: started appending URL" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (url.empty()) {
         throw std::invalid_argument("Can't add an empty string URL");
@@ -93,6 +96,7 @@ void FilePersistence::appendBlacklistedUrl(const std::string &url) {
     // End the line (new URL)
     file << '\n';
     file.close();
+    std::cout << "DEBUG: finished appending URL" << std::endl; //TODO: remove debug print
 }
 
 /**
@@ -124,6 +128,7 @@ std::vector<int> FilePersistence::loadConfigInts() {
 * @return A vector where the first int is bit array size (first int in the input), the rest are how many times to run hash function
 */
 void FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
+    std::cout << "DEBUG: started appending config ints" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (configInts.empty()) {
         throw std::invalid_argument("Can't add an empty config array");
@@ -137,6 +142,7 @@ void FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
         file << '\n';
     }
     file.close();
+    std::cout << "DEBUG: finished appending config ints" << std::endl; //TODO: remove debug print
 }
 
 /**

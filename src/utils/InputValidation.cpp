@@ -3,6 +3,7 @@
 #include <cctype>
 #include <algorithm>
 #include <regex>
+#include "data_persistence/IDataPersistence.h"
 
 /**
  * Processes a line of input.
@@ -88,6 +89,25 @@ bool hasValidCommandStructure(const std::string& line) {
         return false; 
     return true;
 } 
+
+/**
+ * TODO: comments
+ */
+bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence& persistence) {
+    int loadedFirstInt = persistence.getBitSizeConfig();
+    std::vector<int> loadedConfigInts = persistence.loadConfigInts();
+    if(loadedFirstInt == NULL || loadedConfigInts.empty()) {
+        // There are no config ints saved, insert them now
+        std::vector<int> insertConfing = {firstInt};
+        insertConfing.insert(insertConfing.end(), configInts.begin(), configInts.end());
+        persistence.appendConfigInts(insertConfing);
+        return true;
+    }
+    if((loadedFirstInt != firstInt) || (configInts != loadedConfigInts)) {
+        return false;
+    }
+    return true;
+}
 
 /**
  * Validate line before processing:

@@ -1,4 +1,5 @@
 // Author(s): Dor Darmon, Yuval Anteby
+#include "data_persistence/IDataPersistence.h"
 #ifndef INPUT_VALIDATION_H
 #define INPUT_VALIDATION_H
 
@@ -31,6 +32,15 @@ bool containsOnlyDigitsAndWhitespace(const std::string& line);
  * @return true if the choice of the valid options (for now 1 or 2), otherwise false
  */
 bool hasValidCommandStructure(const std::string& line);
+
+/**
+ * Check if the config ints given by user match the ones we have saved.
+ * If we don't have config ints yet save the given ones.
+ * @param firstInt first int in user's input, its the bit array size
+ * @param configInts the rest of the ints in the user's input
+ * @param persistence data source for the config ints
+ */
+bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence& persistence);
 
 /**
  * Validate line before processing:

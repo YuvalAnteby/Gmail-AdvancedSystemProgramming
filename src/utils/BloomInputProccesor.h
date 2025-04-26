@@ -1,6 +1,11 @@
 // @Author(s): Yuval Anteby
+
+#ifndef BLOOM_INPUT_PROCCESOR_H
+#define BLOOM_INPUT_PROCCESOR_H
+
 #include <iostream>
 #include <vector>
+#include "data_persistence/IDataPersistence.h"
 
 /**
  * Get the first number from the first line as a string, edit the line string to skip it.
@@ -23,5 +28,8 @@ std::vector<int> processConfigInts(const std::string& newLine);
  * @param line string of the user's choice of command & the url string
  * @param firstInt
  * @param configInts
+ * @param persistence
  */
-void handleUserChoice(const std::string& line, int firstInt, std::vector<int> configInts);
+void handleUserChoice(const std::string& line, int firstInt, std::vector<int> configInts, IDataPersistence& dataSource);
+
+#endif
