@@ -24,5 +24,5 @@ control + c
 ```
 ### Deleting manually the .txt files (in terminal)
 ```bash
-docker run --rm -v gmail-advancedsystemprogramming_app_data:/usr/src/app/build/data alpine sh -c "rm -f /usr/src/app/build/data/*.txt"
+docker run --rm -v gmail-advancedsystemprogramming_app_data:/data alpine sh -c "rm -f /data/build/data/*.txt"
 ```
