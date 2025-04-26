@@ -4,16 +4,20 @@
 ```bash
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
 cd Gmail-AdvancedSystemProgramming
+```
+1. build
+```bash
 docker-compose build app
 ```
-### Testing locally with Docker
-```bash
-docker-compose run --build --rm gtest
-```
-### Running locally with Docker
+2. run
 ```bash
 docker-compose run --rm app
 ```
+3. Deleting manually the .txt files (in terminal)
+```bash
+docker run --rm -v gmail-advancedsystemprogramming_app_data:/data alpine sh -c "rm -f /data/build/data/*.txt"
+```
+
 ### (Reminder) Exiting the docker container
 ```bash
 control + d
@@ -22,7 +26,17 @@ or
 ```bash
 control + c
 ```
-### Deleting manually the .txt files (in terminal)
+
+### Rebuilding the code in case of code errors (deletes .txt files)
 ```bash
-docker run --rm -v gmail-advancedsystemprogramming_app_data:/data alpine sh -c "rm -f /data/build/data/*.txt"
+docker-compose down -v
+docker-compose build app
+docker-compose run --rm app
+```
+
+### Testing locally with Docker
+```bash
+git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
+cd Gmail-AdvancedSystemProgramming
+docker-compose run --build --rm gtest
 ```
