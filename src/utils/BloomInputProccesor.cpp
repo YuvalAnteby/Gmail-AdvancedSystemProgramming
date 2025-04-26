@@ -65,15 +65,12 @@ void handleUserChoice(const std::string& line, int firstInt, const std::vector<i
     }
     // Extract URL after command and space
     std::string url = line.substr(2);  
-    // If the URL is invalid print false
+    // If the URL is invalid - skip this line
     if (!isValidURL(url)) {
-        //std::cout << "false" << std::endl;
         return;
     }
     // Create the invoker for the commands
     BloomCommandInvoker invoker;
-    // TODO: add to commands' constructors the config ints vector and the bit array size int
-
     // Check what option the user chose, execute the correct command
     if (line[0] == '1') {
         //std::cout << "----- DEBUG: chosen 1 -----" << std::endl; // TODO: remove debug print

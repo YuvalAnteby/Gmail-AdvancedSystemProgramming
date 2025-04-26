@@ -49,6 +49,10 @@ bool isValidFirstLine(const std::string& line) {
  * @return true if the URL is of a valid regex
  */
 bool isValidURL(const std::string& url) {
+    //std::cout << "----- DEBUG: isValidURL -----" << std::endl; // TODO: remove debug print
+    if(url.empty()) {
+        return false;
+    }
     const std::regex pattern(R"(^((https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,})(\/\S*)?$)");
     //std::cout << "----- DEBUG: isValidURL? " << std::regex_match(url, pattern) << " -----" << std::endl; // TODO: remove debug print
     return std::regex_match(url, pattern);
@@ -76,6 +80,7 @@ bool containsOnlyDigitsAndWhitespace(const std::string& line) {
  * @return true if the choice of the valid options (for now 1 or 2), otherwise false
  */
 bool hasValidCommandStructure(const std::string& line) {
+    //std::cout << "----- DEBUG: hasValidCommandStructure -----" << std::endl; // TODO: remove debug print
     std::istringstream iss(line);
     std::string command, url;
     // No command number was provided
@@ -87,6 +92,9 @@ bool hasValidCommandStructure(const std::string& line) {
     // require at least a second token (the URL)
     if (!(iss >> url)) 
         return false; 
+    if(url.empty()) {
+        return false;
+    }
     return true;
 } 
 
