@@ -18,12 +18,12 @@ bool isValidFirstLine(const std::string& line) {
     while (iss >> token) {
         // Skip entire line if it starts with letters
         if (!hasDigits && std::any_of(token.begin(), token.end(), ::isalpha)) {
-            std::cout << "----- DEBUG: isValidFirstLine? FALSE (has letters) -----" << std::endl; // TODO: remove debug print
+            //std::cout << "----- DEBUG: isValidFirstLine? FALSE (has letters) -----" << std::endl; // TODO: remove debug print
             return false;
         }
         // If token is not all digits, it's invalid
         if (!std::all_of(token.begin(), token.end(), ::isdigit)) {
-            std::cout << "----- DEBUG: isValidFirstLine? FALSE (not all digits) -----" << std::endl; // TODO: remove debug print
+            //std::cout << "----- DEBUG: isValidFirstLine? FALSE (not all digits) -----" << std::endl; // TODO: remove debug print
             //std::cout << "false" << std::endl;
             return false;
         }
@@ -34,10 +34,10 @@ bool isValidFirstLine(const std::string& line) {
     // If numbers were found, print newline and return true
     if (hasDigits) {
         //std::cout << std::endl;
-        std::cout << "----- DEBUG: isValidFirstLine? TRUE -----" << std::endl; // TODO: remove debug print
+        //std::cout << "----- DEBUG: isValidFirstLine? TRUE -----" << std::endl; // TODO: remove debug print
         return true;
     }
-    std::cout << "----- DEBUG: isValidFirstLine? FALSE (no numbers found) -----" << std::endl; // TODO: remove debug print
+    //std::cout << "----- DEBUG: isValidFirstLine? FALSE (no numbers found) -----" << std::endl; // TODO: remove debug print
     // No numbers found, line is ignored
     return false;
 }
@@ -49,7 +49,7 @@ bool isValidFirstLine(const std::string& line) {
  */
 bool isValidURL(const std::string& url) {
     const std::regex pattern(R"(^((https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,})(\/\S*)?$)");
-    std::cout << "----- DEBUG: isValidURL? " << std::regex_match(url, pattern) << " -----" << std::endl; // TODO: remove debug print
+    //std::cout << "----- DEBUG: isValidURL? " << std::regex_match(url, pattern) << " -----" << std::endl; // TODO: remove debug print
     return std::regex_match(url, pattern);
 }
 
@@ -61,10 +61,10 @@ bool isValidURL(const std::string& url) {
 bool containsOnlyDigitsAndWhitespace(const std::string& line) {
     for (char c : line) {
         if (!std::isdigit(c) && !std::isspace(c))
-            std::cout << "----- DEBUG: containsOnlyDigitsAndWhitespace FALSE -----" << std::endl; // TODO: remove debug print
+            //std::cout << "----- DEBUG: containsOnlyDigitsAndWhitespace FALSE -----" << std::endl; // TODO: remove debug print
             return false;
     }
-    std::cout << "----- DEBUG: containsOnlyDigitsAndWhitespace TRUE -----" << std::endl; // TODO: remove debug print
+    //std::cout << "----- DEBUG: containsOnlyDigitsAndWhitespace TRUE -----" << std::endl; // TODO: remove debug print
     return true;
 }
 

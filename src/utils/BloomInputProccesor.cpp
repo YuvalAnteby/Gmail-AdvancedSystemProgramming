@@ -55,7 +55,7 @@ std::vector<int> processConfigInts(const std::string& newLine) {
  * @param line string of the user's choice of command & the url string
  */
 void handleUserChoice(const std::string& line, int firstInt, const std::vector<int> configInts) {
-    std::cout << "----- DEBUG: handleUserChoice -----" << std::endl; // TODO: remove debug print
+    //std::cout << "----- DEBUG: handleUserChoice -----" << std::endl; // TODO: remove debug print
     // Make sure the line's length is more than 3 to access the URL
     if (line.size() < 3) {
         return;
@@ -75,11 +75,11 @@ void handleUserChoice(const std::string& line, int firstInt, const std::vector<i
 
     // Check what option the user chose, execute the correct command
     if (line[0] == '1') {
-        std::cout << "----- DEBUG: chosen 1 -----" << std::endl; // TODO: remove debug print
+        //std::cout << "----- DEBUG: chosen 1 -----" << std::endl; // TODO: remove debug print
         InsertUrlCommand insertUrlCommand(url, *dataSource, configInts, firstInt);
         invoker.runCommand(insertUrlCommand);
     } else if (line[0] == '2') {
-        std::cout << "----- DEBUG: chosen 2 -----" << std::endl; // TODO: remove debug print
+        //std::cout << "----- DEBUG: chosen 2 -----" << std::endl; // TODO: remove debug print
         CheckUrlCommand checkUrlCommand(url, *dataSource);
         invoker.runCommand(checkUrlCommand);
     }

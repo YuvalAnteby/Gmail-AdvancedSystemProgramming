@@ -55,7 +55,7 @@ bool CheckUrlCommand::matchesURL(const std::string& url, const std::vector<std::
  * Prints "true " if possibly contains and checks blacklist for true/false result.
  */
 void CheckUrlCommand::execute() {
-    std::cout << "----- DEBUG: executing check option -----" << std::endl; // TODO: remove debug print
+    //std::cout << "----- DEBUG: executing check option -----" << std::endl; // TODO: remove debug print
     if (possiblyContains(url,
         persistence.getBitSizeConfig(),
         persistence.loadConfigInts(),
