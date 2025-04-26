@@ -91,12 +91,16 @@ bool hasValidCommandStructure(const std::string& line) {
 } 
 
 /**
- * TODO: comments
+ * Check if a given config is matching the one we have saved already. If there is no config saved - save the given one.
+ * @param firstInt the bit array size
+ * @param configInts array of config integers
+ * @param persistence data source object
+ * @return true if matching or if we saved the new config, otherwise false
  */
 bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence& persistence) {
     int loadedFirstInt = persistence.getBitSizeConfig();
     std::vector<int> loadedConfigInts = persistence.loadConfigInts();
-    if(loadedFirstInt == NULL || loadedConfigInts.empty()) {
+    if(loadedFirstInt == -1 || loadedConfigInts.empty()) {
         // There are no config ints saved, insert them now
         std::vector<int> insertConfing = {firstInt};
         insertConfing.insert(insertConfing.end(), configInts.begin(), configInts.end());
@@ -107,18 +111,4 @@ bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistenc
         return false;
     }
     return true;
-}
-
-/**
- * Validate line before processing:
- * - Not empty
- * - Contains only digits/whitespace
- * - Valid command structure
- * @param line string of the user's choice of command & the url string
- * @return true if the line is valid (has choice & valid URL), otherwise false
- */
-bool isValidLine(const std::string& line) {
-    return !line.empty() &&
-           containsOnlyDigitsAndWhitespace(line) &&
-           hasValidCommandStructure(line);
 }

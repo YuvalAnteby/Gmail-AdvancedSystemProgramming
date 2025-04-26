@@ -7,7 +7,7 @@ services:
     stdin_open: true     # <-- keeps stdin open
     tty: true            # <-- allocates a pseudo-TTY
     volumes:
-      - app_data:/usr/src/app/data  # <-- only the "data" folder is persisted between runs
+      - app_data:/usr/src/app  # <-- only the "data" folder is persisted between runs
 
   gtest:
     build:

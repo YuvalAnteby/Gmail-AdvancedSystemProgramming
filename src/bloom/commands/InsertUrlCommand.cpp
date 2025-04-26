@@ -3,7 +3,13 @@
 #include "InsertUrlCommand.h"
 #include "bloom/hash/Hasher.h"
 
-// Default constructor
+/**
+ * Default constructor
+ * @param url the URL to be checked
+ * @param persistence data source for the bits, URLs and config needed
+ * @param configInts array of ints given by the user for the bloom filter
+ * @param size bit array size
+ */
 InsertUrlCommand::InsertUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size)
 : url(url), persistence(persistence), configInts(configInts), size(size) {
 

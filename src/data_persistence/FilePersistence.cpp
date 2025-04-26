@@ -42,7 +42,7 @@ std::vector<std::vector<bool>> FilePersistence::loadBitArrays() {
  * @param vector of bit array to save.
  */
 void FilePersistence::appendBitArray(const std::vector<bool> &bits) {
-    std::cout << "DEBUG: started appending bit array" << std::endl; //TODO: remove debug print
+    //std::cout << "DEBUG: started appending bit array" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (bits.empty()) {
         throw std::invalid_argument("Can't add an empty bit array");
@@ -55,7 +55,7 @@ void FilePersistence::appendBitArray(const std::vector<bool> &bits) {
     }
     // End the line (new bit array)
     file << '\n';
-    std::cout << "DEBUG: finished appending bit array" << std::endl; //TODO: remove debug print
+    //std::cout << "DEBUG: finished appending bit array" << std::endl; //TODO: remove debug print
     file.close();
 }
 
@@ -85,7 +85,7 @@ std::vector<std::string> FilePersistence::loadBlacklist() {
  * @param urls The URL to save.
  */
 void FilePersistence::appendBlacklistedUrl(const std::string &url) {
-    std::cout << "DEBUG: started appending URL" << std::endl; //TODO: remove debug print
+    //std::cout << "DEBUG: started appending URL" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (url.empty()) {
         throw std::invalid_argument("Can't add an empty string URL");
@@ -96,12 +96,12 @@ void FilePersistence::appendBlacklistedUrl(const std::string &url) {
     // End the line (new URL)
     file << '\n';
     file.close();
-    std::cout << "DEBUG: finished appending URL" << std::endl; //TODO: remove debug print
+    //std::cout << "DEBUG: finished appending URL" << std::endl; //TODO: remove debug print
 }
 
 /**
  * Save the config ints, given by the user's input.
- * @param vector int array of how many times to run hash functions
+ * @return int array of how many times to run hash functions. if there are no ints saved will return empty vector
  */
 std::vector<int> FilePersistence::loadConfigInts() {
     std::ifstream file(configIntsPath.c_str());
@@ -128,12 +128,12 @@ std::vector<int> FilePersistence::loadConfigInts() {
 * @return A vector where the first int is bit array size (first int in the input), the rest are how many times to run hash function
 */
 void FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
-    std::cout << "DEBUG: started appending config ints" << std::endl; //TODO: remove debug print
+    //std::cout << "DEBUG: started appending config ints" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (configInts.empty()) {
         throw std::invalid_argument("Can't add an empty config array");
     }
-
+    
     std::ofstream file(configIntsPath.c_str(), std::ios::app);
     
     for (int num : configInts) {
@@ -142,19 +142,19 @@ void FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
         file << '\n';
     }
     file.close();
-    std::cout << "DEBUG: finished appending config ints" << std::endl; //TODO: remove debug print
+    //std::cout << "DEBUG: finished appending config ints" << std::endl; //TODO: remove debug print
 }
 
 /**
 * Get from the config the size of the bit array.
-* @return an int representing the bit array size
+* @return an int representing the bit array size. If there is no int saved returns -1
 */
 int FilePersistence::getBitSizeConfig() {
     std::ifstream file(configIntsPath.c_str());
     // If the file doesn't exist, create it and return an empty file.
     if (!file.is_open()) {
         std::ofstream createFile(configIntsPath.c_str());
-        return {};
+        return -1;
     }
     // Get the first int from the file
     std::string line;

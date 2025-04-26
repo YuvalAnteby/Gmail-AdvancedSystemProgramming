@@ -42,14 +42,4 @@ bool hasValidCommandStructure(const std::string& line);
  */
 bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence& persistence);
 
-/**
- * Validate line before processing:
- * - Not empty
- * - Contains only digits/whitespace
- * - Valid command structure
- * @param line string of the user's choice of command & the url string
- * @return true if the line is valid (has choice & valid URL), otherwise false
- */
-bool isValidLine(const std::string& line);
-
 #endif

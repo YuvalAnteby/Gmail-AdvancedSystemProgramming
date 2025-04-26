@@ -7,17 +7,28 @@
 #include <algorithm>
 
 
-// Default constructor
+/**
+ * Default constructor
+ * @param url the URL to be checked
+ * @param persistence data source for the bits, URLs and config needed
+ * @param configInts array of ints given by the user for the bloom filter
+ * @param size bit array size
+ */
 CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size)
     : url(url), persistence(persistence), configInts(configInts), size(size), result(false) {
     }
 
-// Constructor for tests
+/**
+ * Tests constructor
+ * @param url the URL to be checked
+ * @param persistence data source for the bits, URLs and config needed
+ */
 CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence)
     : url(url), persistence(persistence), result(false) {}
 
 /**
  * Checks if a hashed representation of a string is possibly contained in a Bloom filter.
+ * TODO: comments
  */
 bool CheckUrlCommand::possiblyContains(
     const std::string& url,
@@ -45,6 +56,7 @@ bool CheckUrlCommand::possiblyContains(
 
 /**
  * Checks if the given url matches any string in the list.
+ * //TODO: comments
  */
 bool CheckUrlCommand::matchesURL(const std::string& url, const std::vector<std::string>& list) {
     return std::find(list.begin(), list.end(), url) != list.end();
