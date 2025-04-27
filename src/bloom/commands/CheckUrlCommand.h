@@ -27,12 +27,7 @@ private:
     bool matchesURL(const std::string& url, const std::vector<std::string>& list);
 
 public:
-    /**
-     * Constructor
-     * @param url a URL we want to check if is in the bloom filter
-     * @param persistence reference to the data management tool to check with (e.g. .txt file or DB)
-     */
-    CheckUrlCommand(const std::string& url, IDataPersistence& persistence);
+
 
     /**
      * Constructor

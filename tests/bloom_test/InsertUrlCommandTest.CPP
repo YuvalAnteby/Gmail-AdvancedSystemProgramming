@@ -64,7 +64,7 @@ std::vector<bool> createExpectedBits(const std::string& url, const std::vector<i
 // TEST CASES
 // ==========================================
 
-// ✅ Test: Inserting a normal URL successfully
+//: Inserting a normal URL successfully
 TEST(InsertUrlCommandTest, InsertNewUrlSuccessfully) {
     std::string url = "insertme.com";
     int size = 10;
@@ -87,7 +87,7 @@ TEST(InsertUrlCommandTest, InsertNewUrlSuccessfully) {
     EXPECT_EQ(mock.bitArrays[0], expectedBits);
 }
 
-// ✅ Test: Inserting an empty URL string
+//  Inserting an empty URL string
 TEST(InsertUrlCommandTest, InsertEmptyUrlShouldStillWork) {
     std::string url = "";
     int size = 5;
@@ -104,7 +104,7 @@ TEST(InsertUrlCommandTest, InsertEmptyUrlShouldStillWork) {
     EXPECT_EQ(mock.blacklist[0], url);       // The inserted URL should be the empty string
 }
 
-// ✅ Test: Inserting a URL when the Bloom filter is very large
+// Inserting a URL when the Bloom filter is very large
 TEST(InsertUrlCommandTest, InsertUrlWithLargeBitSize) {
     std::string url = "bigsize.com";
     int size = 50000;
@@ -122,7 +122,7 @@ TEST(InsertUrlCommandTest, InsertUrlWithLargeBitSize) {
     EXPECT_EQ(mock.bitArrays[0], expectedBits);
 }
 
-// ✅ Test: Inserting a URL when config is empty (no hash functions)
+//  Inserting a URL when config is empty (no hash functions)
 // Should still insert, but no bits should be set
 TEST(InsertUrlCommandTest, InsertUrlWithEmptyConfig) {
     std::string url = "noconfig.com";

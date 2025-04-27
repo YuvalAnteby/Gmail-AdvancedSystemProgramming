@@ -19,15 +19,6 @@ CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persi
     : url(url), persistence(persistence), configInts(configInts), size(size), result(false) {
 }
 
-/**
- * Constructor used mainly for tests where configInts and size can be retrieved from persistence.
- *
- * @param url the URL to be checked
- * @param persistence the persistence object used to load bit arrays and blacklist
- */
-CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence)
-    : url(url), persistence(persistence), result(false) {
-}
 
 /**
  * Checks if the hashed version of the URL could be contained in any candidate Bloom filter.
