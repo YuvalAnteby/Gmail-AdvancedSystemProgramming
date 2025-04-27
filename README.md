@@ -2,6 +2,7 @@
 # Dear TA please check main1-Ex1 for the final version of a specific assigment
 ## Jira link
 [https://yuvalanteby.atlassian.net/jira/software/projects/GA/boards/34/reports/burnup?atlOrigin=eyJpIjoiMzg1ZTE1Zjg2NWY2NDJkNDg1MmRkODE3ZTU1YmRmNzEiLCJwIjoiaiJ9](https://yuvalanteby.atlassian.net/jira/software/projects/GA/boards/34/reports/burnup?atlOrigin=eyJpIjoiMzg1ZTE1Zjg2NWY2NDJkNDg1MmRkODE3ZTU1YmRmNzEiLCJwIjoiaiJ9)
+## Daily document saved in issues
 ## Set up the app
 ```bash
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
