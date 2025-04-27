@@ -32,7 +32,7 @@ public:
 // Test cases begin
 // -----------------------------
 
-// ✅ Test: URL should NOT be found in an empty Bloom filter
+// URL should NOT be found in an empty Bloom filter
 // Simulates an empty filter, expects that the URL is not falsely found
 TEST(CheckUrlCommandTest, UrlNotInEmptyFilter) {
     std::string url = "http://example.com";
@@ -42,7 +42,7 @@ TEST(CheckUrlCommandTest, UrlNotInEmptyFilter) {
     EXPECT_FALSE(cmd.wasFound());
 }
 
-// ✅ Test: URL IS present in Bloom filter and blacklist
+// URL IS present in Bloom filter and blacklist
 // Positive test case: URL is correctly identified
 TEST(CheckUrlCommandTest, UrlInFilterAndBlacklist) {
     std::string url = "test";
@@ -56,7 +56,7 @@ TEST(CheckUrlCommandTest, UrlInFilterAndBlacklist) {
     EXPECT_TRUE(cmd.wasFound());
 }
 
-// ✅ Test: URL *seems* to be in filter but NOT in blacklist (false positive)
+// URL *seems* to be in filter but NOT in blacklist (false positive)
 // Checks that false positives do not affect blacklist match
 TEST(CheckUrlCommandTest, UrlFalsePositive) {
     std::string url = "test";
@@ -70,7 +70,7 @@ TEST(CheckUrlCommandTest, UrlFalsePositive) {
     EXPECT_FALSE(cmd.wasFound());
 }
 
-// ✅ Test: Simulate a HASH COLLISION (different URLs map same bits)
+//  Simulate a HASH COLLISION (different URLs map same bits)
 // Verifies that collisions do not falsely validate unrelated URLs
 TEST(CheckUrlCommandTest, HashCollision) {
     std::string url1 = "collision1";
@@ -88,7 +88,7 @@ TEST(CheckUrlCommandTest, HashCollision) {
     EXPECT_FALSE(cmd.wasFound());
 }
 
-// ✅ Test: Handle multiple hash functions correctly
+// Handle multiple hash functions correctly
 // Verifies correct handling of multiple hash configurations
 TEST(CheckUrlCommandTest, MultiHashFunctionCheck) {
     std::string url = "multitest";
@@ -105,7 +105,7 @@ TEST(CheckUrlCommandTest, MultiHashFunctionCheck) {
     EXPECT_TRUE(cmd.wasFound());
 }
 
-// ✅ Test: Edge case - empty URL string
+//  Edge case - empty URL string
 // Tests handling of an empty input URL
 TEST(CheckUrlCommandTest, EmptyUrl) {
     std::string url = "";
@@ -115,7 +115,7 @@ TEST(CheckUrlCommandTest, EmptyUrl) {
     EXPECT_FALSE(cmd.wasFound());
 }
 
-// ✅ Test: Very large Bloom filter array
+//  Very large Bloom filter array
 // Stress test with a large bit array size
 TEST(CheckUrlCommandTest, LargeBitArray) {
     std::string url = "largebit";
