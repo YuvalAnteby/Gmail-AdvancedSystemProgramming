@@ -2,7 +2,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: server_cpp/Dockerfile
     container_name: gmail_app
     stdin_open: true     # <-- keeps stdin open
     tty: true            # <-- allocates a pseudo-TTY
@@ -12,7 +12,7 @@ services:
   gtest:
     build:
       context: .
-      dockerfile: Dockerfile.test
+      dockerfile: server_cpp/Dockerfile.test
     container_name: gmail_tests
 
 volumes:
