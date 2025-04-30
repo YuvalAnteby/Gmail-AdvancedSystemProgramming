@@ -1,19 +1,38 @@
 services:
+  # Server itself (CPP)
   app:
     build:
-      context: .
-      dockerfile: server_cpp/Dockerfile
+      context: ./server_cpp
+      dockerfile: Dockerfile
     container_name: gmail_app
     stdin_open: true     # <-- keeps stdin open
     tty: true            # <-- allocates a pseudo-TTY
     volumes:
       - app_data:/usr/src/app  # <-- only the "data" folder is persisted between runs
-
+    ports:
+      - "42069:42069"
+  # Server gtest
   gtest:
     build:
-      context: .
-      dockerfile: server_cpp/Dockerfile.test
+      context: ./server_cpp
+      dockerfile: Dockerfile.test
     container_name: gmail_tests
+    # Prevent the use of terminal input during test runs
+    stdin_open: false
+    tty: false
+  # Client (Python)
+  python_client:
+    build:
+      context: ./client_python
+      dockerfile: Dockerfile
+    container_name: python_client
+    depends_on:
+      - app
+    environment:
+      - SERVER_HOST=app
+      - SERVER_PORT=42069
+    # Change 'app' to desired server name here, '42069' to desired port (given as args)
+    command: [ "python", "main.py", "app", "42069" ]
 
 volumes:
   app_data:   # <-- define the named volume
