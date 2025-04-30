@@ -33,4 +33,9 @@
 
 # VS code config
 .vscode/
-build/
+# CLion config
+.idea/
+# build, cmake folders
+server_cpp/build/
+server_cpp/cmake-build-debug/
+cmake-build-debug/
