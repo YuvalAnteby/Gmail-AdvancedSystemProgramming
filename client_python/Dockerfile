@@ -4,8 +4,8 @@
 # Pick the python version
 FROM python:3.11-slim
 # Copy and set the client in the container
-WORKDIR /app
-COPY. /app
+WORKDIR /app/src
+COPY . /app
 # If ever needed despite TAs instruction - add requirements.txt file here
 # RUN pip install --no-cache-dir -r requirements.txt
 # Run the client
