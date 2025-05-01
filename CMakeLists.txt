@@ -16,11 +16,11 @@ FetchContent_MakeAvailable(googletest)
 
 # For compiling the project itself
 file(GLOB_RECURSE TEST_FILES
-src/utils/*.cpp
-src/bloom/*.cpp
-src/bloom/commands/*.cpp
-src/bloom/hash/*.cpp
-src/data_persistence/*.cpp
+        server_cpp/src/utils/*.cpp
+        server_cpp/src/bloom/*.cpp
+        server_cpp/src/bloom/commands/*.cpp
+        server_cpp/src/bloom/hash/*.cpp
+        server_cpp/src/data_persistence/*.cpp
 tests/*.cpp
 tests/utils_tests/*.cpp
 )
@@ -29,18 +29,18 @@ add_executable(runTests ${TEST_FILES})
 
 # For compiling the project itself
 file(GLOB_RECURSE SRC_FILES
-src/*.cpp
-src/utils/*.cpp
-src/bloom/*.cpp
-src/bloom/commands/*.cpp
-src/bloom/hash/*.cpp
-src/data_persistence/*.cpp
+        server_cpp/src/*.cpp
+        server_cpp/src/utils/*.cpp
+        server_cpp/src/bloom/*.cpp
+        server_cpp/src/bloom/commands/*.cpp
+        server_cpp/src/bloom/hash/*.cpp
+        server_cpp/src/data_persistence/*.cpp
 )
 add_executable(app ${SRC_FILES})
 
 # Include directories
-include_directories(src)
-include_directories(src/data_persistence)
+include_directories(server_cpp/src)
+include_directories(server_cpp/src/data_persistence)
 
 # Link gtest and gtest_main to runTests
 target_link_libraries(runTests gtest gtest_main)
