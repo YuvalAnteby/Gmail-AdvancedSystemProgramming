@@ -22,7 +22,7 @@ CheckUrlCommand::CheckUrlCommand(
     const std::vector<int> &configInts,
     int size
     )
-    : url(url), persistence(persistence), configInts(configInts), size(size), m_bloomResult(CHECK) {
+    : url(url), persistence(persistence), configInts(configInts), size(size), m_bloomResult(GET) {
 }
 
 

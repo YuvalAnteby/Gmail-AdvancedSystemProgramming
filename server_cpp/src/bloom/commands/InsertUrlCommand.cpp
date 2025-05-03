@@ -12,7 +12,7 @@
  */
 InsertUrlCommand::InsertUrlCommand(const std::string &url, IDataPersistence &persistence,
                                    const std::vector<int> &configInts, int size)
-    : url(url), persistence(persistence), configInts(configInts), size(size), m_bloomResult(INSERT) {
+    : url(url), persistence(persistence), configInts(configInts), size(size), m_bloomResult(POST) {
 }
 
 /**
