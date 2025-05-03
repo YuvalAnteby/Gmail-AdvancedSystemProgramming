@@ -23,15 +23,15 @@ public:
     
     // Bits related functions from interface
     std::vector<std::vector<bool>> loadBitArrays() override;
-    void appendBitArray(const std::vector<bool>& bits) override;
+    bool appendBitArray(const std::vector<bool>& bits) override;
 
     // Blacklisted URLs related functions from interface
     std::vector<std::string> loadBlacklist() override;
-    void appendBlacklistedUrl(const std::string& url) override;
+    bool appendBlacklistedUrl(const std::string& url) override;
     
     // Config related function
     std::vector<int> loadConfigInts();
-    void appendConfigInts(const std::vector<int>& configInts);
+    bool appendConfigInts(const std::vector<int>& configInts);
     int getBitSizeConfig();
 };
 

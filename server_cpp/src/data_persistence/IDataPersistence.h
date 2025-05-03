@@ -1,13 +1,15 @@
 // Author(s): Yuval Anteby
 #ifndef IFILE_PERSISTENCE_H
 #define IFILE_PERSISTENCE_H
+
 #include <vector>
 #include <string>
+
 /**
  * Interface for file management of Bloom Filter.
  * 
  * Allows loading and saving bit arrays and blacklisted URLs.
- * Implemenations can store the data in various ways (e.g. file, DB etc.)
+ * Implementations can store the data in various ways (e.g. file, DB etc.)
  */
 class IDataPersistence {
 public:
@@ -17,8 +19,9 @@ public:
     /**
      * Insert the new bit array.
      * @param vector of bit array to save.
+     * @return true if added successfully, otherwise false
      */
-    virtual void appendBitArray(const std::vector<bool>& bits) = 0;
+    virtual bool appendBitArray(const std::vector<bool>& bits) = 0;
 
     /**
      * Load the entire bits arrays which represents the Bloom Filter.
@@ -28,9 +31,10 @@ public:
 
     /**
      * Insert the blacklisted URL.
-     * @param urls The URL to save.
+     * @param URLs The URL to save.
+     * @return true if added successfully, otherwise false
      */
-    virtual void appendBlacklistedUrl(const std::string& url) = 0;
+    virtual bool appendBlacklistedUrl(const std::string& url) = 0;
 
     /**
      * Load the list of blacklisted URLs (used for false-positive checks).
@@ -41,13 +45,16 @@ public:
 
     /**
      * Save the config ints, given by the user's input.
-     * @param vector first int is bit array size (first int in the input), the rest are how many times to run hash function
+     * @param vector first int is bit array size (first int in the input), the rest are how many times to run hash
+     * functions
+     * @return true if added successfully, otherwise false
      */
-    virtual void appendConfigInts(const std::vector<int>& configInts) = 0;
+    virtual bool appendConfigInts(const std::vector<int>& configInts) = 0;
 
     /**
      * Load the config ints, given in a previous input of the user.
-     * @return A vector where the first int is bit array size (first int in the input), the rest are how many times to run hash function
+     * @return A vector where the first int is bit array size (first int in the input), the rest are how many times to
+     * run hash functions
      */
     virtual std::vector<int> loadConfigInts() = 0;
 
