@@ -1,7 +1,7 @@
 // Author(s): Yuval Anteby, Roee Chaim
 #include "CheckUrlCommand.h"
 #include "bloom/hash/Hasher.h"
-#include "utils/BloomFilterStatusCodeParser.h"
+#include "bloom/utils/BloomFilterStatusCodeParser.h"
 #include <iostream>
 #include <vector>
 #include <string>

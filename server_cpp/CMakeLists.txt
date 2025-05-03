@@ -32,8 +32,8 @@ add_executable(runTests ${TEST_FILES})
 file(GLOB_RECURSE SRC_FILES
         src/*.cpp
         src/utils/*.cpp
-        src/utils/BloomFilterCommandEnum.h
-        src/utils/BloomFilterStatusEnum.h
+        src/bloom/utils/BloomFilterCommandEnum.h
+        src/bloom/utils/BloomFilterStatusEnum.h
         src/bloom/*.cpp
         src/bloom/commands/*.cpp
         src/bloom/hash/*.cpp

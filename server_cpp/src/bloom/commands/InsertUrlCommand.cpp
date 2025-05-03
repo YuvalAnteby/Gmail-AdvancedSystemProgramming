@@ -1,7 +1,7 @@
 // Author(s): Yuval Anteby
 #include "InsertUrlCommand.h"
 #include "bloom/hash/Hasher.h"
-#include "utils/BloomFilterStatusCodeParser.h"
+#include "bloom/utils/BloomFilterStatusCodeParser.h"
 
 /**
  * Default constructor

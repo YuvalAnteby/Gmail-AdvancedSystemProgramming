@@ -3,8 +3,8 @@
 #define BLOOM_COMMAND_RESULT_H
 
 #include <string>
-#include "utils/BloomFilterStatusEnum.h"
-#include "utils/BloomFilterCommandEnum.h"
+#include "bloom/utils/BloomFilterStatusEnum.h"
+#include "bloom/utils/BloomFilterCommandEnum.h"
 
 /**
  * Class to represent the result of running a Bloom Filter command.

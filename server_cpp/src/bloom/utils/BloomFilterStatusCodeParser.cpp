@@ -1,8 +1,8 @@
 // Author(s): Yuval Anteby
 
 #include <string>
-#include <bloom/models/BloomCommandResult.h>
-#include <utils/BloomFilterStatusEnum.h>
+#include "bloom/models/BloomCommandResult.h"
+#include "bloom/utils/BloomFilterStatusEnum.h"
 
 /**
  * Convert the bloom filter status code to a message
