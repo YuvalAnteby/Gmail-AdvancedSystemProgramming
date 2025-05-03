@@ -10,7 +10,7 @@
  * @param commandUsed the enum for the command we used
  */
 BloomCommandResult::BloomCommandResult(const BloomFilterCommandEnum commandUsed)
-    : m_commandUsed(commandUsed), m_isSuccess(false), m_status(NONE), m_outcomeMsg(""), m_fullMsg("") {}
+    : m_commandUsed(commandUsed), m_isSuccess(false), m_status(STATUS_NONE), m_outcomeMsg(""), m_fullMsg("") {}
 
 /**
  * Getter for the command used

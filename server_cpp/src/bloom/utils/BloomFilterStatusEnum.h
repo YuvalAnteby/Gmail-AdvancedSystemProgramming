@@ -6,7 +6,7 @@
 * Enum to use for status codes, values set per the assigment instructions.
 */
 enum BloomFilterStatusEnum {
-  NONE = -1,
+  STATUS_NONE = -1,
   OK = 200,
   CREATED = 201,
   NO_CONTENT = 204,

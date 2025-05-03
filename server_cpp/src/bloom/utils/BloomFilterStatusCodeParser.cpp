@@ -12,7 +12,7 @@
  */
 std::string toStatusMessage(const BloomFilterStatusEnum statusCode) {
     switch (statusCode) {
-        case NONE:
+        case STATUS_NONE:
             return "-1 No command ran";
         case OK:
             return "200 Ok";
