@@ -31,19 +31,22 @@ public:
     std::vector<std::vector<bool>> loadBitArrays() override { return bitArrays; }
     std::vector<std::string> loadBlacklist() override { return blacklist; }
 
-    void appendBlacklistedUrl(const std::string& url) override {
+    bool appendBlacklistedUrl(const std::string& url) override {
         urlAppended = true;
         blacklist.push_back(url);
+        return true;
     }
 
-    void appendConfigInts(const std::vector<int>& ints) override {
+    bool appendConfigInts(const std::vector<int>& ints) override {
         configIntsAppended = true;
         configInts = ints;
+        return true;
     }
 
-    void appendBitArray(const std::vector<bool>& bits) override {
+    bool appendBitArray(const std::vector<bool>& bits) override {
         bitArrayAppended = true;
         bitArrays.push_back(bits);
+        return true;
     }
 };
 

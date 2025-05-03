@@ -23,9 +23,9 @@ public:
     std::vector<std::vector<bool>> loadBitArrays() override { return bitArrays; }
     std::vector<std::string> loadBlacklist() override { return blacklist; }
 
-    void appendBlacklistedUrl(const std::string&) override {}
-    void appendConfigInts(const std::vector<int>&) override {}
-    void appendBitArray(const std::vector<bool>&) override {}
+    bool appendBlacklistedUrl(const std::string&) override {}
+    bool appendConfigInts(const std::vector<int>&) override {}
+    bool appendBitArray(const std::vector<bool>&) override {}
 };
 
 // -----------------------------
@@ -39,7 +39,8 @@ TEST(CheckUrlCommandTest, UrlNotInEmptyFilter) {
     MockPersistence mock(10, {1}, {}, {}); // Empty filter
     CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
     cmd.execute();
-    EXPECT_FALSE(cmd.wasFound());
+    BloomCommandResult result = cmd.getResult();
+    EXPECT_EQ(result.getOutcomeMessage().find("true true"), std::string::npos);
 }
 
 // URL IS present in Bloom filter and blacklist
@@ -53,7 +54,8 @@ TEST(CheckUrlCommandTest, UrlInFilterAndBlacklist) {
     MockPersistence mock(10, {1}, {bits}, {url});
     CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
     cmd.execute();
-    EXPECT_TRUE(cmd.wasFound());
+    BloomCommandResult result = cmd.getResult();
+    EXPECT_NE(result.getOutcomeMessage().find("true true"), std::string::npos);
 }
 
 // URL *seems* to be in filter but NOT in blacklist (false positive)
@@ -67,7 +69,8 @@ TEST(CheckUrlCommandTest, UrlFalsePositive) {
     MockPersistence mock(10, {1}, {bits}, {});
     CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
     cmd.execute();
-    EXPECT_FALSE(cmd.wasFound());
+    BloomCommandResult result = cmd.getResult();
+    EXPECT_EQ(result.getOutcomeMessage().find("true true"), std::string::npos);
 }
 
 //  Simulate a HASH COLLISION (different URLs map same bits)
@@ -85,7 +88,8 @@ TEST(CheckUrlCommandTest, HashCollision) {
     MockPersistence mock(10, {1}, {bits}, {url2}); // Only url2 blacklisted
     CheckUrlCommand cmd(url1, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
     cmd.execute();
-    EXPECT_FALSE(cmd.wasFound());
+    BloomCommandResult result = cmd.getResult();
+    EXPECT_EQ(result.getOutcomeMessage().find("true true"), std::string::npos);
 }
 
 // Handle multiple hash functions correctly
@@ -102,7 +106,8 @@ TEST(CheckUrlCommandTest, MultiHashFunctionCheck) {
     MockPersistence mock(50, config, {bits}, {url});
     CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
     cmd.execute();
-    EXPECT_TRUE(cmd.wasFound());
+    BloomCommandResult result = cmd.getResult();
+    EXPECT_NE(result.getOutcomeMessage().find("true true"), std::string::npos);
 }
 
 //  Edge case - empty URL string
@@ -112,7 +117,8 @@ TEST(CheckUrlCommandTest, EmptyUrl) {
     MockPersistence mock(10, {1}, {}, {});
     CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
     cmd.execute();
-    EXPECT_FALSE(cmd.wasFound());
+    BloomCommandResult result = cmd.getResult();
+    EXPECT_EQ(result.getOutcomeMessage().find("true true"), std::string::npos);
 }
 
 //  Very large Bloom filter array
@@ -127,5 +133,6 @@ TEST(CheckUrlCommandTest, LargeBitArray) {
     MockPersistence mock(size, {1}, {bits}, {url});
     CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
     cmd.execute();
-    EXPECT_TRUE(cmd.wasFound());
+    BloomCommandResult result = cmd.getResult();
+    EXPECT_NE(result.getOutcomeMessage().find("true true"), std::string::npos);
 }
