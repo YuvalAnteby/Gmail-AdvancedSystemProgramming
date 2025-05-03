@@ -4,6 +4,7 @@
 
 #include "IBloomCommand.h"
 #include "data_persistence/IDataPersistence.h"
+#include "bloom/models/BloomCommandResult.h"
 
 /**
  * Class responsible for the check command of URLs against the bloom filter.
@@ -15,7 +16,7 @@ private:
     IDataPersistence& persistence;
     std::vector<int> configInts;
     int size; 
-    bool result;
+    BloomCommandResult m_bloomResult;
 
     bool possiblyContains(
         const std::string& url,
@@ -33,17 +34,22 @@ public:
      * Constructor
      * @param url a URL we want to check if is in the bloom filter
      * @param persistence reference to the data management tool to check with (e.g. .txt file or DB)
+     * @param configInts array of the config ints
+     * @param size bit array size
      */
-    CheckUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size);
+    CheckUrlCommand(
+        const std::string& url,
+        IDataPersistence& persistence,
+        const std::vector<int>& configInts,
+        int size
+        );
     /**
-    * Excute the check URL command.
+    * Execute the check URL command.
     * Will call relevant functions to check if a given URL is in the blooom filter.
     */
     void execute() override;
-    /**
-     * getter for result
-     */
-    bool wasFound() const;
+
+    BloomCommandResult getResult() override;
 };
 
 #endif
