@@ -1,6 +1,7 @@
 // Author(s): Yuval Anteby
 
 #include <string>
+#include <bloom/models/BloomCommandResult.h>
 #include <utils/BloomFilterStatusEnum.h>
 
 /**
@@ -11,6 +12,8 @@
  */
 std::string toStatusMessage(const BloomFilterStatusEnum statusCode) {
     switch (statusCode) {
+        case NONE:
+            return "-1 No command ran";
         case OK:
             return "200 Ok";
         case CREATED:
