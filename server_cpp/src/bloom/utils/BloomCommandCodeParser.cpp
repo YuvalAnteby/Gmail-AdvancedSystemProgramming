@@ -28,10 +28,10 @@ std::string toCommandString(const BloomFilterCommandEnum commandCode) {
  * @return enum of the command code. e.g. POST (=1)
  */
 BloomFilterCommandEnum toCommandCode(const std::string &commandString) {
-    if (commandString == "POST") {
+    if (commandString == "POST" || commandString == "1") {
         return POST;
     }
-    if (commandString == "GET") {
+    if (commandString == "GET" || commandString == "2") {
         return GET;
     }
     if (commandString == "DELETE") {
