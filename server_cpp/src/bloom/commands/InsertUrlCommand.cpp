@@ -1,5 +1,8 @@
 // Author(s): Yuval Anteby
 #include "InsertUrlCommand.h"
+
+#include <strategyIO/IOutputWriter.h>
+
 #include "bloom/hash/Hasher.h"
 #include "bloom/utils/BloomFilterStatusCodeParser.h"
 
@@ -10,9 +13,19 @@
  * @param configInts array of ints given by the user for the bloom filter
  * @param size bit array size
  */
-InsertUrlCommand::InsertUrlCommand(const std::string &url, IDataPersistence &persistence,
-                                   const std::vector<int> &configInts, int size)
-    : url(url), persistence(persistence), configInts(configInts), size(size), m_bloomResult(POST) {
+InsertUrlCommand::InsertUrlCommand(
+    const std::string &url,
+    IDataPersistence &persistence,
+    const std::vector<int> &configInts,
+    int size,
+    IOutputWriter &outputWriter
+)
+    : url(url),
+      persistence(persistence),
+      configInts(configInts),
+      size(size),
+      m_bloomResult(POST),
+      m_outputWriter(outputWriter) {
 }
 
 /**

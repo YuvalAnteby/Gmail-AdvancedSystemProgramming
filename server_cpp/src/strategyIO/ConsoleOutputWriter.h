@@ -2,7 +2,7 @@
 #ifndef CONSOLE_OUTPUT_WRITER_H
 #define CONSOLE_OUTPUT_WRITER_H
 
-#include "strategyIO/IOutputWrite.h"
+#include "strategyIO/IOutputWriter.h"
 #include <string>
 
 /**
@@ -10,11 +10,11 @@
  * prints strings (could be more than 1 line at once using "\n"
  * Used as part of the strategy design pattern for Input-Output
  */
-class ConsoleOutputWriter : public IOutputWrite {
+class ConsoleOutputWriter : public IOutputWriter {
     public:
       // Default constructor
       ConsoleOutputWriter();
-      void writeData(std::string line) override;
+      void writeData(std::string& line) override;
 };
 
 

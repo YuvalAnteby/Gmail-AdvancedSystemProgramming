@@ -15,14 +15,21 @@
  * @param persistence the persistence object used to load bit arrays and blacklist
  * @param configInts vector of configuration integers used for hashing
  * @param size the size of the Bloom filter bit array
+ * @param outputWriter object responsible on output to wherever we want
  */
 CheckUrlCommand::CheckUrlCommand(
     const std::string &url,
     IDataPersistence &persistence,
     const std::vector<int> &configInts,
-    int size
-    )
-    : url(url), persistence(persistence), configInts(configInts), size(size), m_bloomResult(GET) {
+    int size,
+    IOutputWriter &outputWriter
+)
+    : url(url),
+      persistence(persistence),
+      configInts(configInts),
+      size(size),
+      m_bloomResult(GET),
+      m_outputWriter(outputWriter) {
 }
 
 
@@ -78,6 +85,15 @@ bool CheckUrlCommand::matchesURL(const std::string &url, const std::vector<std::
 }
 
 /**
+ * Add the new message to the output writer and result class
+ * @param msg message to print using the output writer and add to the result
+ */
+void CheckUrlCommand::addMessage(std::string msg) {
+    m_bloomResult.appendToOutcomeMessage(msg);
+    m_outputWriter.writeData(msg);
+}
+
+/**
  * Executes the CheckUrlCommand.
  * 
  * Steps:
@@ -92,24 +108,16 @@ void CheckUrlCommand::execute() {
 
     // Check if the URL possibly exists in any Bloom filter
     if (possiblyContains(url, size, configInts, bitsArrays)) {
-        m_bloomResult.appendToOutcomeMessage("true");
-        std::cout << "true ";
-
+        addMessage("true ");
         // If possibly contained, check blacklist for real match
         if (matchesURL(url, persistence.loadBlacklist())) {
-            m_bloomResult.appendToOutcomeMessage(" true");
-            std::cout << "true" << std::endl;
-            //result = true;
+            addMessage("true\n");
         } else {
-            //result = false;
-            m_bloomResult.appendToOutcomeMessage(" false");
-            std::cout << "false" << std::endl;
+            addMessage("false\n");
         }
     } else {
         // Definitely not in the Bloom filter
-        m_bloomResult.appendToOutcomeMessage(" false");
-        std::cout << "false" << std::endl;
-        //result = false;
+        addMessage("false\n");
     }
 }
 
