@@ -74,11 +74,11 @@ void handleUserChoice(const std::string& line, int firstInt, const std::vector<i
     // Check what option the user chose, execute the correct command
     if (line[0] == '1') {
         //std::cout << "----- DEBUG: chosen 1 -----" << std::endl; // TODO: remove debug print
-        InsertUrlCommand insertUrlCommand(url, dataSource, configInts, firstInt);
-        invoker.runCommand(insertUrlCommand);
+        //InsertUrlCommand insertUrlCommand(url, dataSource, configInts, firstInt);
+        //invoker.runCommand(insertUrlCommand);
     } else if (line[0] == '2') {
         //std::cout << "----- DEBUG: chosen 2 -----" << std::endl; // TODO: remove debug print
-        CheckUrlCommand checkUrlCommand(url, dataSource, configInts, firstInt);
-        invoker.runCommand(checkUrlCommand);
+        //CheckUrlCommand checkUrlCommand(url, dataSource, configInts, firstInt);
+        //invoker.runCommand(checkUrlCommand);
     }
 }
