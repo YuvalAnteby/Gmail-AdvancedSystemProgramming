@@ -28,9 +28,6 @@ std::string toCommandString(const BloomFilterCommandEnum commandCode) {
  * @return enum of the command code. e.g. POST (=1)
  */
 BloomFilterCommandEnum toCommandCode(const std::string &commandString) {
-    if (commandString.empty()) {
-        return CONFIG_INTS;
-    }
     if (commandString == "POST") {
         return POST;
     }

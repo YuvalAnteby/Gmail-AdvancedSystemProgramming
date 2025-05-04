@@ -1,6 +1,4 @@
-//
-// Created by Yuval Anteby on 03/05/2025.
-//
+// Author(s): Yuval Anteby
 
 #ifndef BLOOM_COMMAND_CODE_PARSER_H
 #define BLOOM_COMMAND_CODE_PARSER_H
