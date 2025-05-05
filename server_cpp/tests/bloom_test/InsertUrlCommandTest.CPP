@@ -4,6 +4,7 @@
 #include "bloom/hash/Hasher.h"
 #include <vector>
 #include <string>
+#include <strategyIO/ConsoleOutputWriter.h>
 
 // ==========================================
 // Mock class for IDataPersistence
@@ -72,9 +73,9 @@ TEST(InsertUrlCommandTest, InsertNewUrlSuccessfully) {
     std::string url = "insertme.com";
     int size = 10;
     std::vector<int> config = {1, 2};
-
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     MockPersistence mock(size, config);
-    InsertUrlCommand cmd(url, mock, config, size);
+    InsertUrlCommand cmd(url, mock, config, size, *outputWriter);
     cmd.execute();
 
     // Expectations
@@ -95,9 +96,9 @@ TEST(InsertUrlCommandTest, InsertEmptyUrlShouldStillWork) {
     std::string url = "";
     int size = 5;
     std::vector<int> config = {1};
-
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     MockPersistence mock(size, config);
-    InsertUrlCommand cmd(url, mock, config, size);
+    InsertUrlCommand cmd(url, mock, config, size, *outputWriter);
     cmd.execute();
 
     // Expectations
@@ -112,9 +113,9 @@ TEST(InsertUrlCommandTest, InsertUrlWithLargeBitSize) {
     std::string url = "bigsize.com";
     int size = 50000;
     std::vector<int> config = {5, 10, 20};
-
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     MockPersistence mock(size, config);
-    InsertUrlCommand cmd(url, mock, config, size);
+    InsertUrlCommand cmd(url, mock, config, size, *outputWriter);
     cmd.execute();
 
     // Expectations
@@ -131,9 +132,9 @@ TEST(InsertUrlCommandTest, InsertUrlWithEmptyConfig) {
     std::string url = "noconfig.com";
     int size = 10;
     std::vector<int> config = {}; // No hash functions
-
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     MockPersistence mock(size, config);
-    InsertUrlCommand cmd(url, mock, config, size);
+    InsertUrlCommand cmd(url, mock, config, size, *outputWriter);
     cmd.execute();
 
     // Expectations

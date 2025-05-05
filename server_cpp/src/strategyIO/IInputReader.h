@@ -13,7 +13,7 @@ class IInputReader {
   public:
     virtual ~IInputReader() = default;
     // input function
-    virtual bool readLine(std::string line) = 0;
+    virtual std::string readLine() = 0;
 };
 
 #endif

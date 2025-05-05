@@ -12,10 +12,11 @@ ConsoleInputReader::ConsoleInputReader() = default;
 
 /**
 * Get a line of input from the console
-* @param line a line of input from the console by the user
-* @return false if received a newline or EOF etc., otherwise true
+* @return a line of input from the console by the user
 */
-bool ConsoleInputReader::readLine(std::string line) {
+std::string ConsoleInputReader::readLine() {
     //TODO add validation tests here
-    return static_cast<bool>(std::getline(std::cin, line));
+    std::string line;
+    std::getline(std::cin, line);
+    return line;
 }

@@ -16,7 +16,7 @@ class ConsoleInputReader : public IInputReader {
     // Default constructor
     ConsoleInputReader();
 
-    bool readLine(std::string line) override;
+    std::string readLine() override;
 };
 
 

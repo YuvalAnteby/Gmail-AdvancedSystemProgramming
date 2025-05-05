@@ -4,6 +4,7 @@
 #include "bloom/hash/Hasher.h"
 #include <memory>
 #include <sstream>
+#include <strategyIO/ConsoleOutputWriter.h>
 
 // Mock class for IDataPersistence
 class MockPersistence : public IDataPersistence {
@@ -35,9 +36,10 @@ public:
 // URL should NOT be found in an empty Bloom filter
 // Simulates an empty filter, expects that the URL is not falsely found
 TEST(CheckUrlCommandTest, UrlNotInEmptyFilter) {
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     std::string url = "http://example.com";
     MockPersistence mock(10, {1}, {}, {}); // Empty filter
-    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
+    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig(), *outputWriter);
     cmd.execute();
     BloomCommandResult result = cmd.getResult();
     EXPECT_EQ(result.getOutcomeMessage().find("true true"), std::string::npos);
@@ -50,9 +52,9 @@ TEST(CheckUrlCommandTest, UrlInFilterAndBlacklist) {
     std::vector<bool> bits(10, false);
     Hasher h(url);
     bits[h.hashN(1) % 10] = true;
-
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     MockPersistence mock(10, {1}, {bits}, {url});
-    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
+    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig(), *outputWriter);
     cmd.execute();
     BloomCommandResult result = cmd.getResult();
     EXPECT_NE(result.getOutcomeMessage().find("true true"), std::string::npos);
@@ -65,9 +67,9 @@ TEST(CheckUrlCommandTest, UrlFalsePositive) {
     std::vector<bool> bits(10, false);
     Hasher h(url);
     bits[h.hashN(1) % 10] = true;
-
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     MockPersistence mock(10, {1}, {bits}, {});
-    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
+    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig(), *outputWriter);
     cmd.execute();
     BloomCommandResult result = cmd.getResult();
     EXPECT_EQ(result.getOutcomeMessage().find("true true"), std::string::npos);
@@ -84,9 +86,9 @@ TEST(CheckUrlCommandTest, HashCollision) {
     std::vector<bool> bits(10, false);
     bits[h1.hashN(1) % 10] = true;
     bits[h2.hashN(1) % 10] = true;
-
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     MockPersistence mock(10, {1}, {bits}, {url2}); // Only url2 blacklisted
-    CheckUrlCommand cmd(url1, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
+    CheckUrlCommand cmd(url1, mock, mock.loadConfigInts(), mock.getBitSizeConfig(), *outputWriter);
     cmd.execute();
     BloomCommandResult result = cmd.getResult();
     EXPECT_EQ(result.getOutcomeMessage().find("true true"), std::string::npos);
@@ -99,12 +101,12 @@ TEST(CheckUrlCommandTest, MultiHashFunctionCheck) {
     std::vector<int> config = {2, 3, 5};
     std::vector<bool> bits(50, false);
     Hasher h(url);
-
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     for (int c : config)
         bits[h.hashN(c) % 50] = true;
 
     MockPersistence mock(50, config, {bits}, {url});
-    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
+    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig(), *outputWriter);
     cmd.execute();
     BloomCommandResult result = cmd.getResult();
     EXPECT_NE(result.getOutcomeMessage().find("true true"), std::string::npos);
@@ -114,8 +116,9 @@ TEST(CheckUrlCommandTest, MultiHashFunctionCheck) {
 // Tests handling of an empty input URL
 TEST(CheckUrlCommandTest, EmptyUrl) {
     std::string url = "";
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     MockPersistence mock(10, {1}, {}, {});
-    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
+    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig(), *outputWriter);
     cmd.execute();
     BloomCommandResult result = cmd.getResult();
     EXPECT_EQ(result.getOutcomeMessage().find("true true"), std::string::npos);
@@ -129,9 +132,9 @@ TEST(CheckUrlCommandTest, LargeBitArray) {
     std::vector<bool> bits(size, false);
     Hasher h(url);
     bits[h.hashN(1) % size] = true;
-
+    IOutputWriter *outputWriter = new ConsoleOutputWriter();
     MockPersistence mock(size, {1}, {bits}, {url});
-    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig());
+    CheckUrlCommand cmd(url, mock, mock.loadConfigInts(), mock.getBitSizeConfig(), *outputWriter);
     cmd.execute();
     BloomCommandResult result = cmd.getResult();
     EXPECT_NE(result.getOutcomeMessage().find("true true"), std::string::npos);

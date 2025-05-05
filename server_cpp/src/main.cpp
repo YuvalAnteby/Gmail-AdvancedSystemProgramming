@@ -4,6 +4,7 @@
 #include <bloom/commands/BloomCommandInvoker.h>
 #include <bloom/commands/CheckUrlCommand.h>
 #include <bloom/commands/InsertUrlCommand.h>
+#include <bloom/utils/BloomFilterStatusCodeParser.h>
 #include <strategyIO/ConsoleInputReader.h>
 #include <strategyIO/ConsoleOutputWriter.h>
 
@@ -28,13 +29,18 @@ void handleChoice(
     switch (commandReq.getCommand()) {
         case POST:
             InsertUrlCommand insertUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);//TODO add output
+            invoker.runCommand(insertUrlCommand);
+        break;
         case GET:
             CheckUrlCommand checkUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
+            invoker.runCommand(checkUrlCommand);
+        break;
         case DELETE:
-            std::cout << "DELETE FUNC HERE " << std::endl;
-        invoker.runCommand(checkUrlCommand);
+            std::cout << "TODO DELETE FUNC HERE " << std::endl;
+        break;
         case default:
-            std::cout << "SOME ERROR" << std::endl; // TODO switch to real error handling
+            std::string errorMsg = toStatusMessage(BAD_REQUEST);
+            outputWriter.writeData(errorMsg);
     }
 }
 
@@ -42,7 +48,6 @@ void handleChoice(
  * Main loop that reads and processes input lines.
  */
 int main() {
-    std::string line;
     bool firstLineFlag = true; // true if we're waiting for first line input
     int firstInt;
     std::vector<int> configInts;
@@ -53,6 +58,7 @@ int main() {
     IOutputWriter *outputWriter = new ConsoleOutputWriter();
     // start the infinite loop
     while (true) {
+        std::string line = inputReader->readLine();
         // TODO change to get input of first line from CLI arguments
         // Skip to next line if the first line was invalid
         if (firstLineFlag && !containsOnlyDigitsAndWhitespace(line) && !isValidFirstLine(line)) {
@@ -78,7 +84,7 @@ int main() {
         // handle the user's command choice
         CommandRequest cr = CommandParser::parseCommand(line);
         handleChoice(firstInt, configInts, cr, *dataSource, *outputWriter);
-        handleUserChoice(line, firstInt, configInts, *dataSource);
+        //handleUserChoice(line, firstInt, configInts, *dataSource);
     }
     delete dataSource;
     return 0;
