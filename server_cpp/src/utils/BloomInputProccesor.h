@@ -3,9 +3,11 @@
 #ifndef BLOOM_INPUT_PROCCESOR_H
 #define BLOOM_INPUT_PROCCESOR_H
 
-#include <iostream>
 #include <vector>
+
+#include "bloom/utils/CommandRequest.h"
 #include "data_persistence/IDataPersistence.h"
+#include "strategyIO/IOutputWriter.h"
 
 /**
  * Get the first number from the first line as a string, edit the line string to skip it.
@@ -22,14 +24,19 @@ std::string processFirstInt(std::string& line);
 std::vector<int> processConfigInts(const std::string& newLine);
 
 /**
- * Process a valid command line (after the initial line of ints):
- * - If it starts with '1', add the URL
- * - If it starts with '2', check against the blacklist
- * @param line string of the user's choice of command & the url string
- * @param firstInt bit array size given by the user
+ * Handle the user's choice of bloom filter command, initialize and execute the correct one, if given valid input.
+ * @param arrSize bit array size given by the user
  * @param configInts the rest of the config integers for the hashing
+ * @param commandReq object of a commands request, made of {command enum, string URL}
  * @param dataSource object of the data source to provide URLs, bits etc
+ * @param outputWriter object responsible on output (e.g. output using a CLI or over a TCP socket)
  */
-void handleUserChoice(const std::string& line, int firstInt, std::vector<int> configInts, IDataPersistence& dataSource);
+void handleBloomCommandChoice(
+    int arrSize,
+    const std::vector<int> &configInts,
+    CommandRequest commandReq,
+    IDataPersistence &dataSource,
+    IOutputWriter &outputWriter
+);
 
 #endif

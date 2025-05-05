@@ -1,13 +1,8 @@
 // Author(s): Dor Darmon, Yuval Anteby
-#include <iostream>
-#include <sstream>
-#include <bloom/commands/BloomCommandInvoker.h>
-#include <bloom/commands/CheckUrlCommand.h>
-#include <bloom/commands/InsertUrlCommand.h>
-#include <bloom/utils/BloomFilterStatusCodeParser.h>
-#include <strategyIO/ConsoleInputReader.h>
-#include <strategyIO/ConsoleOutputWriter.h>
 
+
+#include "strategyIO/ConsoleInputReader.h"
+#include "strategyIO/ConsoleOutputWriter.h"
 #include "utils/InputValidation.h"
 #include "utils/BloomInputProccesor.h"
 #include "data_persistence/IDataPersistence.h"
@@ -17,39 +12,14 @@
 #include "bloom/utils/CommandParser.h"
 #include "bloom/utils/CommandRequest.h"
 
-void handleChoice(
-    int arrSize,
-    const std::vector<int> &configInts,
-    CommandRequest commandReq,
-    IDataPersistence& dataSource,
-    IOutputWriter& outputWriter
-    ) {
-    // Create the invoker for the commands
-    BloomCommandInvoker invoker;
-    switch (commandReq.getCommand()) {
-        case POST:
-            InsertUrlCommand insertUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);//TODO add output
-            invoker.runCommand(insertUrlCommand);
-        break;
-        case GET:
-            CheckUrlCommand checkUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
-            invoker.runCommand(checkUrlCommand);
-        break;
-        case DELETE:
-            std::cout << "TODO DELETE FUNC HERE " << std::endl;
-        break;
-        case default:
-            std::string errorMsg = toStatusMessage(BAD_REQUEST);
-            outputWriter.writeData(errorMsg);
-    }
-}
 
 /**
  * Main loop that reads and processes input lines.
  */
 int main() {
+    //TODO need to get first int and config ints from command line arguments
     bool firstLineFlag = true; // true if we're waiting for first line input
-    int firstInt;
+    int firstInt = -1;
     std::vector<int> configInts;
     // Create the data persistence object according to data source (this time we use files)
     IDataPersistence *dataSource = new FilePersistence();
@@ -79,16 +49,13 @@ int main() {
         // Update the first line flag
         firstLineFlag = false;
         // If still waiting for first line or line isn't valid command - skip it
-        if (firstLineFlag || !hasValidCommandStructure(line)) {
+        if (firstLineFlag /*|| !hasValidCommandStructure(line)*/) {
             continue;
         }
         // handle the user's command choice
-        CommandRequest cr = CommandParser::parseCommand(line);
-        handleChoice(firstInt, configInts, cr, *dataSource, *outputWriter);
-        //handleUserChoice(line, firstInt, configInts, *dataSource);
+        const CommandRequest cr = CommandParser::parseCommand(line);
+        handleBloomCommandChoice(firstInt, configInts, cr, *dataSource, *outputWriter);
     }
     delete dataSource;
     return 0;
 }
-
-

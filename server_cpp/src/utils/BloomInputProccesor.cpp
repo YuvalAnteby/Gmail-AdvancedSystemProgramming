@@ -2,6 +2,9 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <bloom/utils/BloomFilterStatusCodeParser.h>
+#include <bloom/utils/CommandRequest.h>
+
 #include "data_persistence/IDataPersistence.h"
 #include "data_persistence/FilePersistence.h"
 #include "bloom/commands/InsertUrlCommand.h"
@@ -49,36 +52,41 @@ std::vector<int> processConfigInts(const std::string& newLine) {
 }
 
 /**
- * Process a valid command line (after the initial line of ints):
- * - If it starts with '1', add the URL
- * - If it starts with '2', check against the blacklist
- * @param line string of the user's choice of command & the url string
- * @param firstInt bit array size given by the user
+ * Handle the user's choice of bloom filter command, initialize and execute the correct one, if given valid input.
+ * @param arrSize bit array size given by the user
  * @param configInts the rest of the config integers for the hashing
+ * @param commandReq object of a commands request, made of {command enum, string URL}
  * @param dataSource object of the data source to provide URLs, bits etc
+ * @param outputWriter object responsible on output (e.g. output using a CLI or over a TCP socket)
  */
-void handleUserChoice(const std::string& line, int firstInt, const std::vector<int> configInts, IDataPersistence& dataSource) {
-    //std::cout << "----- DEBUG: handleUserChoice -----" << std::endl; // TODO: remove debug print
-    // Make sure the line's length is more than 3 to access the URL
-    if (line.size() < 3) {
-        return;
-    }
-    // Extract URL after command and space
-    std::string url = line.substr(2);  
-    // If the URL is invalid - skip this line
-    if (!isValidURL(url)) {
-        return;
-    }
+void handleBloomCommandChoice(
+    int arrSize,
+    const std::vector<int> &configInts,
+    CommandRequest commandReq,
+    IDataPersistence &dataSource,
+    IOutputWriter &outputWriter
+) {
     // Create the invoker for the commands
     BloomCommandInvoker invoker;
-    // Check what option the user chose, execute the correct command
-    if (line[0] == '1') {
-        //std::cout << "----- DEBUG: chosen 1 -----" << std::endl; // TODO: remove debug print
-        //InsertUrlCommand insertUrlCommand(url, dataSource, configInts, firstInt);
-        //invoker.runCommand(insertUrlCommand);
-    } else if (line[0] == '2') {
-        //std::cout << "----- DEBUG: chosen 2 -----" << std::endl; // TODO: remove debug print
-        //CheckUrlCommand checkUrlCommand(url, dataSource, configInts, firstInt);
-        //invoker.runCommand(checkUrlCommand);
+    switch (commandReq.getCommand()) {
+        case POST: {
+            InsertUrlCommand insertUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
+            //TODO add output
+            invoker.runCommand(insertUrlCommand);
+            break;
+        }
+        case GET: {
+            CheckUrlCommand checkUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
+            invoker.runCommand(checkUrlCommand);
+            break;
+        }
+        case DELETE: {
+            std::cout << "TODO DELETE FUNC HERE " << std::endl;
+            break;
+        }
+        default: {
+            std::string errorMsg = toStatusMessage(BAD_REQUEST);
+            outputWriter.writeData(errorMsg);
+        }
     }
 }
