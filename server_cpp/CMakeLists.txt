@@ -16,7 +16,6 @@ FetchContent_MakeAvailable(googletest)
 
 # For compiling the project itself
 file(GLOB_RECURSE TEST_FILES
-        src/*.cpp
         src/utils/*.cpp
         src/bloom/utils/BloomFilterCommandEnum.h
         src/bloom/utils/BloomFilterStatusEnum.h
@@ -27,7 +26,7 @@ file(GLOB_RECURSE TEST_FILES
         src/bloom/models/*.cpp
         src/data_persistence/*.cpp
         src/strategyIO/*.cpp
-        #tests/*.cpp
+        tests/*.cpp
         tests/utils_tests/*.cpp
 )
 # For compiling the tests

@@ -144,7 +144,7 @@ TEST(appendBitArray, EmptyBitsInput) {
     std::vector<bool> bits = {};
     IDataPersistence *fp = new FilePersistence();
     // Expect invalid argument error to be thrown when trying to save
-    EXPECT_THROW(fp->appendBitArray(bits), std::invalid_argument);
+    EXPECT_FALSE(fp->appendBitArray(bits));
     deleteFiles();
 }
 
@@ -158,7 +158,7 @@ TEST(appendBlacklistedUrl, EmptyUrlInput) {
     std::string url = "";
     IDataPersistence *fp = new FilePersistence();
     // Expect invalid argument error to be thrown when trying to save
-    EXPECT_THROW(fp->appendBlacklistedUrl(url), std::invalid_argument);
+    EXPECT_FALSE(fp->appendBlacklistedUrl(url));
     deleteFiles();
 }
 
@@ -228,6 +228,6 @@ TEST(appendConfigInts, EmptyConfigIntsInput) {
     std::vector<int> ints = {};
     IDataPersistence *fp = new FilePersistence();
     // Expect invalid argument error to be thrown when trying to save
-    EXPECT_THROW(fp->appendConfigInts(ints), std::invalid_argument);
+    EXPECT_FALSE(fp->appendConfigInts(ints));
     deleteFiles();
 }
