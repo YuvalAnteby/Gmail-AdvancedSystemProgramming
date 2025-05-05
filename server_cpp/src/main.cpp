@@ -53,6 +53,7 @@ int main() {
     std::vector<int> configInts;
     // Create the data persistence object according to data source (this time we use files)
     IDataPersistence *dataSource = new FilePersistence();
+    /// TODO make the IO dynamic with TCP socket/ console etc
     // Create the dynamic IO
     IInputReader *inputReader = new ConsoleInputReader();
     IOutputWriter *outputWriter = new ConsoleOutputWriter();
