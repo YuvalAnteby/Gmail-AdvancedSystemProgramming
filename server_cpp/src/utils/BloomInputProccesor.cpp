@@ -71,20 +71,23 @@ void handleBloomCommandChoice(
     switch (commandReq.getCommand()) {
         case POST: {
             InsertUrlCommand insertUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
-            //TODO add output
             invoker.runCommand(insertUrlCommand);
+            /// TODO add output as needed
             break;
         }
         case GET: {
             CheckUrlCommand checkUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
             invoker.runCommand(checkUrlCommand);
+            /// TODO add output as needed
             break;
         }
         case DELETE: {
+            /// TODO delete command here
             std::cout << "TODO DELETE FUNC HERE " << std::endl;
             break;
         }
         default: {
+            /// TODO Ensure this is the correct error message
             std::string errorMsg = toStatusMessage(BAD_REQUEST);
             outputWriter.writeData(errorMsg);
         }

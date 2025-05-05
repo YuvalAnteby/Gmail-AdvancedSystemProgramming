@@ -17,7 +17,7 @@
  * Main loop that reads and processes input lines.
  */
 int main() {
-    //TODO need to get first int and config ints from command line arguments
+    /// TODO need to get first int and config ints from command line arguments. get, validate, move to variables
     bool firstLineFlag = true; // true if we're waiting for first line input
     int firstInt = -1;
     std::vector<int> configInts;
@@ -27,14 +27,16 @@ int main() {
     // Create the dynamic IO
     IInputReader *inputReader = new ConsoleInputReader();
     IOutputWriter *outputWriter = new ConsoleOutputWriter();
+    /// TODO check if there's a way to exit the infinite loop using terminal, old way of control+d doesnt work now
     // start the infinite loop
     while (true) {
         std::string line = inputReader->readLine();
-        // TODO change to get input of first line from CLI arguments
+        /// TODO change to get input of first line from CLI arguments
         // Skip to next line if the first line was invalid
         if (firstLineFlag && !containsOnlyDigitsAndWhitespace(line) && !isValidFirstLine(line)) {
             continue;
         }
+        /// TODO remove this if block, won't be in use when using CLI arguments
         // processing first line of config ints
         if (firstLineFlag) {
             // Get the first line's ints, put the first int (bit array size) int one variable
@@ -48,6 +50,7 @@ int main() {
         }
         // Update the first line flag
         firstLineFlag = false;
+        /// TODO remove this if block, won't be in use when using CLI arguments
         // If still waiting for first line or line isn't valid command - skip it
         if (firstLineFlag /*|| !hasValidCommandStructure(line)*/) {
             continue;
