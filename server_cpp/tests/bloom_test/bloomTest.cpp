@@ -24,9 +24,9 @@ public:
     std::vector<std::vector<bool>> loadBitArrays() override { return bitArrays; }
     std::vector<std::string> loadBlacklist() override { return blacklist; }
 
-    bool appendBlacklistedUrl(const std::string&) override {}
-    bool appendConfigInts(const std::vector<int>&) override {}
-    bool appendBitArray(const std::vector<bool>&) override {}
+    bool appendBlacklistedUrl(const std::string&) override {return true;}
+    bool appendConfigInts(const std::vector<int>&) override {return true;}
+    bool appendBitArray(const std::vector<bool>&) override {return true;}
 };
 
 // -----------------------------

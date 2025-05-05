@@ -30,8 +30,6 @@ private:
 
     bool matchesURL(const std::string& url, const std::vector<std::string>& list);
 
-    void addMessage(std::string msg);
-
 public:
 
 

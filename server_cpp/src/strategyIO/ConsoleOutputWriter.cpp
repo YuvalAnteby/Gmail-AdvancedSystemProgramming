@@ -13,6 +13,6 @@ ConsoleOutputWriter::ConsoleOutputWriter() = default;
 * Print the given string to the CLI
 * @param line the string to print
 */
-void writeData(std::string& line) {
+void ConsoleOutputWriter::writeData(std::string& line) {
   std::cout << line << std::endl;
 }

@@ -26,7 +26,7 @@ CommandRequest CommandParser::parseCommand(const std::string& line) {
   iss >> command >> url;
   BloomFilterCommandEnum cmdCode = toCommandCode(command);
   // check validation of the URL
-  if(!isValidURL(url)) {
+  if(!isValidURL(url) || cmdCode == CMD_NONE) {
     std::string emptyString = "";
     return CommandRequest{emptyString, emptyString};
   }

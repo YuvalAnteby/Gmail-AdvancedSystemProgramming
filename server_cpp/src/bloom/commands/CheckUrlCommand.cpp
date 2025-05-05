@@ -85,15 +85,6 @@ bool CheckUrlCommand::matchesURL(const std::string &url, const std::vector<std::
 }
 
 /**
- * Add the new message to the output writer and result class
- * @param msg message to print using the output writer and add to the result
- */
-void CheckUrlCommand::addMessage(std::string msg) {
-    m_bloomResult.appendToOutcomeMessage(msg);
-    m_outputWriter.writeData(msg);
-}
-
-/**
  * Executes the CheckUrlCommand.
  * 
  * Steps:
@@ -103,22 +94,26 @@ void CheckUrlCommand::addMessage(std::string msg) {
  * 4. Prints the result and updates the internal result state (`true` or `false`).
  */
 void CheckUrlCommand::execute() {
+    std::string outcome;
     // Load Bloom filter bit arrays from persistence
     std::vector<std::vector<bool> > bitsArrays = persistence.loadBitArrays();
 
     // Check if the URL possibly exists in any Bloom filter
     if (possiblyContains(url, size, configInts, bitsArrays)) {
-        addMessage("true ");
+        outcome = "true ";
         // If possibly contained, check blacklist for real match
         if (matchesURL(url, persistence.loadBlacklist())) {
-            addMessage("true\n");
+            outcome += "true\n";
         } else {
-            addMessage("false\n");
+            outcome += "false\n";
         }
     } else {
         // Definitely not in the Bloom filter
-        addMessage("false\n");
+        outcome +="false\n";
     }
+    // add the message
+    m_bloomResult.appendToOutcomeMessage(outcome);
+    m_outputWriter.writeData(outcome);
 }
 
 /**
