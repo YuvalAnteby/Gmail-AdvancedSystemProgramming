@@ -94,21 +94,26 @@ bool CheckUrlCommand::matchesURL(const std::string &url, const std::vector<std::
  * 4. Prints the result and updates the internal result state (`true` or `false`).
  */
 void CheckUrlCommand::execute() {
+    std::string outcome;
     // Load Bloom filter bit arrays from persistence
     std::vector<std::vector<bool> > bitsArrays = persistence.loadBitArrays();
+
     // Check if the URL possibly exists in any Bloom filter
     if (possiblyContains(url, size, configInts, bitsArrays)) {
-        m_bloomResult.appendToOutcomeMessage( "true ");
+        outcome = "true ";
         // If possibly contained, check blacklist for real match
         if (matchesURL(url, persistence.loadBlacklist())) {
-            m_bloomResult.appendToOutcomeMessage("true\n");
+            outcome += "true\n";
         } else {
-            m_bloomResult.appendToOutcomeMessage( "false\n");
+            outcome += "false\n";
         }
     } else {
         // Definitely not in the Bloom filter
-        m_bloomResult.appendToOutcomeMessage("false\n");
+        outcome +="false\n";
     }
+    // add the message
+    m_bloomResult.appendToOutcomeMessage(outcome);
+    m_outputWriter.writeData(outcome);
 }
 
 /**
@@ -117,18 +122,16 @@ void CheckUrlCommand::execute() {
  * @return a command result object with the result of the check (including code, messages etc.)
  */
 BloomCommandResult CheckUrlCommand::getResult() {
-    std::string fullMsg;
     // Set the full message and return the result
-    switch (m_bloomResult.getStatusCode()) {
-        case OK: // Gotten the answer as intended, return the message according to the instructions
-            m_bloomResult.setIsSuccess(true);
-            fullMsg = toStatusMessage(m_bloomResult.getStatusCode()) + "\n\n" + m_bloomResult.getOutcomeMessage();
-            break;
-        default: // Probably some error, handle it using the codes
-            m_bloomResult.setIsSuccess(false);
-            fullMsg = toStatusMessage(m_bloomResult.getStatusCode()) + "\n";
-            break;
+    if (m_bloomResult.getStatusCode() == OK) {
+        m_bloomResult.setIsSuccess(true);
+        // Set the message to the client as requested in the instructions
+        m_bloomResult.setFullMessage(
+            toStatusMessage(m_bloomResult.getStatusCode()) + "\n\n" + m_bloomResult.getOutcomeMessage());
+    } else {
+        // Probably some error, handle it using the codes
+        m_bloomResult.setIsSuccess(false);
+        m_bloomResult.setFullMessage(toStatusMessage(m_bloomResult.getStatusCode()) + "\n");
     }
-    m_bloomResult.setFullMessage(fullMsg);
     return m_bloomResult;
 }
