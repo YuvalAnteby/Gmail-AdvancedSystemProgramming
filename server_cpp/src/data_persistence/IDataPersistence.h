@@ -68,7 +68,7 @@ public:
 
     /**
      * Delete a given URL from the data source.
-     * Default implementation is a runtime error of 'deletion of URLs is not supported'.
+     * @throws std::runtime_error Default implementation is a runtime error of 'deletion of URLs is not supported'.
      * @param url a URL to be deleted
      * @return true if deleted successfully all URL instances in the data source, otherwise false.
      */
