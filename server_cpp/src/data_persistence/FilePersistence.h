@@ -31,9 +31,9 @@ public:
     BloomFilterStatusEnum deleteUrl(const std::string& url) override;
 
     // Config related function
-    std::vector<int> loadConfigInts();
-    bool appendConfigInts(const std::vector<int>& configInts);
-    int getBitSizeConfig();
+    std::vector<int> loadConfigInts() override;
+    bool appendConfigInts(const std::vector<int>& configInts) override;
+    int getBitSizeConfig() override;
 
 };
 
