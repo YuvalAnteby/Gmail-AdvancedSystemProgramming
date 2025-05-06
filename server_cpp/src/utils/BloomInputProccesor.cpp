@@ -78,7 +78,8 @@ void handleBloomCommandChoice(
         case GET: {
             CheckUrlCommand checkUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
             invoker.runCommand(checkUrlCommand);
-            /// TODO add output as needed
+            std::string msg = checkUrlCommand.getResult().getFullMessage();
+            outputWriter.writeData(msg);
             break;
         }
         case DELETE: {
