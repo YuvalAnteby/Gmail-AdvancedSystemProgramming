@@ -74,7 +74,7 @@ void handleBloomCommandChoice(
             break;
         }
         case GET: {
-            CheckUrlCommand checkUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize);
+            CheckUrlCommand checkUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
             invoker.runCommand(checkUrlCommand);
             // Print the result using the dynamic writer
             std::string msg = checkUrlCommand.getResult().getFullMessage();

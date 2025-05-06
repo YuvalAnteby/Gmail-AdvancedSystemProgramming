@@ -15,18 +15,21 @@
  * @param persistence the persistence object used to load bit arrays and blacklist
  * @param configInts vector of configuration integers used for hashing
  * @param size the size of the Bloom filter bit array
+ * @param outputWriter object responsible on output to wherever we want
  */
 CheckUrlCommand::CheckUrlCommand(
     const std::string &url,
     IDataPersistence &persistence,
     const std::vector<int> &configInts,
-    int size
+    int size,
+    IOutputWriter &outputWriter
 )
     : url(url),
       persistence(persistence),
       configInts(configInts),
       size(size),
-      m_bloomResult(GET) {
+      m_bloomResult(GET),
+      m_outputWriter(outputWriter) {
 }
 
 
