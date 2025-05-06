@@ -18,7 +18,7 @@ FilePersistence::FilePersistence() {
  * Load the entire bits arrays which represents the Bloom Filter.
  * @return A vector of a vector of bools, each element represents a bit array.
  */
-std::vector<std::vector<bool>> FilePersistence::loadBitArrays() override {
+std::vector<std::vector<bool>> FilePersistence::loadBitArrays() {
     std::ifstream file(bitArrayPath.c_str());
     // If the file doesn't exist, create it and return an empty file.
     if (!file.is_open()) {
@@ -45,7 +45,7 @@ std::vector<std::vector<bool>> FilePersistence::loadBitArrays() override {
  * @param vector of bit array to save.
  * @return true if added successfully, otherwise false
  */
-bool FilePersistence::appendBitArray(const std::vector<bool> &bits) override {
+bool FilePersistence::appendBitArray(const std::vector<bool> &bits) {
     //std::cout << "DEBUG: started appending bit array" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (bits.empty()) {
@@ -71,7 +71,7 @@ bool FilePersistence::appendBitArray(const std::vector<bool> &bits) override {
  * Load the list of blacklisted URLs (used for false-positive checks) from the .txt file.
  * @return A vector of blacklisted URLs.
  */
-std::vector<std::string> FilePersistence::loadBlacklist() override {
+std::vector<std::string> FilePersistence::loadBlacklist() {
     std::ifstream file(blacklistPath.c_str());
     // If the file doesn't exist, create it and return an empty file.
     if (!file.is_open()) {
@@ -93,7 +93,7 @@ std::vector<std::string> FilePersistence::loadBlacklist() override {
  * @param URLs The URL to save.
  * @return true if added successfully, otherwise false
  */
-bool FilePersistence::appendBlacklistedUrl(const std::string &url) override {
+bool FilePersistence::appendBlacklistedUrl(const std::string &url) {
     //std::cout << "DEBUG: started appending URL" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (url.empty()) {
@@ -116,7 +116,7 @@ bool FilePersistence::appendBlacklistedUrl(const std::string &url) override {
  * Save the config ints, given by the user's input.
  * @return int array of how many times to run hash functions. if there are no ints saved will return empty vector
  */
-std::vector<int> FilePersistence::loadConfigInts() override {
+std::vector<int> FilePersistence::loadConfigInts() {
     std::ifstream file(configIntsPath.c_str());
     // If the file doesn't exist, create it and return an empty file.
     if (!file.is_open()) {
@@ -142,7 +142,7 @@ std::vector<int> FilePersistence::loadConfigInts() override {
 * hash functions
 * @return true if added successfully, otherwise false
 */
-bool FilePersistence::appendConfigInts(const std::vector<int>& configInts) override {
+bool FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
     //std::cout << "DEBUG: started appending config ints" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (configInts.empty()) {
@@ -167,7 +167,7 @@ bool FilePersistence::appendConfigInts(const std::vector<int>& configInts) overr
 * Get from the config the size of the bit array.
 * @return an int representing the bit array size. If there is no int saved returns -1
 */
-int FilePersistence::getBitSizeConfig() override {
+int FilePersistence::getBitSizeConfig() {
     std::ifstream file(configIntsPath.c_str());
     // If the file doesn't exist, create it and return an empty file.
     if (!file.is_open()) {
@@ -187,7 +187,7 @@ int FilePersistence::getBitSizeConfig() override {
  * @param url a URL to be deleted
  * @return NO_CONTENT (204) if deleted successfully, NOT_FOUND (404) if URL doesn't exist, otherwise BAD_REQUEST (400)
  */
-BloomFilterStatusEnum FilePersistence::deleteUrl(const std::string &url) override {
+BloomFilterStatusEnum FilePersistence::deleteUrl(const std::string &url) {
     const std::string tempPath = "data/temp.txt";
     // set flag if we found & deleted at least one URL
     bool deleted = false;
