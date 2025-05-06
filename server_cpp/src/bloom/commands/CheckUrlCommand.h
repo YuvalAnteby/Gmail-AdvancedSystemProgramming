@@ -19,7 +19,6 @@ private:
     std::vector<int> configInts;
     int size; 
     BloomCommandResult m_bloomResult;
-    IOutputWriter& m_outputWriter;
 
     bool possiblyContains(
         const std::string& url,
@@ -39,15 +38,14 @@ public:
      * @param persistence reference to the data management tool to check with (e.g. .txt file or DB)
      * @param configInts array of the config ints
      * @param size bit array size
-     * @param outputWriter object responsible on output to wherever we want
      */
     CheckUrlCommand(
         const std::string& url,
         IDataPersistence& persistence,
         const std::vector<int>& configInts,
-        int size,
-        IOutputWriter& outputWriter
+        int size
         );
+
     /**
     * Execute the check URL command.
     * Will call relevant functions to check if a given URL is in the blooom filter.
