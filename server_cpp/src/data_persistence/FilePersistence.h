@@ -28,11 +28,13 @@ public:
     // Blacklisted URLs related functions from interface
     std::vector<std::string> loadBlacklist() override;
     bool appendBlacklistedUrl(const std::string& url) override;
-    
+    BloomFilterStatusEnum deleteUrl(const std::string& url) override;
+
     // Config related function
     std::vector<int> loadConfigInts();
     bool appendConfigInts(const std::vector<int>& configInts);
     int getBitSizeConfig();
+
 };
 
 #endif

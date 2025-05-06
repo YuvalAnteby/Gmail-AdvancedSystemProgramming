@@ -2,8 +2,10 @@
 #ifndef IFILE_PERSISTENCE_H
 #define IFILE_PERSISTENCE_H
 
+#include <stdexcept>
 #include <vector>
 #include <string>
+#include "bloom/utils/BloomFilterStatusEnum.h"
 
 /**
  * Interface for file management of Bloom Filter.
@@ -63,5 +65,15 @@ public:
      * @return an int representing the bit array size
      */
     virtual int getBitSizeConfig() = 0;
+
+    /**
+     * Delete a given URL from the data source.
+     * Default implementation is a runtime error of 'deletion of URLs is not supported'.
+     * @param url a URL to be deleted
+     * @return true if deleted successfully all URL instances in the data source, otherwise false.
+     */
+    virtual BloomFilterStatusEnum deleteUrl(const std::string& url) {
+        throw std::runtime_error("deletion of URLs is not supported");
+    }
 };
 #endif
