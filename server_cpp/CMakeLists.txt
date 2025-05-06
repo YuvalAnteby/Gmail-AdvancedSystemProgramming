@@ -17,10 +17,15 @@ FetchContent_MakeAvailable(googletest)
 # For compiling the project itself
 file(GLOB_RECURSE TEST_FILES
         src/utils/*.cpp
+        src/bloom/utils/BloomFilterCommandEnum.h
+        src/bloom/utils/BloomFilterStatusEnum.h
+        src/bloom/utils/*.cpp
         src/bloom/*.cpp
         src/bloom/commands/*.cpp
         src/bloom/hash/*.cpp
+        src/bloom/models/*.cpp
         src/data_persistence/*.cpp
+        src/strategyIO/*.cpp
         tests/*.cpp
         tests/utils_tests/*.cpp
 )
@@ -31,10 +36,15 @@ add_executable(runTests ${TEST_FILES})
 file(GLOB_RECURSE SRC_FILES
         src/*.cpp
         src/utils/*.cpp
+        src/bloom/utils/BloomFilterCommandEnum.h
+        src/bloom/utils/BloomFilterStatusEnum.h
+        src/bloom/utils/*.cpp
         src/bloom/*.cpp
         src/bloom/commands/*.cpp
         src/bloom/hash/*.cpp
+        src/bloom/models/*.cpp
         src/data_persistence/*.cpp
+        src/strategyIO/*.cpp
 )
 add_executable(app ${SRC_FILES})
 
