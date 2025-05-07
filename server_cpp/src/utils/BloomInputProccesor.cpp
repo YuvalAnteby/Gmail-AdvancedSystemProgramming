@@ -7,11 +7,9 @@
 #include <bloom/utils/CommandRequest.h>
 
 #include "data_persistence/IDataPersistence.h"
-#include "data_persistence/FilePersistence.h"
 #include "bloom/commands/InsertUrlCommand.h"
 #include "bloom/commands/CheckUrlCommand.h"
 #include "bloom/commands/BloomCommandInvoker.h"
-#include "utils/InputValidation.h"
 
 /**
  * Get the first number from the first line as a string, edit the line string to skip it.
@@ -79,7 +77,9 @@ void handleBloomCommandChoice(
         case GET: {
             CheckUrlCommand checkUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
             invoker.runCommand(checkUrlCommand);
-            /// TODO add output as needed
+            // Print the result using the dynamic writer
+            std::string msg = checkUrlCommand.getResult().getFullMessage();
+            outputWriter.writeData(msg);
             break;
         }
         case DELETE: {
