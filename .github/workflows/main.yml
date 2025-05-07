@@ -1,5 +1,3 @@
-name: CI
-
 # Trigger only 
 on:
   pull_request:
@@ -14,7 +12,7 @@ on:
       - GA-36-Client-side
       - GA-29-TCP-connection-C-server
       # TODO: Add more main-ExN branches as we need for assignments
-    
+
 jobs:
   # ----- Build & tests the CPP server -----
   build-and-test-server:
@@ -22,7 +20,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
       - name: Build and run gtests
         run: docker compose run --build --rm gtest
-      

@@ -14,45 +14,19 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# For compiling the project itself
-file(GLOB_RECURSE TEST_FILES
-        src/utils/*.cpp
-        src/network/*.cpp
-        src/bloom/utils/BloomFilterCommandEnum.h
-        src/bloom/utils/BloomFilterStatusEnum.h
-        src/bloom/utils/*.cpp
-        src/bloom/*.cpp
-        src/bloom/commands/*.cpp
-        src/bloom/hash/*.cpp
-        src/bloom/models/*.cpp
-        src/data_persistence/*.cpp
-        src/strategyIO/*.cpp
-        tests/*.cpp
-        tests/utils_tests/*.cpp
-)
-# For compiling the tests
-add_executable(runTests ${TEST_FILES})
+# ----- Building CPP server -----
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp)
+add_executable(runServer ${SRC_FILES})
+# ----- Building CPP server -----
 
-# For compiling the project itself
-file(GLOB_RECURSE SRC_FILES
-        src/*.cpp
-        src/utils/*.cpp
-        src/network/*.cpp
-        src/bloom/utils/BloomFilterCommandEnum.h
-        src/bloom/utils/BloomFilterStatusEnum.h
-        src/bloom/utils/*.cpp
-        src/bloom/*.cpp
-        src/bloom/commands/*.cpp
-        src/bloom/hash/*.cpp
-        src/bloom/models/*.cpp
-        src/data_persistence/*.cpp
-        src/strategyIO/*.cpp
-)
-add_executable(app ${SRC_FILES})
+# ----- Building unit tests -----
+file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS tests/*.cpp)
+set(TEST_FILES_LIST ${SRC_FILES} ${TEST_FILES})
+list(FILTER TEST_FILES_LIST EXCLUDE REGEX "src/main.cpp")
+list(APPEND TEST_FILES_LIST tests/test_main.cpp)
+add_executable(runTests ${TEST_FILES_LIST})
+# ----- Building unit tests -----
 
-# Include directories
 include_directories(src)
-include_directories(src/data_persistence)
-
 # Link gtest and gtest_main to runTests
 target_link_libraries(runTests gtest gtest_main)
