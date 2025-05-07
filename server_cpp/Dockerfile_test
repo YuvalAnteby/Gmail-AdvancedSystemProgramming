@@ -7,6 +7,7 @@ FROM gcc:latest
 # Add CMake to the container
 RUN apt-get update && apt-get install -y cmake
 
+
 # Copy and set the project in the container
 WORKDIR /usr/src/server_tests
 COPY server_cpp ./
