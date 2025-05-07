@@ -12,6 +12,7 @@ on:
       - main-Ex4
       - main-Ex5
       - GA-36-Client-side
+      - GA-47-Change-naming-of-app-to-server-wherever-needed
       - GA-29-TCP-connection-C-server
       # TODO: Add more main-ExN branches as we need for assignments
 
@@ -40,7 +41,6 @@ jobs:
           docker buildx build \
             --cache-from type=local,src=/tmp/.buildx-cache \
             --cache-to type=local,dest=/tmp/.buildx-cache \
-            --target gtest \
             --file server_cpp/Dockerfile_test \
             --load \
             -t gmail_tests \
