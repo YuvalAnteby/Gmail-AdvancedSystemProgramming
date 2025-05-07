@@ -59,6 +59,7 @@ void InsertUrlCommand::execute() {
  */
 BloomCommandResult InsertUrlCommand::getResult() {
     // Set the message to the client as requested in the instructions (the same for errors and success
+    m_bloomResult.appendToOutcomeMessage(toStatusMessage(m_bloomResult.getStatusCode()) + "\n");
     m_bloomResult.setFullMessage(m_bloomResult.getStatusCode() + "\n");
     return m_bloomResult;
 }

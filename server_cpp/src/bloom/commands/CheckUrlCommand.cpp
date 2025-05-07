@@ -109,6 +109,7 @@ void CheckUrlCommand::execute() {
         // Definitely not in the Bloom filter
         m_bloomResult.appendToOutcomeMessage("false\n");
     }
+    m_bloomResult.setStatusCode(OK);
 }
 
 /**
