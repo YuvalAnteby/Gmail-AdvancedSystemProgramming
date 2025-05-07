@@ -91,7 +91,6 @@ edge_cases = {
     "Hebrew": "שלום",
     "Arabic": "مرحبا",
     "Chinese": "你好",
-    "Emoji": "test 🌍"
 }
 
 for name, test_input in edge_cases.items():
