@@ -35,6 +35,15 @@ services:
       - SERVER_PORT=42069
     # Change 'app' to desired server name here, '42069' to desired port (given as args)
     command: [ "python", "main.py", "app", "42069" ]
+  # Client test runner (Python)
+  pytest_client:
+    build:
+      context: ./client_python
+      dockerfile: Dockerfile
+    container_name: pytest_client
+    working_dir: /app/tests
+    entrypoint: ["python", "client_tests.py"]
+  
 
 volumes:
   app_data:   # <-- define the named volume

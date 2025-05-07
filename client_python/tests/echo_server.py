@@ -1,10 +1,9 @@
+# Author: Dor Darmon
 import os
 import subprocess
 import time
 
 # This test checks whether the client correctly sends a message and
-# receives the same message back from a simple echo server.
-
 # Start a simple echo server in the background
 echo_server = subprocess.Popen(["python", "client_python/tests/echo_server.py"])
 time.sleep(1)

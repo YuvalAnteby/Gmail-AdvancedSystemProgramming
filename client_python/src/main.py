@@ -1,5 +1,7 @@
+# Author: Dor Darmon
 import socket
 import os
+import sys
 
 
 # Manages TCP connection to the server
@@ -60,16 +62,18 @@ class ClientApp:
             self.connection.close()
 
 
-# Parse IP and port from command line args
+# Gats IP and port from command line args
 def get_server_details() -> tuple[str, int] | None:
-    ip = os.getenv("SERVER_HOST")
-    port_str = os.getenv("SERVER_PORT")
-    if not ip or not port_str:
-        return None
-    try:
-        return ip, int(port_str)
-    except ValueError:
-        return None
+   if len(sys.argv) == 3:
+        return sys.argv[1], int(sys.argv[2])
+   ip = os.getenv("SERVER_HOST")
+   port_str = os.getenv("SERVER_PORT")
+   if not ip or not port_str:
+       return None
+   try:
+       return ip, int(port_str)
+   except ValueError:
+       return None
 
 
 # Entry point
