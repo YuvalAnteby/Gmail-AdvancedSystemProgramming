@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <bloom/commands/DeleteUrlCommand.h>
 #include <bloom/utils/BloomFilterStatusCodeParser.h>
 #include <bloom/utils/CommandRequest.h>
 
@@ -82,8 +83,12 @@ void handleBloomCommandChoice(
             break;
         }
         case DELETE: {
-            /// TODO delete command here
-            std::cout << "TODO DELETE FUNC HERE " << std::endl;
+            // Initialize & execute
+            DeleteUrlCommand deleteUrlCommand(commandReq.getUrl(), dataSource, outputWriter);
+            invoker.runCommand(deleteUrlCommand);
+            // Print the outcome using the dynamic writer
+            std::string msg = deleteUrlCommand.getResult().getFullMessage();
+            outputWriter.writeData(msg);
             break;
         }
         default: {

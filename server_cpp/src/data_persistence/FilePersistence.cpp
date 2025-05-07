@@ -1,7 +1,10 @@
 // Author(s): Yuval Anteby
+
+#include "bloom/utils/BloomFilterStatusEnum.h"
 #include "FilePersistence.h"
 #include <fstream>
 #include <iostream>
+#include <utils/InputValidation.h>
 
 /**
  * Constructor
@@ -177,4 +180,45 @@ int FilePersistence::getBitSizeConfig() {
     int result = std::stoi(line);
     file.close();
     return result;
+}
+
+/**
+ * Delete a given URL from the .txt file.
+ * @param url a URL to be deleted
+ * @return NO_CONTENT (204) if deleted successfully, NOT_FOUND (404) if URL doesn't exist, otherwise BAD_REQUEST (400)
+ */
+BloomFilterStatusEnum FilePersistence::deleteUrl(const std::string &url) {
+    const std::string tempPath = "data/temp.txt";
+    // set flag if we found & deleted at least one URL
+    bool deleted = false;
+    // Check validation of the URL
+    if (url.empty() || !isValidURL(url)) {
+        return BAD_REQUEST;
+    }
+    // Created a temp file, make sure both files opened correctly
+    std::ifstream originalFile(blacklistPath.c_str());
+    std::ofstream tempFile(tempPath, std::ios::app);
+    if (!originalFile.is_open() || !tempFile.is_open()) {
+        return BAD_REQUEST;
+    }
+    std::string line;
+    // Loop through the original file, remove any instance of the given URL, move the rest to temp file
+    while (std::getline(originalFile, line)) {
+        if (line == url) {
+            deleted = true;
+        } else {
+            tempFile << line << std::endl;
+        }
+    }
+    tempFile.close();
+    originalFile.close();
+    // Didn't find the URL in file
+    if (!deleted) {
+        std::remove(tempPath.c_str());
+        return NOT_FOUND;
+    }
+    // We deleted the URL, now replace the temp file to be the new original file
+    std::remove(blacklistPath.c_str());
+    std::rename(tempPath.c_str(), blacklistPath.c_str());
+    return NO_CONTENT;
 }
