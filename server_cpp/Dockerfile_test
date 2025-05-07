@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y cmake
 
 # Copy and set the project in the container
 WORKDIR /usr/src/server_tests
-COPY server_cpp ./
+COPY . ./
 # Ensures a clean build folder
 RUN rm -rf build && mkdir build
 WORKDIR /usr/src/server_tests/build

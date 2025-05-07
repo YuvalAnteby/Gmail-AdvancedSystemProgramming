@@ -22,7 +22,6 @@ add_executable(runServer ${SRC_FILES})
 # ----- Building unit tests -----
 file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS tests/*.cpp)
 set(TEST_FILES_LIST ${SRC_FILES} ${TEST_FILES})
-list(FILTER TEST_FILES_LIST INCLUDE REGEX "tests/.*\\.cpp")
 list(FILTER TEST_FILES_LIST EXCLUDE REGEX "src/main.cpp")
 list(APPEND TEST_FILES_LIST tests/test_main.cpp)
 add_executable(runTests ${TEST_FILES_LIST})

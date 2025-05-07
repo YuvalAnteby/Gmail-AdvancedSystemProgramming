@@ -20,11 +20,11 @@ cd Gmail-AdvancedSystemProgramming
 ```
 ### build
 ```bash
-docker-compose build app
+docker-compose build runServer
 ```
 ### run
 ```bash
-docker-compose run --rm app
+docker-compose run --rm runServer
 ```
 
 ### Deleting manually the .txt files (in terminal)
@@ -35,8 +35,8 @@ docker run --rm -v gmail-advancedsystemprogramming_app_data:/data alpine sh -c "
 ### Rebuilding the code in case of code errors (deletes .txt files)
 ```bash
 docker-compose down -v
-docker-compose build app
-docker-compose run --rm app
+docker-compose build server
+docker-compose run --rm server
 ```
 
 ### Testing locally with Docker
