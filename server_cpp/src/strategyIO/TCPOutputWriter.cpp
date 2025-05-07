@@ -5,8 +5,8 @@
 #include <sys/socket.h>
 
 /**
- * Default constructor. Gets the client info and send the info using it
- * @param clientSocket
+ * Constructor. Gets the client info and send the info using it
+ * @param clientSocket socket's identifier to a client's connection
  */
 TCPOutputWriter::TCPOutputWriter(const int clientSocket) : m_clientSocket(clientSocket) {
 }

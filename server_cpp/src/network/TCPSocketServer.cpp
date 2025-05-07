@@ -7,17 +7,20 @@
 #include <unistd.h>
 
 /**
- * Default constructor, sets up the server and needed socket info for it.
+ * Constructor, sets up the server and needed socket info for it.
  * Enables at most one client to be connected to the server.
+ * Will close all connection in destructor
  * @param serverPort port to be used by the server
+ * @throws std::runtime_error if reached an error on binding or listening
  */
-TCPSocketServer::TCPSocketServer(int serverPort) :  TCPSocketServer(serverPort, 1) {
+TCPSocketServer::TCPSocketServer(int serverPort) : TCPSocketServer(serverPort, 1) {
 }
 
 /**
  * Constructor, sets up the server and needed socket info for it.
  * @param serverPort port to be used by the server
  * @param maxClients max amount of clients the connection will support
+ * @throws std::runtime_error if reached an error on binding or listening
  */
 TCPSocketServer::TCPSocketServer(int serverPort, int maxClients)
     : m_serverPort(serverPort), m_maxClients(maxClients), m_serverSocket(-1), m_clientSocket(-1) {
@@ -36,26 +39,28 @@ TCPSocketServer::TCPSocketServer(int serverPort, int maxClients)
     // bind the socket to the server's IP+port, print if there's an error
     if (bind(m_serverSocket, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
         perror("error binding socket");
-        return;
+        throw std::runtime_error("Failed to bind socket");
     }
     // Check if we exceeded the max amount of connections
     if (listen(m_serverSocket, m_maxClients) < 0) {
         perror("error listening on socket");
-        return;
+        throw std::runtime_error("Failed to listen on socket");
     }
 }
 
 /**
  * Accept a connection from a new client (if possible)
+ * @return true if managed to connect successfully, otherwise false
  */
-void TCPSocketServer::acceptNewClient() {
+bool TCPSocketServer::acceptNewClient() {
     sockaddr_in client_sin{};
     unsigned int addr_len = sizeof(client_sin);
     m_clientSocket = accept(m_serverSocket, (struct sockaddr *) &client_sin, &addr_len);
     if (m_clientSocket < 0) {
         perror("error accepting client");
-        exit(1);
+        return false;
     }
+    return true;
 }
 
 /**

@@ -1,6 +1,7 @@
 // @Author(s): Yuval Anteby
 #ifndef TCP_SOCKET_SERVER_H
 #define TCP_SOCKET_SERVER_H
+#include <stdexcept>
 
 
 class TCPSocketServer {
@@ -19,7 +20,7 @@ public:
     // Destructor
     ~TCPSocketServer();
 
-    void acceptNewClient();
+    bool acceptNewClient();
 
     int getClientSocket() const;
 };
