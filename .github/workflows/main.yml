@@ -20,9 +20,27 @@ jobs:
   build-and-test-server:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Build and run gtests
-        run: docker compose run --build --rm gtest
+        run: |
+          docker buildx create --use
+          docker buildx build \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache \
+            --target gtest \
+            --file server_cpp/Dockerfile_test \
+            --load \
+            -t gmail_tests \
+            .
+          docker run --rm gmail_tests
       
