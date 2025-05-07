@@ -8,5 +8,6 @@ WORKDIR /app/src
 COPY . /app
 # If ever needed despite TAs instruction - add requirements.txt file here
 # RUN pip install --no-cache-dir -r requirements.txt
-# Run the client
-CMD ["python", "main.py"]
+
+# Set default command
+CMD ["python", "main.py", "server_cpp", "42069"]
