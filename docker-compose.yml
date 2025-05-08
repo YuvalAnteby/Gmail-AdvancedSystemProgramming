@@ -42,7 +42,9 @@ services:
       dockerfile: Dockerfile
     container_name: pytest_client
     working_dir: /app/tests
-    entrypoint: ["python", "client_tests.py"]
+    depends_on:
+      - echo_server
+    command: pytest tests/pytest_client.py  
   
 
 volumes:

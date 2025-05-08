@@ -1,41 +1,57 @@
-# Author: Dor Darmon
+
+#Echo server used for testing the client.
+#Listens on a TCP port and echoes back messages.
+#Supports clean shutdown with "STOP" command.
+
+#Author: Dor Darmon
+
 import socket
 import threading
+# Global flag to allow graceful shutdown
+should_run = True  
 
-def handle_clinet(conn,addr):
+def handle_client(conn, addr):
+    """
+    Handles an individual client connection.
+    Echoes received data, exits if "STOP" is received.
+    """
+    global should_run
     with conn:
         try:
-            while True:
-                data=conn.recv(1024)
+            while should_run:
+                data = conn.recv(1024)
                 if not data:
+                    break
+                decoded = data.decode().strip()
+                if decoded == "STOP":
+                    should_run = False
                     break
                 conn.sendall(data)
         except ConnectionResetError:
-            pass 
-    
-def
-# Server connection settings
-host = "localhost"
-port = "42069"
-input_text = "ECHO_TEST_INPUT"
+            pass  # Client disconnected abruptly
 
-# Start the client with the expected arguments and pass input
-client_proc = subprocess.Popen(
-    ["python", "client_python/main.py", host, port],
-    stdin=subprocess.PIPE,
-    stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE,
-    text=True
-)
+def run_echo_server(host="127.0.0.1", port=42069):
+    """
+    Starts the echo server and accepts incoming connections.
+    """
+    global should_run
+    should_run = True  # Reset flag in case re-run
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((host, port))
+    server.listen()
+    print(f"[Echo Server] Listening on {host}:{port}")
 
-# Send a single message and capture the response
-output, _ = client_proc.communicate(input=input_text + "\\n", timeout=5)
+    try:
+        while should_run:
+            conn, addr = server.accept()
+            thread = threading.Thread(target=handle_client, args=(conn, addr), daemon=True)
+            thread.start()
+    except KeyboardInterrupt:
+        print("[Echo Server] Shutting down.")
+    finally:
+        server.close()
 
-# Shut down echo server
-echo_server.terminate()
+if __name__ == "__main__":
+    run_echo_server()
 
-# Check that the output contains the message we sent
-if input_text in output:
-    print(" Echo test passed.")
-else:
-    print(" Echo test failed.")
