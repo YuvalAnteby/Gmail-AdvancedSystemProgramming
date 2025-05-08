@@ -7,9 +7,9 @@ FROM python:3.11-slim
 WORKDIR /app/src
 COPY . /app
 # If ever needed despite TAs instruction - add requirements.txt file here
-
 #Install Python test dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+
 # Install Python test dependencies
 RUN pip install pytest 
 #Argument to determine whether to run or test IDEA mode.

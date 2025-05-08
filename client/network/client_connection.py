@@ -5,6 +5,7 @@ import socket
 #Handles the TCP connection to the server
 class ClientConnection:
     def __init__(self, server_ip, server_port):
+        
         #Initializes with the IP address and port of the server.
         self.server_ip = server_ip
         self.server_port = server_port

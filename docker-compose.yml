@@ -35,7 +35,7 @@ services:
       - SERVER_PORT=42069
     # Change 'app' to desired server name here, '42069' to desired port (given as args)
     command: [ "python", "main.py", "app", "42069" ]
-  # Client test runner (Python)
+  # Client test runner (Python).
   pytest_client:
     build:
       context: ./client_python
