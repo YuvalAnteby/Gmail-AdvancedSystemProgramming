@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     IInputReader* inputReader = new TcpInputReader(port);
     IOutputWriter* outputWriter = new TCPOutputWriter(port);
 
-    std::cout << "Server is running on port " << port << "...\n";
+    std::cout << "Server is running on port " << port << "...\n";//TODO: do not print just for checking
 
     // Main loop: listen for commands from the client, process, respond.
     while (true) {
