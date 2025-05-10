@@ -11,7 +11,7 @@
  * Processes a line of input.
  * @param line line of the user's input
  * @return true if valid numbers were found and no invalid characters existed between them.
- * Otherwise, returns false, prints "FALSE"
+ * Otherwise, returns false
  */
 bool isValidFirstLine(const std::string& line);
 
@@ -25,41 +25,71 @@ bool isValidURL(const std::string& url);
 /**
  * Check if all characters in the string are digits or whitespace.
  * @param line string of the user's choice of command & the url string
- * @return false if there is no alphabetic char or integer char in the current char of the string
+ * @return false if there is a non-digit non-whitespace character
  */
 bool containsOnlyDigitsAndWhitespace(const std::string& line);
 
 /**
  * Validate command structure.
- * The first token is ignored, all following tokens must be "1" or "2".
- * @param line string of the user's choice of command & the url string
- * @return true if the choice of the valid options (for now 1 or 2), otherwise false
+ * The first token is expected to be "1" or "2", followed by a valid URL.
+ * @param line string of the user's command input
+ * @return true if format is correct, otherwise false
  */
 bool hasValidCommandStructure(const std::string& line);
 
 /**
  * Check if the config ints given by user match the ones we have saved.
- * If we don't have config ints yet save the given ones.
+ * If we don't have config ints yet, save the given ones.
  * @param firstInt first int in user's input, its the bit array size
  * @param configInts the rest of the ints in the user's input
  * @param persistence data source for the config ints
+ * @return true if matching or saved successfully, otherwise false
  */
 bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence& persistence);
 
 /**
+ * Validate that a port string is numeric and in range 1024–65535.
+ * If valid, writes parsed value to the `port` reference.
+ * @param portStr the port string from argv
+ * @param port output parameter (reference) to store the validated port
+ * @return true if valid
+ */
+bool isValidPort(const std::string& portStr, int& port);
+
+/**
+ * Validate that a bloom size string is numeric and > 0.
+ * If valid, writes parsed value to the `bloomSize` reference.
+ * @param bloomSizeStr the bloom size string from argv
+ * @param bloomSize output parameter (reference) to store the validated size
+ * @return true if valid
+ */
+bool isValidBloomSize(const std::string& bloomSizeStr, int& bloomSize);
+
+/**
+ * Validates and extracts hash mod values from CLI args starting at index 3.
+ * If all values are valid (positive integers), writes them to `hashMods` reference vector.
+ * @param argc number of args
+ * @param argv array of args
+ * @param hashMods output parameter (reference) to store validated hash mods
+ * @return true if all are valid
+ */
+bool isValidHashMods(int argc, char* argv[], std::vector<int>& hashMods);
+
+/**
  * Validate and parse server startup arguments.
- * Expects: ./server <port> <bloom_size> <hash1> [<hash2> ... <hashN>]
- * - Verifies port is numeric and in range [1024–65535]
- * - Verifies bloom size is a positive integer
- * - Verifies all hash mod values are positive integers
+ * This is the main interface function to be called from main().
+ * Internally uses other helper validation functions to avoid God function design.
+ *
+ * - If all arguments are valid, parsed values are written into the referenced parameters.
+ * - Parameters are passed by reference so the original variables get updated.
  *
  * @param argc number of CLI arguments
  * @param argv array of CLI argument strings
- * @param port  parsed TCP port to listen on
- * @param bloomSize  parsed bloom filter bit size
- * @param configInts  list of parsed mod values for hash functions
- * @return true if all arguments are valid and were parsed successfully; false otherwise (with errors printed)
+ * @param port output: parsed TCP port
+ * @param bloomSize output: parsed bloom filter bit size
+ * @param configInts output: parsed list of mod values for hash functions
+ * @return true if valid, false otherwise
  */
 bool validateAndParse(int argc, char* argv[], int& port, int& bloomSize, std::vector<int>& configInts);
 
-#endif // INPUT_VALIDATION_H
+#endif 

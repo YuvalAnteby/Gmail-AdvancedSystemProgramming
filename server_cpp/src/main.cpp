@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
 
     // Validate and parse CLI arguments using a dedicated utility class.
     // This keeps main() clean and follows the Single Responsibility Principle.
+    // port and bloomsize and confiInts getting their value in this function.
     if (!InputValidation::validateAndParse(argc, argv, port, bloomSize, configInts)) {
         return 1;  // error already printed inside the function
     }
@@ -33,10 +34,6 @@ int main(int argc, char* argv[]) {
     // Main loop: listen for commands from the client, process, respond.
     while (true) {
         std::string line = inputReader->readLine();
-
-        // Skip invalid lines early.
-        if (!hasValidCommandStructure(line)) {
-            continue;
         }
 
         // Parse and process the command using existing Bloom Filter logic.

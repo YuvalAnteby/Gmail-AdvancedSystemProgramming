@@ -117,9 +117,10 @@ TEST(containsOnlyDigitsAndWhitespace, ValidInputsDigitsWhitespaces) {
 }
 
 /**
+ * * no longer in use!, keep it maybe we will use it in the future
  * Test: try valid commands structures
  * Expected: getting true to every input
- */
+
 TEST(hasValidCommandStructure, ValidCommands) {
     std::vector<std::string> commandLines = {
         "1 www.example.com",
@@ -131,11 +132,12 @@ TEST(hasValidCommandStructure, ValidCommands) {
         EXPECT_TRUE(hasValidCommandStructure(str));
     }
 }
-
+ */
 /**
+ * no longer in use!, keep it maybe we will use it in the future
  * Test: try valid commands structures
  * Expected: getting true to every input
- */
+
 TEST(hasValidCommandStructure, InvalidCommands) {
     std::vector<std::string> commandLines = {
         "3 www.example.com",
@@ -149,4 +151,36 @@ TEST(hasValidCommandStructure, InvalidCommands) {
     for(std::string str : commandLines) {
         EXPECT_FALSE(hasValidCommandStructure(str));
     }
+    // --- CLI Args Validation Tests ---
+ */
+TEST(ValidationTests, ValidPort) {
+    int port;
+    EXPECT_TRUE(isValidPort("8080", port));
+    EXPECT_EQ(port, 8080);
+    EXPECT_FALSE(isValidPort("999", port));   // Below range
+    EXPECT_FALSE(isValidPort("70000", port)); // Above range
+    EXPECT_FALSE(isValidPort("abc", port));   // Not a number
+}
+
+TEST(ValidationTests, ValidBloomSize) {
+    int bloom;
+    EXPECT_TRUE(isValidBloomSize("1000", bloom));
+    EXPECT_EQ(bloom, 1000);
+    EXPECT_FALSE(isValidBloomSize("-1", bloom));
+    EXPECT_FALSE(isValidBloomSize("abc", bloom));
+}
+
+TEST(ValidationTests, ValidHashMods) {
+    std::vector<int> mods;
+    char* argv1[] = { (char*)"./server", (char*)"8080", (char*)"1000", (char*)"3", (char*)"7", (char*)"11" };
+    EXPECT_TRUE(isValidHashMods(6, argv1, mods));
+    EXPECT_EQ(mods, std::vector<int>({3, 7, 11}));
+
+    mods.clear();
+    char* argv2[] = { (char*)"./server", (char*)"8080", (char*)"1000", (char*)"0" };
+    EXPECT_FALSE(isValidHashMods(4, argv2, mods));
+
+    mods.clear();
+    char* argv3[] = { (char*)"./server", (char*)"8080", (char*)"1000", (char*)"abc" };
+    EXPECT_FALSE(isValidHashMods(4, argv3, mods));
 }
