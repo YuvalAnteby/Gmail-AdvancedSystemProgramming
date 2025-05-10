@@ -22,10 +22,15 @@ class ClientConnection:
 
     #Collects the server's reply.
     def retrieve(self) -> str:
+        self.socket.settimeot(2)
         reply = b""
-        while True:
-            segment = self.socket.recv(1024)
-            reply += segment
-            if b"\n" in segment:
-                break
+        try:
+            while True:
+                segment = self.socket.recv(1024)
+                if not segment:
+                    reply += segment
+                    if b"\n" in segment:
+                        break
+        except socket.timeout:
+            pass 
         return reply.decode()

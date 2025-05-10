@@ -7,7 +7,7 @@ import subprocess
 import time
 
 def start_echo_server():
-    server = subprocess.Popen(["python", "tests/echo_server.py"])
+    server = subprocess.Popen(["python", "client_python/tests/echo_server.py"])
     time.sleep(1)
     return server
 
@@ -18,7 +18,7 @@ def stop_echo_server(server):
 
 def run_client_input(user_input: str) -> str:
     proc = subprocess.Popen(
-        ["python", "main.py", "localhost", "42069"],
+        ["python", "client_python/src/main.py", "localhost", "42069"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -33,7 +33,7 @@ def run_client_input(user_input: str) -> str:
 
 def run_command_sequence(commands):
     proc = subprocess.Popen(
-        ["python", "main.py", "localhost", "42069"],
+        ["python", "client_python/src/main.py", "localhost", "42069"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

@@ -14,7 +14,7 @@
 
 ---
 
-## Setting up and running the client
+## Setting up and running the client.
 
 ### Clone
 ```bash

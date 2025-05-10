@@ -1,10 +1,13 @@
 # Author: Dor Darmon
-
-from client.network.client_connection import ClientConnection
-from client.io.console_io import ConsoleIO
+import sys
+import os
+ 
+sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from network.client_connection import ClientConnection
+from app_io.console_io import ConsoleIO
 
 #ClientApp ties together the user interface and the network communication.
-class ClienApp:
+class ClientApp:
     def __init__(self, server_ip, server_port):
         
         #Initialize the app with a network connection and console I/O.

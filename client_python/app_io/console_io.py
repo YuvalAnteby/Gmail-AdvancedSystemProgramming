@@ -9,4 +9,4 @@ class ConsoleIO:
     
     def print_output(self, response: str):
      #Print the server's response to the user.
-     print(response, end="") 
+     print(response, end="\n") 
