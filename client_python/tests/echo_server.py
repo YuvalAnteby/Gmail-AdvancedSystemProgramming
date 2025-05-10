@@ -1,20 +1,18 @@
-
-#Echo server used for testing the client.
-#Listens on a TCP port and echoes back messages.
-#Supports clean shutdown with "STOP" command.
-
-#Author: Dor Darmon
+# Author: Dor Darmon
 
 import socket
-import threading
+import threading 
+
 # Global flag to allow graceful shutdown
 should_run = True  
 
+# Echo server used for testing the client.
+# Listens on a TCP port and echoes back messages.
+# Supports clean shutdown with "STOP" command.
 def handle_client(conn, addr):
-    """
-    Handles an individual client connection.
-    Echoes received data, exits if "STOP" is received.
-    """
+    
+    # Handles an individual client connection.
+    # Echoes received data, exits if "STOP" is received.
     global should_run
     with conn:
         try:
@@ -26,16 +24,16 @@ def handle_client(conn, addr):
                 if decoded == "STOP":
                     should_run = False
                     break
-                conn.sendall(data)
+                conn.sendall(data+b"\n")
         except ConnectionResetError:
-            pass  # Client disconnected abruptly
+            pass
 
 def run_echo_server(host="127.0.0.1", port=42069):
-    """
-    Starts the echo server and accepts incoming connections.
-    """
+    
+    # Starts the echo server and accepts incoming connections.
     global should_run
-    should_run = True  # Reset flag in case re-run
+    # Reset flag in case re-run
+    should_run = True 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((host, port))

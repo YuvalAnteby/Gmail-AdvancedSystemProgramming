@@ -31,6 +31,8 @@ docker-compose build app
 ```bash
 docker-compose run --rm app
 ```
+# Run the tests
+CMD ["python", "client_python/tests/test_client_unittest.py"]
 
 ### Rebuilding the code in case of code errors (deletes .txt files)
 ```bash

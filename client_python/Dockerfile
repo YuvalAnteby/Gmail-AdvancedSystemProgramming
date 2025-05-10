@@ -10,13 +10,6 @@ COPY . /app
 #Install Python test dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Python test dependencies
-RUN pip install pytest 
-#Argument to determine whether to run or test IDEA mode.
-
-ARG MODE=run
-ENV MODE=${MODE}
-
 # Default command depending on the mode:
 #Take ARG in build AND runtime for more flexible container behaviour
-CMD ["/bin/sh", "-c", "if [ \"$MODE\" = 'test' ]; then cd tests && pytest; else python main. py server_cpp 42069; fi"]
+CMD ["python", "src/main.py","app","42069"]

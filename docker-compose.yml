@@ -43,8 +43,8 @@ services:
     container_name: pytest_client
     working_dir: /app/tests
     depends_on:
-      - echo_server
-    command: pytest tests/pytest_client.py  
+      - app
+    command: ["python",test_runner.py] 
   
 
 volumes:
