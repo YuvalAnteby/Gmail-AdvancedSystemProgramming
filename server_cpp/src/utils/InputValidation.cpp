@@ -107,21 +107,25 @@ bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistenc
  * @param hashMods Output vector of hash mod values.
  * @return True if all arguments are valid.
  */
-bool validateAndParseArgs(int argc, char* argv[], int& port, int& bloomSize, std::vector<int>& hashMods) {
+// Validate and parse command line arguments for server configuration
+bool validateAndParseArgs(int argc, char* argv[]) {
+    // Check if we have enough arguments
     if (argc < 4) {
-        std::cerr << "Usage: ./server <port> <bloom_size> <hash1> [<hash2> ... <hashN>]\n";
         return false;
     }
 
-    if (!isValidPort(argv[1], port)) {
+    // Validate the port argument
+    if (!validatePort(argv[1])) {
         return false;
     }
 
-    if (!isValidBloomSize(argv[2], bloomSize)) {
+    // Validate the bloom size argument
+    if (!validateBloomSize(argv[2])) {
         return false;
     }
 
-    if (!isValidHashMods(argc, argv, hashMods)) {
+    // Validate the hash mod arguments
+    if (!validateHashMods(argc, argv)) {
         return false;
     }
 
@@ -134,28 +138,39 @@ bool validateAndParseArgs(int argc, char* argv[], int& port, int& bloomSize, std
  * @param port Output integer to store the validated port.
  * @return True if valid (numeric and in range 1024–65535), false otherwise.
  */
-bool isValidPort(const std::string& portStr, int& port) {
+bool validatePort(const std::string& portStr) {
     if (!std::all_of(portStr.begin(), portStr.end(), ::isdigit)) {
         return false;
     }
-    port = std::stoi(portStr);
-    return port >= 1024 && port <= 65535;
-}
 
+    int port = std::stoi(portStr);
+    
+    if (port < 1024 || port > 65535) {
+        return false;
+    }
+
+    return true;
+}
 /**
  * Validates the Bloom filter size argument and converts it to an integer.
  * @param sizeStr Bloom size argument from argv[2].
  * @param bloomSize Output integer to store the validated size.
  * @return True if valid (positive integer), false otherwise.
  */
-bool isValidBloomSize(const std::string& sizeStr, int& bloomSize) {
-    if (!std::all_of(sizeStr.begin(), sizeStr.end(), ::isdigit)) {
+// Validate the bloom filter size (must be a positive integer)
+bool validateBloomSize(const std::string& bloomSizeStr) {
+    if (!std::all_of(bloomSizeStr.begin(), bloomSizeStr.end(), ::isdigit)) {
         return false;
     }
-    bloomSize = std::stoi(sizeStr);
-    return bloomSize > 0;
-}
 
+    int bloomSize = std::stoi(bloomSizeStr);
+    
+    if (bloomSize <= 0) {
+        return false;
+    }
+
+    return true;
+}
 /**
  * Validates all hash mod arguments starting from argv[3] and fills the hashMods vector.
  * @param argc Total number of arguments.
@@ -163,9 +178,11 @@ bool isValidBloomSize(const std::string& sizeStr, int& bloomSize) {
  * @param hashMods Output vector to store all hash mod integers.
  * @return True if all mod arguments are valid positive integers, false otherwise.
  */
-bool isValidHashMods(int argc, char* argv[], std::vector<int>& hashMods) {
+// Validate hash mod arguments (must be positive integers)
+bool validateHashMods(int argc, char* argv[]) {
     for (int i = 3; i < argc; ++i) {
         std::string modStr(argv[i]);
+        
         if (!std::all_of(modStr.begin(), modStr.end(), ::isdigit)) {
             return false;
         }
@@ -174,8 +191,7 @@ bool isValidHashMods(int argc, char* argv[], std::vector<int>& hashMods) {
         if (mod <= 0) {
             return false;
         }
-
-        hashMods.push_back(mod);
     }
+
     return true;
 }

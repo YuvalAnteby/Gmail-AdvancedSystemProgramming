@@ -12,16 +12,22 @@
 #include "bloom/utils/CommandRequest.h"
 
 int main(int argc, char* argv[]) {
+    // Declaring variables to store port, bloom filter size, and hash mod values
     int port;
     int bloomSize;
     std::vector<int> configInts;
 
-    // Validate and parse CLI arguments using a dedicated utility class.
-    // This keeps main() clean and follows the Single Responsibility Principle.
-    // port and bloomsize and confiInts getting their value in this function.
-    if (!InputValidation::validateAndParse(argc, argv, port, bloomSize, configInts)) {
-        return 1;  // error already printed inside the function
+    // Validate the input arguments
+    // If validation fails return
+     if (!validateAndParseArgs(argc, argv)) {
+        return 1; 
     }
+    // Process the input using (you will call the relevant method here)
+    // This is where you can process the arguments (port, bloomSize, configInts)
+    void InputProcessor::processInput(int argc, char* argv[], int& port, int& bloomSize, std::vector<int>& configInts);
+
+
+
 
     // Initialize IO and persistence components.
     // Note: TcpInputReader and TCPOutputWriter are assumed to use the given port.

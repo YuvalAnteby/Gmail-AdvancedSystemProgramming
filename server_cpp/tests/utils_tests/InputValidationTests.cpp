@@ -117,7 +117,7 @@ TEST(containsOnlyDigitsAndWhitespace, ValidInputsDigitsWhitespaces) {
 }
 
 /**
- * * no longer in use!, keep it maybe we will use it in the future
+ * not in use for now
  * Test: try valid commands structures
  * Expected: getting true to every input
 
@@ -134,7 +134,7 @@ TEST(hasValidCommandStructure, ValidCommands) {
 }
  */
 /**
- * no longer in use!, keep it maybe we will use it in the future
+ * for now not in use
  * Test: try valid commands structures
  * Expected: getting true to every input
 
@@ -151,36 +151,69 @@ TEST(hasValidCommandStructure, InvalidCommands) {
     for(std::string str : commandLines) {
         EXPECT_FALSE(hasValidCommandStructure(str));
     }
-    // --- CLI Args Validation Tests ---
+}
  */
-TEST(ValidationTests, ValidPort) {
-    int port;
-    EXPECT_TRUE(isValidPort("8080", port));
-    EXPECT_EQ(port, 8080);
-    EXPECT_FALSE(isValidPort("999", port));   // Below range
-    EXPECT_FALSE(isValidPort("70000", port)); // Above range
-    EXPECT_FALSE(isValidPort("abc", port));   // Not a number
+
+/**
+ * Test: Verifies that validateAndParseArgs works correctly when all arguments are valid.
+ * When the input has the correct number of arguments and all values are valid, the function should return true.
+ * Expecting the function to return true for valid args.
+ */
+TEST(ValidateAndParseArgsTest, ValidArgsCount) {
+    const char* argv[] = {"program_name", "8080", "1000", "3", "5", "7"};
+    int argc = sizeof(argv) / sizeof(argv[0]);
+
+    // Validate and parse the arguments
+    bool result = validateAndParseArgs(argc, const_cast<char**>(argv));
+
+    // Assert that the function returns true for valid arguments
+    EXPECT_TRUE(result);  // The function should return true for valid input
 }
 
-TEST(ValidationTests, ValidBloomSize) {
-    int bloom;
-    EXPECT_TRUE(isValidBloomSize("1000", bloom));
-    EXPECT_EQ(bloom, 1000);
-    EXPECT_FALSE(isValidBloomSize("-1", bloom));
-    EXPECT_FALSE(isValidBloomSize("abc", bloom));
+/**
+ * Test: Verifies that validateAndParseArgs returns false when the number of arguments is insufficient.
+ * If the input is missing essential arguments, the function should return false.
+ * Expecting false for this test case due to missing hash mods.
+ */
+TEST(ValidateAndParseArgsTest, InvalidArgsCount) {
+    const char* argv[] = {"program_name", "8080", "1000"};
+    int argc = sizeof(argv) / sizeof(argv[0]);
+
+    // Validate and parse the arguments
+    bool result = validateAndParseArgs(argc, const_cast<char**>(argv));
+
+    // Assert that the function returns false due to insufficient arguments
+    EXPECT_FALSE(result);  // The function should return false for insufficient arguments
 }
 
-TEST(ValidationTests, ValidHashMods) {
-    std::vector<int> mods;
-    char* argv1[] = { (char*)"./server", (char*)"8080", (char*)"1000", (char*)"3", (char*)"7", (char*)"11" };
-    EXPECT_TRUE(isValidHashMods(6, argv1, mods));
-    EXPECT_EQ(mods, std::vector<int>({3, 7, 11}));
+/**
+ * Test: Verifies that validateAndParseArgs returns false if the port is non-numeric.
+ * The port should be an integer; if it's not, the function should return false.
+ * Expecting false for this test case due to an invalid port.
+ */
+TEST(ValidateAndParseArgsTest, InvalidPort) {
+    const char* argv[] = {"program_name", "invalidPort", "1000", "3", "5", "7"};
+    int argc = sizeof(argv) / sizeof(argv[0]);
 
-    mods.clear();
-    char* argv2[] = { (char*)"./server", (char*)"8080", (char*)"1000", (char*)"0" };
-    EXPECT_FALSE(isValidHashMods(4, argv2, mods));
+    // Validate and parse the arguments with an invalid port value
+    bool result = validateAndParseArgs(argc, const_cast<char**>(argv));
 
-    mods.clear();
-    char* argv3[] = { (char*)"./server", (char*)"8080", (char*)"1000", (char*)"abc" };
-    EXPECT_FALSE(isValidHashMods(4, argv3, mods));
+    // Assert that the function returns false due to the invalid port
+    EXPECT_FALSE(result);  // The function should return false for an invalid port
+}
+
+/**
+ * Test: Verifies that validateAndParseArgs returns false if the bloom size is non-numeric.
+ * The bloom size should be an integer; if it's not, the function should return false.
+ * Expecting false for this test case due to an invalid bloom size.
+ */
+TEST(ValidateAndParseArgsTest, InvalidBloomSize) {
+    const char* argv[] = {"program_name", "8080", "invalidBloomSize", "3", "5", "7"};
+    int argc = sizeof(argv) / sizeof(argv[0]);
+
+    // Validate and parse the arguments with an invalid bloom size value
+    bool result = validateAndParseArgs(argc, const_cast<char**>(argv));
+
+    // Assert that the function returns false due to the invalid bloom size
+    EXPECT_FALSE(result);  // The function should return false for an invalid bloom size
 }

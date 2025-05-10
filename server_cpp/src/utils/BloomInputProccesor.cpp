@@ -11,6 +11,31 @@
 #include "bloom/commands/CheckUrlCommand.h"
 #include "bloom/commands/BloomCommandInvoker.h"
 
+
+/**
+ * Process the input arguments passed to the program.
+ * This function extracts the port, bloom filter size, and hash mods from the provided arguments (argv).
+ * The values are then assigned to the references port, bloomSize, and hashMods.
+ * @param argc number of command-line arguments.
+ * @param argv array of command-line arguments.
+ * @param port reference to an integer where the port value will be stored.
+ * @param bloomSize reference to an integer where the bloom size will be stored.
+ * @param hashMods reference to a vector where the hash mod values will be stored.
+ */
+void processInput(int argc, char* argv[], int& port, int& bloomSize, std::vector<int>& hashMods) {
+
+    std::string portStr(argv[1]);
+    port = std::stoi(portStr);
+
+    std::string bloomSizeStr(argv[2]);
+    bloomSize = std::stoi(bloomSizeStr);
+
+    for (int i = 3; i < argc; ++i) {
+        int mod = std::stoi(argv[i]);
+        hashMods.push_back(mod);
+    }
+}
+
 /**
  * Get the first number from the first line as a string, edit the line string to skip it.
  * @param line string of the user's input line. will be changed in function
