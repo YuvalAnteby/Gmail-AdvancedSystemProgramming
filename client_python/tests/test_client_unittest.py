@@ -14,17 +14,16 @@ class TestEchoServer(unittest.TestCase):
         #Starts the echo server before running the tests.
         echo_path = os.path.join(os.path.dirname(__file__), "echo_server.py")
         cls.server_proc = subprocess.Popen(["python", echo_path])
-        time.sleep(1)  # Give the server time to start
-
+        time.sleep(1)
     @classmethod
     def tearDownClass(cls):
         
         #Stops the echo server after all tests are done.
         try:
             with socket.create_connection(("127.0.0.1", 42069), timeout=2) as s:
-                s.sendall(b"STOP\n")  # Shutdown command
+                s.sendall(b"STOP\n")
         except Exception as e:
-            print("⚠️ Could not stop server:", e)
+            print("Could not stop server:", e)
 
         cls.server_proc.terminate()
         cls.server_proc.wait()
