@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     }
     // Process the input using (you will call the relevant method here)
     // This is where you can process the arguments (port, bloomSize, configInts)
-    void InputProcessor::processInput(int argc, char* argv[], int& port, int& bloomSize, std::vector<int>& configInts);
+   processInput(argc, argv, port, bloomSize, configInts);
 
 
 
