@@ -3,6 +3,7 @@
 #include <cctype>
 #include <algorithm>
 #include <regex>
+#include <sstream> // Required for istringstream
 #include "data_persistence/IDataPersistence.h"
 
 /**
@@ -19,28 +20,17 @@ bool isValidFirstLine(const std::string& line) {
     while (iss >> token) {
         // Skip entire line if it starts with letters
         if (!hasDigits && std::any_of(token.begin(), token.end(), ::isalpha)) {
-            //std::cout << "----- DEBUG: isValidFirstLine? FALSE (has letters) -----" << std::endl; // TODO: remove debug print
             return false;
         }
         // If token is not all digits, it's invalid
         if (!std::all_of(token.begin(), token.end(), ::isdigit)) {
-            //std::cout << "----- DEBUG: isValidFirstLine? FALSE (not all digits) -----" << std::endl; // TODO: remove debug print
-            //std::cout << "false" << std::endl;
             return false;
         }
 
         hasDigits = true;
     }
 
-    // If numbers were found, print newline and return true
-    if (hasDigits) {
-        //std::cout << std::endl;
-        //std::cout << "----- DEBUG: isValidFirstLine? TRUE -----" << std::endl; // TODO: remove debug print
-        return true;
-    }
-    //std::cout << "----- DEBUG: isValidFirstLine? FALSE (no numbers found) -----" << std::endl; // TODO: remove debug print
-    // No numbers found, line is ignored
-    return false;
+    return hasDigits;
 }
 
 /**
@@ -49,12 +39,10 @@ bool isValidFirstLine(const std::string& line) {
  * @return true if the URL is of a valid regex
  */
 bool isValidURL(const std::string& url) {
-    //std::cout << "----- DEBUG: isValidURL -----" << std::endl; // TODO: remove debug print
-    if(url.empty()) {
+    if (url.empty()) {
         return false;
     }
     const std::regex pattern(R"(^((https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,})(\/\S*)?$)");
-    //std::cout << "----- DEBUG: isValidURL? " << std::regex_match(url, pattern) << " -----" << std::endl; // TODO: remove debug print
     return std::regex_match(url, pattern);
 }
 
@@ -66,10 +54,8 @@ bool isValidURL(const std::string& url) {
 bool containsOnlyDigitsAndWhitespace(const std::string& line) {
     for (char c : line) {
         if (!std::isdigit(c) && !std::isspace(c))
-            //std::cout << "----- DEBUG: containsOnlyDigitsAndWhitespace FALSE -----" << std::endl; // TODO: remove debug print
             return false;
     }
-    //std::cout << "----- DEBUG: containsOnlyDigitsAndWhitespace TRUE -----" << std::endl; // TODO: remove debug print
     return true;
 }
 
@@ -80,22 +66,15 @@ bool containsOnlyDigitsAndWhitespace(const std::string& line) {
  * @return true if the choice of the valid options (for now 1 or 2), otherwise false
  */
 bool hasValidCommandStructure(const std::string& line) {
-    //std::cout << "----- DEBUG: hasValidCommandStructure -----" << std::endl; // TODO: remove debug print
     std::istringstream iss(line);
     std::string command, url;
-    // No command number was provided
     if (!(iss >> command)) 
         return false;
-    // If the command doesnt start with 1 or 2 its invalid
     if (command != "1" && command != "2") 
         return false;
-    // require at least a second token (the URL)
     if (!(iss >> url)) 
         return false; 
-    if(url.empty()) {
-        return false;
-    }
-    return true;
+    return !url.empty();
 } 
 
 /**
@@ -108,15 +87,65 @@ bool hasValidCommandStructure(const std::string& line) {
 bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence& persistence) {
     int loadedFirstInt = persistence.getBitSizeConfig();
     std::vector<int> loadedConfigInts = persistence.loadConfigInts();
-    if(loadedFirstInt == -1 || loadedConfigInts.empty()) {
-        // There are no config ints saved, insert them now
+    if (loadedFirstInt == -1 || loadedConfigInts.empty()) {
         std::vector<int> insertConfing = {firstInt};
         insertConfing.insert(insertConfing.end(), configInts.begin(), configInts.end());
         persistence.appendConfigInts(insertConfing);
         return true;
     }
-    if((loadedFirstInt != firstInt) || (configInts != loadedConfigInts)) {
+    return (loadedFirstInt == firstInt) && (configInts == loadedConfigInts);
+}
+
+/**
+ * Validates and parses CLI arguments for server configuration.
+ * @param argc number of command-line arguments
+ * @param argv array of command-line arguments
+ * @param port port number (output)
+ * @param bloomSize Bloom filter size (output)
+ * @param hashMods vector of hash function mod values (output)
+ * @return true if all arguments are valid, false otherwise.
+ */
+bool validateAndParseArgs(int argc, char* argv[], int& port, int& bloomSize, std::vector<int>& hashMods) {
+    if (argc < 4) {
+        std::cerr << "Usage: ./server <port> <bloom_size> <hash1> [<hash2> ... <hashN>]\n";
         return false;
     }
+
+    std::string portStr(argv[1]);
+    if (!std::all_of(portStr.begin(), portStr.end(), ::isdigit)) {
+        std::cerr << "Error: Port must be a positive integer.\n";//TODO: dont print this is just for tests
+        return false;
+    }
+    port = std::stoi(portStr);
+    if (port < 1024 || port > 65535) {
+        std::cerr << "Error: Port must be in range 1024–65535.\n";//TODO: dont print this is just for tests
+        return false;
+    }
+
+    std::string bloomSizeStr(argv[2]);
+    if (!std::all_of(bloomSizeStr.begin(), bloomSizeStr.end(), ::isdigit)) {
+        std::cerr << "Error: Bloom filter size must be a positive integer.\n";//TODO: dont print this is just for tests
+        return false;
+    }
+    bloomSize = std::stoi(bloomSizeStr);
+    if (bloomSize <= 0) {
+        std::cerr << "Error: Bloom filter size must be greater than 0.\n";//TODO: dont print this is just for tests
+        return false;
+    }
+
+    for (int i = 3; i < argc; ++i) {
+        std::string modStr(argv[i]);
+        if (!std::all_of(modStr.begin(), modStr.end(), ::isdigit)) {
+            std::cerr << "Error: Hash mod value '" << modStr << "' is not a positive integer.\n";//TODO: dont print this is just for tests
+            return false;
+        }
+        int mod = std::stoi(modStr);
+        if (mod <= 0) {
+            std::cerr << "Error: Hash mod value must be greater than 0.\n";//TODO: dont print this is just for tests
+            return false;
+        }
+        hashMods.push_back(mod);  
+    }
+
     return true;
 }

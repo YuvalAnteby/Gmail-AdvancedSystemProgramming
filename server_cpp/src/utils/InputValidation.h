@@ -1,7 +1,11 @@
 // Author(s): Dor Darmon, Yuval Anteby
-#include "data_persistence/IDataPersistence.h"
+
 #ifndef INPUT_VALIDATION_H
 #define INPUT_VALIDATION_H
+
+#include <string>
+#include <vector>
+#include "data_persistence/IDataPersistence.h"
 
 /**
  * Processes a line of input.
@@ -42,4 +46,20 @@ bool hasValidCommandStructure(const std::string& line);
  */
 bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence& persistence);
 
-#endif
+/**
+ * Validate and parse server startup arguments.
+ * Expects: ./server <port> <bloom_size> <hash1> [<hash2> ... <hashN>]
+ * - Verifies port is numeric and in range [1024–65535]
+ * - Verifies bloom size is a positive integer
+ * - Verifies all hash mod values are positive integers
+ *
+ * @param argc number of CLI arguments
+ * @param argv array of CLI argument strings
+ * @param port  parsed TCP port to listen on
+ * @param bloomSize  parsed bloom filter bit size
+ * @param configInts  list of parsed mod values for hash functions
+ * @return true if all arguments are valid and were parsed successfully; false otherwise (with errors printed)
+ */
+bool validateAndParse(int argc, char* argv[], int& port, int& bloomSize, std::vector<int>& configInts);
+
+#endif // INPUT_VALIDATION_H
