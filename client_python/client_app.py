@@ -3,8 +3,8 @@ import sys
 import os
  
 sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from network.client_connection import ClientConnection
-from app_io.console_io import ConsoleIO
+from client_python.client_connection import ClientConnection
+from client_python.console_io import ConsoleIO
 
 #ClientApp ties together the user interface and the network communication.
 class ClientApp:

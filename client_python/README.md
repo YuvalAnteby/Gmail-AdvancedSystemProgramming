@@ -20,10 +20,11 @@
 ```bash
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
 cd Gmail-AdvancedSystemProgramming/client_python
- 
+``` 
 
  
 ### build
+
 ```bash
 docker-compose build app
 ```
@@ -32,7 +33,9 @@ docker-compose build app
 docker-compose run --rm app
 ```
 # Run the tests
-CMD ["python", "client_python/tests/test_client_unittest.py"]
+```bash
+docker-compose up --build test_client
+```
 
 ### Rebuilding the code in case of code errors (deletes .txt files)
 ```bash

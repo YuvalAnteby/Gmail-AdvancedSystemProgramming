@@ -4,7 +4,7 @@ services:
     build:
       context: ./server_cpp
       dockerfile: Dockerfile
-    container_name: gmail_app
+    container_name: gmail_server
     stdin_open: true     # <-- keeps stdin open
     tty: true            # <-- allocates a pseudo-TTY
     volumes:
@@ -40,7 +40,7 @@ services:
     build:
       context: .
       dockerfile: client_python/Dockerfile.tests
-    container_name: client-tests
+    container_name: client_tests
     depends_on:
       - app
     command: ["python","client_python/tests/test_client_unittest.py"] 
