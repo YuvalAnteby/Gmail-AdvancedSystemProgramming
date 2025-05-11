@@ -6,10 +6,6 @@ FROM python:3.11-slim
 # Copy and set the client in the container
 WORKDIR /app/src
 COPY . /app
-# If ever needed despite TAs instruction - add requirements.txt file here
-#Install Python test dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
 # Default command depending on the mode:
 #Take ARG in build AND runtime for more flexible container behaviour
 CMD ["python", "src/main.py","app","42069"]
