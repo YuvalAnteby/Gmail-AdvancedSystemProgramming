@@ -1,6 +1,6 @@
 // Author(s): Yuval Anteby
-#ifndef SOCKET_INPUT_READER_H
-#define SOCKET_INPUT_READER_H
+#ifndef TCP_INPUT_READER_H
+#define TCP_INPUT_READER_H
 /// TODO tests
 #include "IInputReader.h"
 
