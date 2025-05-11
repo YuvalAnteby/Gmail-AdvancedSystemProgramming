@@ -33,8 +33,6 @@ int main(int argc, char *argv[]) {
     IInputReader *inputReader = new TCPInputReader(port);
     IOutputWriter *outputWriter = new TCPOutputWriter(port);
 
-    std::cout << "Server is running on port " << port << "...\n";//TODO: do not print just for checking
-
     // Main loop: listen for commands from the client, process, respond.
     while (true) {
         std::string line = inputReader->readLine();
@@ -49,8 +47,7 @@ int main(int argc, char *argv[]) {
     // }
 
 
-//  delete allocated resources.
-//TODO: i am not sure we need to delete that
+    //delete allocated resources.
     delete inputReader;
     delete outputWriter;
     delete dataSource;
