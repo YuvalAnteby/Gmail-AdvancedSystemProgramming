@@ -44,7 +44,7 @@ services:
     working_dir: /app/client_python/tests
     depends_on:
       - app
-    command: ["python",test_client_unittest.py] 
+    command: ["python","test_client_unittest.py"] 
   
 
 volumes:
