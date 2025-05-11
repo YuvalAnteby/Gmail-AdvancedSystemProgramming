@@ -1,3 +1,5 @@
+# Author: Dor Darmon
+
 import unittest
 
 #Discover and run all tests 
