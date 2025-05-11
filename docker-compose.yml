@@ -38,13 +38,12 @@ services:
   # Client test runner (Python).
   test_client:
     build:
-      context: ./client_python
-      dockerfile: Dockerfile.tests
+      context: .
+      dockerfile: client_python/Dockerfile.tests
     container_name: client-tests
-    working_dir: /app/client_python/tests
     depends_on:
       - app
-    command: ["python","test_client_unittest.py"] 
+    command: ["python","client_python/tests/test_client_unittest.py"] 
   
 
 volumes:

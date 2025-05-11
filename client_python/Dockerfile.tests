@@ -4,9 +4,9 @@
 FROM python:3.11-slim
 
 # set working directory 
-WORKDIR /app/src
+WORKDIR /app
 
-# copy only whats needrd for testing 
+# copy whats needrd for testing 
 COPY  . ./
 
 # Dfault command: run test 
