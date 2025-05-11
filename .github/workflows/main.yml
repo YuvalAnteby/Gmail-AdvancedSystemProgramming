@@ -12,18 +12,17 @@ on:
       - main-Ex4
       - main-Ex5
       # TODO: Add more main-ExN branches as we need for assignments
-    
+
 jobs:
   # ----- Build & tests the CPP server -----
   build-and-test-server:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-        
+        uses: actions/checkout@v3        
       - name: Build and run gtests
         run: docker compose run --build --rm gtest
-        
+       
   # ----- Build the Python client -----
   build-python-client:
     runs-on: ubuntu-latest

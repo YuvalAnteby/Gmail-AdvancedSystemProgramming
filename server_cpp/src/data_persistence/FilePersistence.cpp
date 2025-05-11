@@ -1,7 +1,10 @@
 // Author(s): Yuval Anteby
+
+#include "bloom/utils/BloomFilterStatusEnum.h"
 #include "FilePersistence.h"
 #include <fstream>
 #include <iostream>
+#include <utils/InputValidation.h>
 
 /**
  * Constructor
@@ -40,15 +43,19 @@ std::vector<std::vector<bool>> FilePersistence::loadBitArrays() {
 /**
  * Insert the new bit array to the .txt file.
  * @param vector of bit array to save.
+ * @return true if added successfully, otherwise false
  */
-void FilePersistence::appendBitArray(const std::vector<bool> &bits) {
+bool FilePersistence::appendBitArray(const std::vector<bool> &bits) {
     //std::cout << "DEBUG: started appending bit array" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (bits.empty()) {
-        throw std::invalid_argument("Can't add an empty bit array");
+        return false;
     }
 
     std::ofstream file(bitArrayPath.c_str(), std::ios::app);
+    if (!file.is_open()) {
+        return false;
+    }
     // Convert each bool to 1/0 chars and add to the file
     for (bool bit : bits) {
         file << (bit ? '1' : '0');
@@ -57,6 +64,7 @@ void FilePersistence::appendBitArray(const std::vector<bool> &bits) {
     file << '\n';
     //std::cout << "DEBUG: finished appending bit array" << std::endl; //TODO: remove debug print
     file.close();
+    return true;
 }
 
 /**
@@ -82,21 +90,26 @@ std::vector<std::string> FilePersistence::loadBlacklist() {
 
 /**
  * Insert the blacklisted URL to the .txt file.
- * @param urls The URL to save.
+ * @param URLs The URL to save.
+ * @return true if added successfully, otherwise false
  */
-void FilePersistence::appendBlacklistedUrl(const std::string &url) {
+bool FilePersistence::appendBlacklistedUrl(const std::string &url) {
     //std::cout << "DEBUG: started appending URL" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (url.empty()) {
-        throw std::invalid_argument("Can't add an empty string URL");
+        return false;
     }
 
     std::ofstream file(blacklistPath.c_str(), std::ios::app);
+    if (!file.is_open()) {
+        return false;
+    }
     file << url;
     // End the line (new URL)
     file << '\n';
     file.close();
     //std::cout << "DEBUG: finished appending URL" << std::endl; //TODO: remove debug print
+    return true;
 }
 
 /**
@@ -125,17 +138,21 @@ std::vector<int> FilePersistence::loadConfigInts() {
 
 /**
 * Load the config ints, given in a previous input of the user.
-* @return A vector where the first int is bit array size (first int in the input), the rest are how many times to run hash function
+* @param A vector where the first int is bit array size (first int in the input), the rest are how many times to run
+* hash functions
+* @return true if added successfully, otherwise false
 */
-void FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
+bool FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
     //std::cout << "DEBUG: started appending config ints" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (configInts.empty()) {
-        throw std::invalid_argument("Can't add an empty config array");
+        return false;
     }
     
     std::ofstream file(configIntsPath.c_str(), std::ios::app);
-    
+    if (!file.is_open()) {
+        return false;
+    }
     for (int num : configInts) {
         file << num;
         // End the line (new number)
@@ -143,6 +160,7 @@ void FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
     }
     file.close();
     //std::cout << "DEBUG: finished appending config ints" << std::endl; //TODO: remove debug print
+    return true;
 }
 
 /**
@@ -162,4 +180,45 @@ int FilePersistence::getBitSizeConfig() {
     int result = std::stoi(line);
     file.close();
     return result;
+}
+
+/**
+ * Delete a given URL from the .txt file.
+ * @param url a URL to be deleted
+ * @return NO_CONTENT (204) if deleted successfully, NOT_FOUND (404) if URL doesn't exist, otherwise BAD_REQUEST (400)
+ */
+BloomFilterStatusEnum FilePersistence::deleteUrl(const std::string &url) {
+    const std::string tempPath = "data/temp.txt";
+    // set flag if we found & deleted at least one URL
+    bool deleted = false;
+    // Check validation of the URL
+    if (url.empty() || !isValidURL(url)) {
+        return BAD_REQUEST;
+    }
+    // Created a temp file, make sure both files opened correctly
+    std::ifstream originalFile(blacklistPath.c_str());
+    std::ofstream tempFile(tempPath, std::ios::app);
+    if (!originalFile.is_open() || !tempFile.is_open()) {
+        return BAD_REQUEST;
+    }
+    std::string line;
+    // Loop through the original file, remove any instance of the given URL, move the rest to temp file
+    while (std::getline(originalFile, line)) {
+        if (line == url) {
+            deleted = true;
+        } else {
+            tempFile << line << std::endl;
+        }
+    }
+    tempFile.close();
+    originalFile.close();
+    // Didn't find the URL in file
+    if (!deleted) {
+        std::remove(tempPath.c_str());
+        return NOT_FOUND;
+    }
+    // We deleted the URL, now replace the temp file to be the new original file
+    std::remove(blacklistPath.c_str());
+    std::rename(tempPath.c_str(), blacklistPath.c_str());
+    return NO_CONTENT;
 }

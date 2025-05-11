@@ -3,120 +3,204 @@
 #include <cctype>
 #include <algorithm>
 #include <regex>
+#include <sstream>
+#include "InputValidation.h"
 #include "data_persistence/IDataPersistence.h"
 
 /**
- * Processes a line of input.
- * @param line line of the user's input
- * @return true if valid numbers were found and no invalid characters existed between them.
- * Otherwise, returns false, prints "FALSE"
+ * Checks if the input line contains only digits separated by spaces.
+ * @param line The user input line.
+ * @return True if valid, false otherwise.
  */
-bool isValidFirstLine(const std::string& line) {
+bool isValidFirstLine(const std::string &line) {
     std::istringstream iss(line);
     std::string token;
     bool hasDigits = false;
-    std::vector<int> intsResult;
+
     while (iss >> token) {
-        // Skip entire line if it starts with letters
+        // Skip if token contains any letters
         if (!hasDigits && std::any_of(token.begin(), token.end(), ::isalpha)) {
-            //std::cout << "----- DEBUG: isValidFirstLine? FALSE (has letters) -----" << std::endl; // TODO: remove debug print
             return false;
         }
-        // If token is not all digits, it's invalid
+
+        // Token must consist of digits only
         if (!std::all_of(token.begin(), token.end(), ::isdigit)) {
-            //std::cout << "----- DEBUG: isValidFirstLine? FALSE (not all digits) -----" << std::endl; // TODO: remove debug print
-            //std::cout << "false" << std::endl;
             return false;
         }
 
         hasDigits = true;
     }
 
-    // If numbers were found, print newline and return true
-    if (hasDigits) {
-        //std::cout << std::endl;
-        //std::cout << "----- DEBUG: isValidFirstLine? TRUE -----" << std::endl; // TODO: remove debug print
-        return true;
-    }
-    //std::cout << "----- DEBUG: isValidFirstLine? FALSE (no numbers found) -----" << std::endl; // TODO: remove debug print
-    // No numbers found, line is ignored
-    return false;
+    return hasDigits;
 }
 
 /**
- * Check if the URL is valid using a basic regex pattern.
- * @param url string of a URL to be checked
- * @return true if the URL is of a valid regex
+ * Validates a URL using a regular expression.
+ * @param url The string to validate.
+ * @return True if the URL is valid.
  */
-bool isValidURL(const std::string& url) {
-    //std::cout << "----- DEBUG: isValidURL -----" << std::endl; // TODO: remove debug print
-    if(url.empty()) {
+bool isValidURL(const std::string &url) {
+    if (url.empty()) {
         return false;
     }
     const std::regex pattern(R"(^((https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,})(\/\S*)?$)");
-    //std::cout << "----- DEBUG: isValidURL? " << std::regex_match(url, pattern) << " -----" << std::endl; // TODO: remove debug print
     return std::regex_match(url, pattern);
 }
 
 /**
- * Check if all characters in the string are digits or whitespace.
- * @param line string of the user's choice of command & the url string
- * @return false if there is no alphabetic char or integer char in the current char of the string
+ * Checks if a line contains only digits and whitespace.
+ * @param line Input string.
+ * @return True if valid, false otherwise.
  */
-bool containsOnlyDigitsAndWhitespace(const std::string& line) {
-    for (char c : line) {
+bool containsOnlyDigitsAndWhitespace(const std::string &line) {
+    for (char c: line) {
         if (!std::isdigit(c) && !std::isspace(c))
-            //std::cout << "----- DEBUG: containsOnlyDigitsAndWhitespace FALSE -----" << std::endl; // TODO: remove debug print
             return false;
     }
-    //std::cout << "----- DEBUG: containsOnlyDigitsAndWhitespace TRUE -----" << std::endl; // TODO: remove debug print
     return true;
 }
 
 /**
- * Validate command structure.
- * The first token is ignored, all following tokens must be "1" or "2".
- * @param line string of the user's choice of command & the url string
- * @return true if the choice of the valid options (for now 1 or 2), otherwise false
- */
+ * no longer in use! keep it if we need it 
+ * Checks command format: first token is 1 or 2, followed by a non-empty URL.
+ * @param line Full user command input.
+ * @return True if structure is valid.
+ 
 bool hasValidCommandStructure(const std::string& line) {
-    //std::cout << "----- DEBUG: hasValidCommandStructure -----" << std::endl; // TODO: remove debug print
     std::istringstream iss(line);
     std::string command, url;
-    // No command number was provided
     if (!(iss >> command)) 
         return false;
-    // If the command doesnt start with 1 or 2 its invalid
     if (command != "1" && command != "2") 
         return false;
-    // require at least a second token (the URL)
     if (!(iss >> url)) 
         return false; 
-    if(url.empty()) {
-        return false;
-    }
-    return true;
-} 
-
+    return !url.empty();
+}
+*/
 /**
- * Check if a given config is matching the one we have saved already. If there is no config saved - save the given one.
- * @param firstInt the bit array size
- * @param configInts array of config integers
- * @param persistence data source object
- * @return true if matching or if we saved the new config, otherwise false
+ * Compares a given config with persisted config, or saves it if no config exists.
+ * @param firstInt The bloom filter bit size.
+ * @param configInts The vector of hash mod values.
+ * @param persistence Persistence interface to load/save config.
+ * @return True if matching or saved successfully, false if mismatch.
  */
-bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence& persistence) {
+bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence &persistence) {
     int loadedFirstInt = persistence.getBitSizeConfig();
     std::vector<int> loadedConfigInts = persistence.loadConfigInts();
-    if(loadedFirstInt == -1 || loadedConfigInts.empty()) {
-        // There are no config ints saved, insert them now
-        std::vector<int> insertConfing = {firstInt};
-        insertConfing.insert(insertConfing.end(), configInts.begin(), configInts.end());
-        persistence.appendConfigInts(insertConfing);
+
+    if (loadedFirstInt == -1 || loadedConfigInts.empty()) {
+        std::vector<int> insertConfig = {firstInt};
+        insertConfig.insert(insertConfig.end(), configInts.begin(), configInts.end());
+        persistence.appendConfigInts(insertConfig);
         return true;
     }
-    if((loadedFirstInt != firstInt) || (configInts != loadedConfigInts)) {
+
+    return (loadedFirstInt == firstInt) && (configInts == loadedConfigInts);
+}
+
+/**
+ * Validates and parses CLI arguments for server configuration.
+ * @param argc Argument count.
+ * @param argv Argument array.
+ * @param port Output port.
+ * @param bloomSize Output bloom size.
+ * @param hashMods Output vector of hash mod values.
+ * @return True if all arguments are valid.
+ */
+// Validate and parse command line arguments for server configuration
+bool isValidArgs(int argc, char *argv[]) {
+    // Check if we have enough arguments
+    if (argc < 4) {
         return false;
     }
+
+    // Validate the port argument
+    if (!isValidPort(argv[1])) {
+        return false;
+    }
+
+    // Validate the bloom size argument
+    if (!isValidBloomSize(argv[2])) {
+        return false;
+    }
+
+    // Validate the hash mod arguments
+    if (!isValidHashMods(argc, argv)) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Validates the given port string and converts it to an integer.
+ * @param portStr Port argument from argv[1].
+ * @param port Output integer to store the validated port.
+ * @return True if valid (numeric and in range 1024–65535), false otherwise.
+ */
+bool isValidPort(const std::string &portStr) {
+    if (portStr.c_str() == nullptr) {
+        return false;
+    }
+
+    if (!std::all_of(portStr.begin(), portStr.end(), ::isdigit)) {
+        return false;
+    }
+    try {
+        int port = std::stoi(portStr);
+        return port > 1024 && port < 65535;
+    } catch (...) {
+        return false;
+    }
+}
+/**
+ * Validates the Bloom filter size argument and converts it to an integer.
+ * @param sizeStr Bloom size argument from argv[2].
+ * @param bloomSize Output integer to store the validated size.
+ * @return True if valid (positive integer), false otherwise.
+ */
+// Validate the bloom filter size (must be a positive integer)
+bool isValidBloomSize(const std::string &bloomSizeStr) {
+    if (bloomSizeStr.c_str() == nullptr) {
+        return false;
+    }
+
+    if (!std::all_of(bloomSizeStr.begin(), bloomSizeStr.end(), ::isdigit)) {
+        return false;
+    }
+    try {
+        int bloomSize = std::stoi(bloomSizeStr);
+        return bloomSize > 0;
+    } catch (...) {
+        return false;
+    }
+}
+/**
+ * Validates all hash mod arguments starting from argv[3] and fills the hashMods vector.
+ * @param argc Total number of arguments.
+ * @param argv Command-line argument array.
+ * @param hashMods Output vector to store all hash mod integers.
+ * @return True if all mod arguments are valid positive integers, false otherwise.
+ */
+// Validate hash mod arguments (must be positive integers)
+bool isValidHashMods(int argc, char *argv[]) {
+    for (int i = 3; i < argc; ++i) {
+        if (argv[i] == nullptr) {
+            return false;
+        }
+        std::string modStr(argv[i]);
+
+        if (!std::all_of(modStr.begin(), modStr.end(), ::isdigit)) {
+            return false;
+        }
+        try {
+            int mod = std::stoi(modStr);
+            return mod > 0;
+        } catch (...) {
+            return false;
+        }
+    }
+
     return true;
 }

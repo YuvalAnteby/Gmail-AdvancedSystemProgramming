@@ -1,6 +1,7 @@
 // Author(s): Yuval Anteby, Roee Chaim
 #include "CheckUrlCommand.h"
 #include "bloom/hash/Hasher.h"
+#include "bloom/utils/BloomFilterStatusCodeParser.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -14,9 +15,21 @@
  * @param persistence the persistence object used to load bit arrays and blacklist
  * @param configInts vector of configuration integers used for hashing
  * @param size the size of the Bloom filter bit array
+ * @param outputWriter object responsible on output to wherever we want
  */
-CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persistence, const std::vector<int>& configInts, int size)
-    : url(url), persistence(persistence), configInts(configInts), size(size), result(false) {
+CheckUrlCommand::CheckUrlCommand(
+    const std::string &url,
+    IDataPersistence &persistence,
+    const std::vector<int> &configInts,
+    int size,
+    IOutputWriter &outputWriter
+)
+    : url(url),
+      persistence(persistence),
+      configInts(configInts),
+      size(size),
+      m_bloomResult(GET),
+      m_outputWriter(outputWriter) {
 }
 
 
@@ -30,10 +43,10 @@ CheckUrlCommand::CheckUrlCommand(const std::string& url, IDataPersistence& persi
  * @return true if the hashed URL matches any candidate Bloom filter, false otherwise
  */
 bool CheckUrlCommand::possiblyContains(
-    const std::string& url,
+    const std::string &url,
     int size,
-    const std::vector<int>& counts,
-    const std::vector<std::vector<bool>>& candidates
+    const std::vector<int> &counts,
+    const std::vector<std::vector<bool> > &candidates
 ) {
     // Create a Hasher object for the URL
     Hasher hasher(url);
@@ -42,7 +55,7 @@ bool CheckUrlCommand::possiblyContains(
     std::vector<bool> hashedArray = hasher.buildHashedArray(url, size, counts);
 
     // Check the hashed array against each candidate bit array
-    for (const auto& candidate : candidates) {
+    for (const auto &candidate: candidates) {
         bool match = true;
         for (int i = 0; i < size; ++i) {
             // If a bit is required by hashedArray but missing in the candidate, it's not a match
@@ -67,7 +80,7 @@ bool CheckUrlCommand::possiblyContains(
  * @param list a vector of blacklisted URLs
  * @return true if URL is found in the list, false otherwise
  */
-bool CheckUrlCommand::matchesURL(const std::string& url, const std::vector<std::string>& list) {
+bool CheckUrlCommand::matchesURL(const std::string &url, const std::vector<std::string> &list) {
     return std::find(list.begin(), list.end(), url) != list.end();
 }
 
@@ -82,31 +95,41 @@ bool CheckUrlCommand::matchesURL(const std::string& url, const std::vector<std::
  */
 void CheckUrlCommand::execute() {
     // Load Bloom filter bit arrays from persistence
-    std::vector<std::vector<bool>> bitsArrays = persistence.loadBitArrays();
-
+    std::vector<std::vector<bool> > bitsArrays = persistence.loadBitArrays();
     // Check if the URL possibly exists in any Bloom filter
     if (possiblyContains(url, size, configInts, bitsArrays)) {
-        std::cout << "true ";
+        m_bloomResult.appendToOutcomeMessage( "true ");
         // If possibly contained, check blacklist for real match
         if (matchesURL(url, persistence.loadBlacklist())) {
-            std::cout << "true" << std::endl;
-            result = true;
+            m_bloomResult.appendToOutcomeMessage("true\n");
         } else {
-            result = false;
-            std::cout << "false" << std::endl;
+            m_bloomResult.appendToOutcomeMessage( "false\n");
         }
     } else {
         // Definitely not in the Bloom filter
-        std::cout << "false" << std::endl;
-        result = false;
+        m_bloomResult.appendToOutcomeMessage("false\n");
     }
+    m_bloomResult.setStatusCode(OK);
 }
 
 /**
  * Returns the result of the check.
  *
- * @return true if the URL was found in the Bloom filter and verified in the blacklist, false otherwise
+ * @return a command result object with the result of the check (including code, messages etc.)
  */
-bool CheckUrlCommand::wasFound() const {
-    return result;
+BloomCommandResult CheckUrlCommand::getResult() {
+    std::string fullMsg;
+    // Set the full message and return the result
+    switch (m_bloomResult.getStatusCode()) {
+        case OK: // Gotten the answer as intended, return the message according to the instructions
+            m_bloomResult.setIsSuccess(true);
+            fullMsg = toStatusMessage(m_bloomResult.getStatusCode()) + "\n\n" + m_bloomResult.getOutcomeMessage();
+            break;
+        default: // Probably some error, handle it using the codes
+            m_bloomResult.setIsSuccess(false);
+            fullMsg = toStatusMessage(m_bloomResult.getStatusCode()) + "\n";
+            break;
+    }
+    m_bloomResult.setFullMessage(fullMsg);
+    return m_bloomResult;
 }
