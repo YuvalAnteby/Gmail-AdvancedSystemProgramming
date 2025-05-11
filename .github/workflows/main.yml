@@ -11,8 +11,6 @@ on:
       - main-Ex3
       - main-Ex4
       - main-Ex5
-      - GA-36-Client-side
-      - GA-29-TCP-connection-C-server
       # TODO: Add more main-ExN branches as we need for assignments
     
 jobs:
@@ -33,8 +31,5 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Build Python client
-        run: docker build -t python-client ./client_python
-
-      - name: Run client (smoke test with dummy input)
-        run: docker run --rm python-client python src/main.py 127.0.0.1 42069 || true # Put or true since it's not a requirement to pass tests on client yet
+      - name: Build and run Python client's tests
+        run: docker-compose run --build test_client
