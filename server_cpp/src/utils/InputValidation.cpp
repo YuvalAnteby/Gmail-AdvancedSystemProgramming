@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <regex>
 #include <sstream>
+#include "InputValidation.h"
 #include "data_persistence/IDataPersistence.h"
 
 /**
@@ -11,7 +12,7 @@
  * @param line The user input line.
  * @return True if valid, false otherwise.
  */
-bool isValidFirstLine(const std::string& line) {
+bool isValidFirstLine(const std::string &line) {
     std::istringstream iss(line);
     std::string token;
     bool hasDigits = false;
@@ -38,7 +39,7 @@ bool isValidFirstLine(const std::string& line) {
  * @param url The string to validate.
  * @return True if the URL is valid.
  */
-bool isValidURL(const std::string& url) {
+bool isValidURL(const std::string &url) {
     if (url.empty()) {
         return false;
     }
@@ -51,8 +52,8 @@ bool isValidURL(const std::string& url) {
  * @param line Input string.
  * @return True if valid, false otherwise.
  */
-bool containsOnlyDigitsAndWhitespace(const std::string& line) {
-    for (char c : line) {
+bool containsOnlyDigitsAndWhitespace(const std::string &line) {
+    for (char c: line) {
         if (!std::isdigit(c) && !std::isspace(c))
             return false;
     }
@@ -84,7 +85,7 @@ bool hasValidCommandStructure(const std::string& line) {
  * @param persistence Persistence interface to load/save config.
  * @return True if matching or saved successfully, false if mismatch.
  */
-bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence& persistence) {
+bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistence &persistence) {
     int loadedFirstInt = persistence.getBitSizeConfig();
     std::vector<int> loadedConfigInts = persistence.loadConfigInts();
 
@@ -108,24 +109,24 @@ bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistenc
  * @return True if all arguments are valid.
  */
 // Validate and parse command line arguments for server configuration
-bool validateAndParseArgs(int argc, char* argv[]) {
+bool isValidArgs(int argc, char *argv[]) {
     // Check if we have enough arguments
     if (argc < 4) {
         return false;
     }
 
     // Validate the port argument
-    if (!validatePort(argv[1])) {
+    if (!isValidPort(argv[1])) {
         return false;
     }
 
     // Validate the bloom size argument
-    if (!validateBloomSize(argv[2])) {
+    if (!isValidBloomSize(argv[2])) {
         return false;
     }
 
     // Validate the hash mod arguments
-    if (!validateHashMods(argc, argv)) {
+    if (!isValidHashMods(argc, argv)) {
         return false;
     }
 
@@ -138,18 +139,20 @@ bool validateAndParseArgs(int argc, char* argv[]) {
  * @param port Output integer to store the validated port.
  * @return True if valid (numeric and in range 1024–65535), false otherwise.
  */
-bool validatePort(const std::string& portStr) {
+bool isValidPort(const std::string &portStr) {
+    if (portStr.c_str() == nullptr) {
+        return false;
+    }
+
     if (!std::all_of(portStr.begin(), portStr.end(), ::isdigit)) {
         return false;
     }
-
-    int port = std::stoi(portStr);
-    
-    if (port < 1024 || port > 65535) {
+    try {
+        int port = std::stoi(portStr);
+        return port > 1024 && port < 65535;
+    } catch (...) {
         return false;
     }
-
-    return true;
 }
 /**
  * Validates the Bloom filter size argument and converts it to an integer.
@@ -158,18 +161,20 @@ bool validatePort(const std::string& portStr) {
  * @return True if valid (positive integer), false otherwise.
  */
 // Validate the bloom filter size (must be a positive integer)
-bool validateBloomSize(const std::string& bloomSizeStr) {
+bool isValidBloomSize(const std::string &bloomSizeStr) {
+    if (bloomSizeStr.c_str() == nullptr) {
+        return false;
+    }
+
     if (!std::all_of(bloomSizeStr.begin(), bloomSizeStr.end(), ::isdigit)) {
         return false;
     }
-
-    int bloomSize = std::stoi(bloomSizeStr);
-    
-    if (bloomSize <= 0) {
+    try {
+        int bloomSize = std::stoi(bloomSizeStr);
+        return bloomSize > 0;
+    } catch (...) {
         return false;
     }
-
-    return true;
 }
 /**
  * Validates all hash mod arguments starting from argv[3] and fills the hashMods vector.
@@ -179,16 +184,20 @@ bool validateBloomSize(const std::string& bloomSizeStr) {
  * @return True if all mod arguments are valid positive integers, false otherwise.
  */
 // Validate hash mod arguments (must be positive integers)
-bool validateHashMods(int argc, char* argv[]) {
+bool isValidHashMods(int argc, char *argv[]) {
     for (int i = 3; i < argc; ++i) {
+        if (argv[i] == nullptr) {
+            return false;
+        }
         std::string modStr(argv[i]);
-        
+
         if (!std::all_of(modStr.begin(), modStr.end(), ::isdigit)) {
             return false;
         }
-
-        int mod = std::stoi(modStr);
-        if (mod <= 0) {
+        try {
+            int mod = std::stoi(modStr);
+            return mod > 0;
+        } catch (...) {
             return false;
         }
     }

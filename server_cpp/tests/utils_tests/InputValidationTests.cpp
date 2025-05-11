@@ -159,12 +159,12 @@ TEST(hasValidCommandStructure, InvalidCommands) {
  * When the input has the correct number of arguments and all values are valid, the function should return true.
  * Expecting the function to return true for valid args.
  */
-TEST(ValidateAndParseArgsTest, ValidArgsCount) {
+TEST(isValidArgs, ValidArgsCount) {
     const char* argv[] = {"program_name", "8080", "1000", "3", "5", "7"};
     int argc = sizeof(argv) / sizeof(argv[0]);
 
     // Validate and parse the arguments
-    bool result = validateAndParseArgs(argc, const_cast<char**>(argv));
+    bool result = isValidArgs(argc, const_cast<char**>(argv));
 
     // Assert that the function returns true for valid arguments
     EXPECT_TRUE(result);  // The function should return true for valid input
@@ -175,12 +175,12 @@ TEST(ValidateAndParseArgsTest, ValidArgsCount) {
  * If the input is missing essential arguments, the function should return false.
  * Expecting false for this test case due to missing hash mods.
  */
-TEST(ValidateAndParseArgsTest, InvalidArgsCount) {
+TEST(isValidArgs, InvalidArgsCount) {
     const char* argv[] = {"program_name", "8080", "1000"};
     int argc = sizeof(argv) / sizeof(argv[0]);
 
     // Validate and parse the arguments
-    bool result = validateAndParseArgs(argc, const_cast<char**>(argv));
+    bool result = isValidArgs(argc, const_cast<char**>(argv));
 
     // Assert that the function returns false due to insufficient arguments
     EXPECT_FALSE(result);  // The function should return false for insufficient arguments
@@ -191,12 +191,12 @@ TEST(ValidateAndParseArgsTest, InvalidArgsCount) {
  * The port should be an integer; if it's not, the function should return false.
  * Expecting false for this test case due to an invalid port.
  */
-TEST(ValidateAndParseArgsTest, InvalidPort) {
+TEST(isValidArgs, InvalidPort) {
     const char* argv[] = {"program_name", "invalidPort", "1000", "3", "5", "7"};
     int argc = sizeof(argv) / sizeof(argv[0]);
 
     // Validate and parse the arguments with an invalid port value
-    bool result = validateAndParseArgs(argc, const_cast<char**>(argv));
+    bool result = isValidArgs(argc, const_cast<char**>(argv));
 
     // Assert that the function returns false due to the invalid port
     EXPECT_FALSE(result);  // The function should return false for an invalid port
@@ -207,13 +207,39 @@ TEST(ValidateAndParseArgsTest, InvalidPort) {
  * The bloom size should be an integer; if it's not, the function should return false.
  * Expecting false for this test case due to an invalid bloom size.
  */
-TEST(ValidateAndParseArgsTest, InvalidBloomSize) {
+TEST(isValidArgs, InvalidBloomSize) {
     const char* argv[] = {"program_name", "8080", "invalidBloomSize", "3", "5", "7"};
     int argc = sizeof(argv) / sizeof(argv[0]);
 
     // Validate and parse the arguments with an invalid bloom size value
-    bool result = validateAndParseArgs(argc, const_cast<char**>(argv));
+    bool result = isValidArgs(argc, const_cast<char**>(argv));
 
     // Assert that the function returns false due to the invalid bloom size
     EXPECT_FALSE(result);  // The function should return false for an invalid bloom size
 }
+
+/**
+ * Test: Verifies how processInput handles an invalid number of arguments.
+ * When the arguments are incomplete (missing values for hash mods), the function should leave the variables as is.
+ * Expecting false
+ */
+TEST(isValidArgs, InvalidArgs) {
+    const char* argv[] = {"program_name", "8080"};
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    // Process the arguments with not enough input, expect validation to be false
+    EXPECT_EQ(isValidArgs(argc, const_cast<char **>(argv)), false);
+
+}
+
+/**
+ * Test: Verifies that processInput handles invalid non-numeric values for port and bloom size.
+ * If the port and bloom size are not valid numbers, the function should not update these variables.
+ * Expecting port=0, bloomSize=0, and hash mods set to valid values.
+ */
+TEST(ProcessInputTest, InvalidPortAndBloomSize) {
+    const char* argv[] = {"program_name", "invalidPort", "invalidBloomSize", "3", "5"};
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    // expect false
+    EXPECT_EQ(isValidArgs(argc, const_cast<char**>(argv)), false);
+}
+

@@ -51,29 +51,26 @@ bool isConfigMatching(int firstInt, std::vector<int> configInts, IDataPersistenc
  * Validate that a port string is numeric and in range 1024–65535.
  * If valid, writes parsed value to the `port` reference.
  * @param portStr the port string from argv
- * @param port output parameter (reference) to store the validated port
  * @return true if valid
  */
-bool isValidPort(const std::string& portStr, int& port);
+bool isValidPort(const std::string& portStr);
 
 /**
  * Validate that a bloom size string is numeric and > 0.
  * If valid, writes parsed value to the `bloomSize` reference.
  * @param bloomSizeStr the bloom size string from argv
- * @param bloomSize output parameter (reference) to store the validated size
  * @return true if valid
  */
-bool isValidBloomSize(const std::string& bloomSizeStr, int& bloomSize);
+bool isValidBloomSize(const std::string& bloomSizeStr);
 
 /**
  * Validates and extracts hash mod values from CLI args starting at index 3.
  * If all values are valid (positive integers), writes them to `hashMods` reference vector.
  * @param argc number of args
  * @param argv array of args
- * @param hashMods output parameter (reference) to store validated hash mods
  * @return true if all are valid
  */
-bool isValidHashMods(int argc, char* argv[], std::vector<int>& hashMods);
+bool isValidHashMods(int argc, char* argv[]);
 
 /**
  * Validate and parse server startup arguments.
@@ -85,11 +82,8 @@ bool isValidHashMods(int argc, char* argv[], std::vector<int>& hashMods);
  *
  * @param argc number of CLI arguments
  * @param argv array of CLI argument strings
- * @param port output: parsed TCP port
- * @param bloomSize output: parsed bloom filter bit size
- * @param configInts output: parsed list of mod values for hash functions
  * @return true if valid, false otherwise
  */
-bool validateAndParse(int argc, char* argv[], int& port, int& bloomSize, std::vector<int>& configInts);
+bool isValidArgs(int argc, char* argv[]);
 
 #endif 
