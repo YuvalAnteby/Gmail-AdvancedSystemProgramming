@@ -22,7 +22,7 @@ class ClientConnection:
 
     #Collects the server's reply.
     def retrieve(self) -> str:
-        self.socket.settimeot(2)
+        self.socket.settimeout(2)
         reply = b""
         try:
             while True:

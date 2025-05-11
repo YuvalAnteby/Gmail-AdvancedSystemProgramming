@@ -30,20 +30,27 @@ int main(int argc, char *argv[]) {
     processInput(argc, argv, port, bloomSize, configInts);
     TCPSocketServer server(port);
     if (!server.acceptNewClient()) {
+        std::cerr << "Failed to accept new client" << std::endl;
         return 1;
+    } else {
+        std::cout << "Accepted new client" << std::endl;
     }
     // Initialize IO and persistence components.
     // Note: TcpInputReader and TCPOutputWriter are assumed to use the given port.
     IDataPersistence *dataSource = new FilePersistence();
-    IInputReader *inputReader = new TCPInputReader(port);
-    IOutputWriter *outputWriter = new TCPOutputWriter(port);
-
+    IInputReader *inputReader = new TCPInputReader(server.getClientSocket());
+    IOutputWriter *outputWriter = new TCPOutputWriter(server.getClientSocket());
+    bool shouldProcessInput = true;
     // Main loop: listen for commands from the client, process, respond.
     while (true) {
-        std::string line = inputReader->readLine();
-        // Parse and process the command using existing Bloom Filter logic.
-        const CommandRequest cr = CommandParser::parseCommand(line);
-        handleBloomCommandChoice(bloomSize, configInts, cr, *dataSource, *outputWriter);
+        if (shouldProcessInput) {
+            std::string line = inputReader->readLine();
+            shouldProcessInput = false;
+            // Parse and process the command using existing Bloom Filter logic.
+            const CommandRequest cr = CommandParser::parseCommand(line);
+            handleBloomCommandChoice(bloomSize, configInts, cr, *dataSource, *outputWriter);
+            shouldProcessInput = true;
+        }
     }
 
     //    // Exit mechanism — could be replaced with admin-only command later.

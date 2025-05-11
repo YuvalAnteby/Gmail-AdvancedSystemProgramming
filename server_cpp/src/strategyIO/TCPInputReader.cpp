@@ -24,8 +24,6 @@ std::string TCPInputReader::readLine() {
         std::cout << "received: " << std::string(buffer, readBytes) << std::endl;
         return std::string(buffer, readBytes);
     }
-    if (readBytes < 0) {
-        //perror("error reading from client");
-    }
+    std::cout << "recv failed" << std::endl;
     return std::string("");
 }

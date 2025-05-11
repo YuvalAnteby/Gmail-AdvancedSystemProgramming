@@ -16,9 +16,13 @@ class ClientApp:
     def run(self):
         #Run the main client loop: connect, read input, send it , response.
         self.connection.establish_connection()
-        while True:
+        user_input = self.io.read_input()
+        while not user_input == 'quit_quit':
+            print("sent info:", user_input)
+            self.connection.socket.send(bytes(user_input, "utf-8"))
+            response = self.connection.socket.recv(4096)
+            msg = response.decode("utf-8")
+            self.io.print_output(msg)
+            print("got info: ", msg)
             user_input = self.io.read_input()
-            self.connection.socket.send(user_input)
-            response = self.connection.socket.receive()
-            self.io.print_output(response)
-
+        self.connection.socket.close()
