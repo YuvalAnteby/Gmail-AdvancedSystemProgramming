@@ -59,11 +59,11 @@ std::vector<int> processConfigInts(const std::string& newLine) {
  * @param outputWriter object responsible on output (e.g. output using a CLI or over a TCP socket)
  */
 void handleBloomCommandChoice(
-    int arrSize,
-    const std::vector<int> &configInts,
-    CommandRequest commandReq,
-    IDataPersistence &dataSource,
-    IOutputWriter &outputWriter
+        int arrSize,
+        const std::vector<int> &configInts,
+        CommandRequest commandReq,
+        IDataPersistence &dataSource,
+        IOutputWriter &outputWriter
 ) {
     // Create the invoker for the commands
     BloomCommandInvoker invoker;
@@ -71,7 +71,9 @@ void handleBloomCommandChoice(
         case POST: {
             InsertUrlCommand insertUrlCommand(commandReq.getUrl(), dataSource, configInts, arrSize, outputWriter);
             invoker.runCommand(insertUrlCommand);
-            /// TODO add output as needed
+            // Print the result using the dynamic writer
+            std::string msg = insertUrlCommand.getResult().getFullMessage();
+            outputWriter.writeData(msg);
             break;
         }
         case GET: {
@@ -92,7 +94,6 @@ void handleBloomCommandChoice(
             break;
         }
         default: {
-            /// TODO Ensure this is the correct error message
             std::string errorMsg = toStatusMessage(BAD_REQUEST);
             outputWriter.writeData(errorMsg);
         }
