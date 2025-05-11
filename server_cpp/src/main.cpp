@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <network/TCPSocketServer.h>
+
 #include "utils/InputValidation.h"
 #include "strategyIO/TCPInputReader.h"
 #include "strategyIO/TCPOutputWriter.h"
@@ -26,7 +28,10 @@ int main(int argc, char *argv[]) {
     // Process the input using (you will call the relevant method here)
     // This is where you can process the arguments (port, bloomSize, configInts)
     processInput(argc, argv, port, bloomSize, configInts);
-
+    TCPSocketServer server(port);
+    if (!server.acceptNewClient()) {
+        return 1;
+    }
     // Initialize IO and persistence components.
     // Note: TcpInputReader and TCPOutputWriter are assumed to use the given port.
     IDataPersistence *dataSource = new FilePersistence();

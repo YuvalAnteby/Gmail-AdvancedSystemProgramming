@@ -4,8 +4,8 @@
 # Pick the python version
 FROM python:3.11-slim
 # Copy and set the client in the container
-WORKDIR /app/src
-COPY . /app
+WORKDIR /python_client/src
+COPY . /python_client
 #Default command depending on the mode:
 #Take ARG in build AND runtime for more flexible container behaviour
 CMD ["python", "src/main.py","app","42069"]

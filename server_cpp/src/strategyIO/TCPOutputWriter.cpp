@@ -2,6 +2,8 @@
 
 #include "TCPOutputWriter.h"
 
+#include <iostream>
+#include <ostream>
 #include <sys/socket.h>
 
 /**
@@ -17,7 +19,9 @@ TCPOutputWriter::TCPOutputWriter(const int clientSocket) : m_clientSocket(client
  */
 void TCPOutputWriter::writeData(std::string &line) {
     int send_bytes = send(m_clientSocket, line.c_str(), line.size(), 0);
+    if (send_bytes > 0)
+        std::cout << "sent: " << line << std::endl;
     if (send_bytes < 0) {
-        perror("error sending to client");
+        //perror("error sending to client");
     }
 }

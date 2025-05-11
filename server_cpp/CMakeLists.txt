@@ -14,9 +14,11 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+include_directories(src)
+
 # ----- Building CPP server -----
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS src/*.cpp)
-add_executable(runServer ${SRC_FILES})
+add_executable(run_server ${SRC_FILES})
 # ----- Building CPP server -----
 
 # ----- Building unit tests -----
@@ -27,6 +29,5 @@ list(APPEND TEST_FILES_LIST tests/test_main.cpp)
 add_executable(runTests ${TEST_FILES_LIST})
 # ----- Building unit tests -----
 
-include_directories(src)
 # Link gtest and gtest_main to runTests
 target_link_libraries(runTests gtest gtest_main)

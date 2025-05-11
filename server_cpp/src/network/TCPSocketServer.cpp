@@ -41,11 +41,7 @@ TCPSocketServer::TCPSocketServer(int serverPort, int maxClients)
         perror("error binding socket");
         throw std::runtime_error("Failed to bind socket");
     }
-    // Check if we exceeded the max amount of connections
-    if (listen(m_serverSocket, m_maxClients) < 0) {
-        perror("error listening on socket");
-        throw std::runtime_error("Failed to listen on socket");
-    }
+
 }
 
 /**
@@ -53,6 +49,11 @@ TCPSocketServer::TCPSocketServer(int serverPort, int maxClients)
  * @return true if managed to connect successfully, otherwise false
  */
 bool TCPSocketServer::acceptNewClient() {
+    // Check if we exceeded the max amount of connections
+    if (listen(m_serverSocket, m_maxClients) < 0) {
+        perror("error listening on socket");
+        throw std::runtime_error("Failed to listen on socket");
+    }
     sockaddr_in client_sin{};
     unsigned int addr_len = sizeof(client_sin);
     m_clientSocket = accept(m_serverSocket, (struct sockaddr *) &client_sin, &addr_len);
