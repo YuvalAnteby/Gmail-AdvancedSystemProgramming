@@ -1,0 +1,13 @@
+# Author: dor darmon 
+
+# use official python image 
+FROM python:3.11-slim
+
+# set working directory 
+WORKDIR /app
+
+# copy whats needrd for testing 
+COPY  . ./
+
+# Dfault command: run test 
+CMD [ "python","client_python/tests/test_client_unittest.py" ]
