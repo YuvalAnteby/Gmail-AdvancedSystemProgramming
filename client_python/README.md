@@ -34,7 +34,7 @@ docker-compose run --rm app
 ```
 # Run the tests
 ```bash
-docker-compose up --build test_client
+docker-compose run --build test_client
 ```
 
 ### Rebuilding the code in case of code errors (deletes .txt files)
