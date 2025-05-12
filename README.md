@@ -6,6 +6,7 @@
 ---
 
 ## Table of Contents
+- [Running server and client](#testing-or-running-the-server-and-client-as-project)
 - [Screenshots](#screenshots)
   - [Ex2](#ex2-screenshots)
 - [Answers to Ex2 questions](#answers-to-ex2-questions)
@@ -14,6 +15,35 @@
   - [Python client README]()
 
 ---
+
+### Testing or Running the server and client as project
+Clone the project
+```bash
+git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
+cd Gmail-AdvancedSystemProgramming/python_client
+```
+
+- To test the project
+```bash
+  docker-compose run --build --rm gtest
+  docker-compose run --build --rm test_client
+```
+1. Build the project
+```bash
+  docker-compose build
+```
+3. Run the server
+```bash
+  docker-compose up run_server
+```
+2. Run the client
+```bash
+  docker-compose run --build --rm python_client
+```
+- Remainder, to exit the container gracefully use
+```bash
+control+c
+```
 
 ### Screenshots
 
