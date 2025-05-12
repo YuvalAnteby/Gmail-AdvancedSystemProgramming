@@ -4,7 +4,7 @@ import socket
 
 # Run the main class for client
 # We need at least 3 args (initial element, server's ip, port)
-if len(sys.argv) >= 3:
+if len(sys.argv) < 3:
     sys.exit(1)
 # Take the ip and port from command-arg
 ip = sys.argv[1]
