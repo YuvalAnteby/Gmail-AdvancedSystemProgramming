@@ -1,7 +1,8 @@
 # Gmail-AdvancedSystemProgramming
 
-## Dear TA please check main1-Ex1 for the final version of a specific assigment
-## Dear TA please check main1-Ex2 for the final version of a specific assigment
+## Dear TA please check main-Ex1 for the final version of Ex1
+## Dear TA please check main-Ex2 for the final version of Ex2
+## Dear TA please check main-Ex3 for the final version of Ex3
 
 ---
 
