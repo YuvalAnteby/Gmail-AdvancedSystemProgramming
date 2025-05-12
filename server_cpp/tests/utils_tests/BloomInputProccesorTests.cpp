@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <sstream>
-#include "utils/BloomInputProccesor.h"
+#include "data_persistence/FilePersistence.h"
+
+#include "strategy_io/utils/BloomInputProccesor.h"
 
 /**
  * Test: tests some basic examples of invalid first line. expecting to skip them and move to the correct one
@@ -24,20 +26,17 @@ TEST(ProcessInputTest, ValidArgs) {
     int port = 0;
     int bloomSize = 0;
     std::vector<int> hashMods;
-    const char* argv[] = {"program_name", "8080", "1000", "3", "5", "7"};
+    const char *argv[] = {"program_name", "8080", "1000", "3", "5", "7"};
     int argc = sizeof(argv) / sizeof(argv[0]);
-
+    IDataPersistence *dataSource = new FilePersistence();
     // Process the arguments
-    processInput(argc, const_cast<char**>(argv), port, bloomSize, hashMods);
+    processInput(argc, const_cast<char **>(argv), port, bloomSize, hashMods, *dataSource);
 
     // Assert that port, bloomSize, and hashMods have been correctly set from the input arguments
-    EXPECT_EQ(port, 8080);         // Port should be 8080
-    EXPECT_EQ(bloomSize, 1000);    // Bloom size should be 1000
+    EXPECT_EQ(port, 8080); // Port should be 8080
+    EXPECT_EQ(bloomSize, 1000); // Bloom size should be 1000
     EXPECT_EQ(hashMods.size(), 3); // Three hash mods should be set
-    EXPECT_EQ(hashMods[0], 3);     // First hash mod should be 3
-    EXPECT_EQ(hashMods[1], 5);     // Second hash mod should be 5
-    EXPECT_EQ(hashMods[2], 7);     // Third hash mod should be 7
+    EXPECT_EQ(hashMods[0], 3); // First hash mod should be 3
+    EXPECT_EQ(hashMods[1], 5); // Second hash mod should be 5
+    EXPECT_EQ(hashMods[2], 7); // Third hash mod should be 7
 }
-
-
-

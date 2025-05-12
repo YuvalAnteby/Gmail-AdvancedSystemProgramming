@@ -5,9 +5,9 @@
 
 #include <vector>
 
-#include "bloom/utils/CommandRequest.h"
+#include "bloom/commands/utils/CommandRequest.h"
 #include "data_persistence/IDataPersistence.h"
-#include "strategyIO/IOutputWriter.h"
+#include "strategy_io/IOutputWriter.h"
 
 /**
  * Get the first number from the first line as a string, edit the line string to skip it.

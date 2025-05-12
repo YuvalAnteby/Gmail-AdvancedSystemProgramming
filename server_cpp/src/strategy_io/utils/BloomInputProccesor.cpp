@@ -2,14 +2,16 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <bloom/commands/DeleteUrlCommand.h>
-#include <bloom/utils/BloomFilterStatusCodeParser.h>
-#include <bloom/utils/CommandRequest.h>
-
-#include "data_persistence/IDataPersistence.h"
-#include "bloom/commands/InsertUrlCommand.h"
-#include "bloom/commands/CheckUrlCommand.h"
 #include "bloom/commands/BloomCommandInvoker.h"
+#include "bloom/commands/CheckUrlCommand.h"
+#include "bloom/commands/DeleteUrlCommand.h"
+#include "bloom/commands/InsertUrlCommand.h"
+#include "bloom/commands/utils//CommandRequest.h"
+#include "bloom/utils/status_code/BloomFilterStatusEnum.h"
+#include "bloom/utils/status_code/BloomFilterStatusCodeParser.h"
+#include "bloom/utils/command_code/BloomFilterCommandEnum.h"
+
+#include "../../data_persistence/IDataPersistence.h"
 
 
 /**
@@ -30,7 +32,7 @@ void processInput(
     int &bloomSize,
     std::vector<int> &hashMods,
     IDataPersistence &dataSource
-    ) {
+) {
     // Get the port
     std::string portStr(argv[1]);
     port = std::stoi(portStr);
@@ -97,11 +99,11 @@ std::vector<int> processConfigInts(const std::string &newLine) {
  * @param outputWriter object responsible on output (e.g. output using a CLI or over a TCP socket)
  */
 void handleBloomCommandChoice(
-        int arrSize,
-        const std::vector<int> &configInts,
-        CommandRequest commandReq,
-        IDataPersistence &dataSource,
-        IOutputWriter &outputWriter
+    int arrSize,
+    const std::vector<int> &configInts,
+    CommandRequest commandReq,
+    IDataPersistence &dataSource,
+    IOutputWriter &outputWriter
 ) {
     // Create the invoker for the commands
     BloomCommandInvoker invoker;

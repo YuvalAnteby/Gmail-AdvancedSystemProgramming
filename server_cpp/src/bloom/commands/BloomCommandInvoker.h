@@ -4,7 +4,7 @@
 
 #include "IBloomCommand.h"
 /**
- * Class reponsible on executing the correct command of the bloom filter.
+ * Class responsible on executing the correct command of the bloom filter.
  * Part of Command design pattern.
  */
 class BloomCommandInvoker {

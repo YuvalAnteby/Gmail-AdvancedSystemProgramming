@@ -3,10 +3,10 @@
 #define DELETE_URL_COMMAND_H
 
 
-#include "strategyIO/IOutputWriter.h"
+#include "./strategy_io/IOutputWriter.h"
 #include "IBloomCommand.h"
 #include "data_persistence/IDataPersistence.h"
-#include "bloom/models/BloomCommandResult.h"
+#include "bloom/result//BloomCommandResult.h"
 
 class DeleteUrlCommand : public IBloomCommand {
     std::string m_url;

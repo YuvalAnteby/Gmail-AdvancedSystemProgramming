@@ -2,9 +2,8 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include "data_persistence/FilePersistence.h"
-#include <iostream> // TODO: remove
 
-#include "bloom/utils/BloomFilterStatusEnum.h"
+#include "bloom/utils/status_code/BloomFilterStatusEnum.h"
 
 // Default paths for the .txt files.
 const std::string testBitsPath = "data/bloom_bits.txt";

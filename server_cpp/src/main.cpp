@@ -1,18 +1,17 @@
-#include <iostream>
 #include <vector>
 #include <string>
 #include <network/TCPSocketServer.h>
 
-#include "utils/InputValidation.h"
-#include "strategyIO/TCPInputReader.h"
-#include "strategyIO/TCPOutputWriter.h"
+#include "strategy_io/utils/InputValidation.h"
+#include "strategy_io/tcp/TCPInputReader.h"
+#include "strategy_io/tcp/TCPOutputWriter.h"
 #include "data_persistence/IDataPersistence.h"
 #include "data_persistence/FilePersistence.h"
-#include "strategyIO/IInputReader.h"
-#include "strategyIO/IOutputWriter.h"
-#include "bloom/utils/CommandParser.h"
-#include "bloom/utils/CommandRequest.h"
-#include "utils/BloomInputProccesor.h"
+#include "strategy_io/IInputReader.h"
+#include "strategy_io/IOutputWriter.h"
+#include "bloom/utils/command_code/CommandParser.h"
+#include "bloom/commands/utils/CommandRequest.h"
+#include "strategy_io/utils/BloomInputProccesor.h"
 
 int main(int argc, char *argv[]) {
     // Declaring variables to store port, bloom filter size, and hash mod values

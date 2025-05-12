@@ -1,11 +1,13 @@
 // Author(s): Yuval Anteby, Roee Chaim
 #include "CheckUrlCommand.h"
 #include "bloom/hash/Hasher.h"
-#include "bloom/utils/BloomFilterStatusCodeParser.h"
+#include "bloom/utils/status_code/BloomFilterStatusCodeParser.h"
 #include <iostream>
 #include <vector>
 #include <string>
 #include <algorithm>
+#include "bloom/utils/status_code/BloomFilterStatusEnum.h"
+#include "bloom/utils/command_code/BloomFilterCommandEnum.h"
 
 /**
  * Constructor for production usage.

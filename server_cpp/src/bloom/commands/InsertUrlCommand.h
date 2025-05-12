@@ -2,7 +2,7 @@
 #ifndef INSERT_URL_COMMAND_H
 #define INSERT_URL_COMMAND_H
 
-#include <strategyIO/IOutputWriter.h>
+#include <strategy_io/IOutputWriter.h>
 
 #include "IBloomCommand.h"
 #include "data_persistence/IDataPersistence.h"

@@ -1,10 +1,10 @@
 // Author(s): Yuval Anteby
 #include "InsertUrlCommand.h"
 
-#include <strategyIO/IOutputWriter.h>
+#include <strategy_io/IOutputWriter.h>
 
 #include "bloom/hash/Hasher.h"
-#include "bloom/utils/BloomFilterStatusCodeParser.h"
+#include "bloom/utils/status_code/BloomFilterStatusCodeParser.h"
 
 /**
  * Default constructor

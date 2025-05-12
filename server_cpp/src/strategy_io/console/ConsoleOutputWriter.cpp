@@ -2,7 +2,6 @@
 #include "ConsoleOutputWriter.h"
 #include <iostream>
 
-/// TODO add tests
 
 /**
 * Default constructor

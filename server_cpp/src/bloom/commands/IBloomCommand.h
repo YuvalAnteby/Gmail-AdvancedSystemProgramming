@@ -2,7 +2,7 @@
 #ifndef IBLOOM_COMMAND_H
 #define IBLOOM_COMMAND_H
 
-#include "bloom/models/BloomCommandResult.h"
+#include "bloom/result//BloomCommandResult.h"
 
 /**
  * Interface for all commands related to the bloom filter.

@@ -1,8 +1,9 @@
 // Author(s): Yuval Anteby
 #include <string>
 #include "BloomCommandResult.h"
-#include "bloom/utils/BloomFilterCommandEnum.h"
-#include "bloom/utils/BloomFilterStatusEnum.h"
+
+#include "bloom/utils/command_code/BloomFilterCommandEnum.h"
+#include "bloom/utils/status_code/BloomFilterStatusEnum.h"
 
 /**
  * Default constructor.

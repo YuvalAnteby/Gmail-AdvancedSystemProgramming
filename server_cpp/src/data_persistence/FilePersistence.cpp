@@ -1,10 +1,10 @@
 // Author(s): Yuval Anteby
 
-#include "bloom/utils/BloomFilterStatusEnum.h"
+#include "bloom/utils/status_code/BloomFilterStatusEnum.h"
 #include "FilePersistence.h"
 #include <fstream>
 #include <iostream>
-#include <utils/InputValidation.h>
+#include "strategy_io/utils/InputValidation.h"
 
 /**
  * Constructor

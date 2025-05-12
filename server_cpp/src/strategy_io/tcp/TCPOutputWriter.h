@@ -1,8 +1,7 @@
 // Author(s): Yuval Anteby
 #ifndef SOCKET_OUTPUT_WRITER_H
 #define SOCKET_OUTPUT_WRITER_H
-/// TODO tests
-#include "IOutputWriter.h"
+#include "./strategy_io/IOutputWriter.h"
 
 /**
  * Class to be responsible on sending data from the server to a client using TCP connection.

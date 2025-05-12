@@ -3,7 +3,7 @@
 #ifndef CONSOLE_INPUT_READER_H
 #define CONSOLE_INPUT_READER_H
 
-#include "strategyIO/IInputReader.h"
+#include "strategy_io/IInputReader.h"
 
 /**
  * Class responsible on getting input from the user, using the CLI.
