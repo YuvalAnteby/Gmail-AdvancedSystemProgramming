@@ -6,6 +6,7 @@
 ---
 
 ## Table of Contents
+- [Running server and client](#testing-or-running-the-server-and-client-as-project)
 - [Screenshots](#screenshots)
   - [Ex2](#ex2-screenshots)
 - [Answers to Ex2 questions](#answers-to-ex2-questions)
@@ -15,12 +16,47 @@
 
 ---
 
+### Testing or Running the server and client as project
+Clone the project
+```bash
+git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
+cd Gmail-AdvancedSystemProgramming/python_client
+```
+
+- To test the project
+```bash
+  docker-compose run --build --rm gtest
+  docker-compose run --build --rm test_client
+```
+1. Build the project
+```bash
+  docker-compose build
+```
+3. Run the server
+```bash
+  docker-compose up run_server
+```
+2. Run the client
+```bash
+  docker-compose run --build --rm python_client
+```
+- Remainder, to exit the container gracefully use
+```bash
+control+c
+```
+
 ### Screenshots
 
 #### Ex2 screenshots
 <details>
 <summary>Click to expand Ex2 screenshots</summary>
-TODO add
+<img src="screenshots/BloomFilter/ex2/example run 1.png" height="500" alt="img1">
+<img src="screenshots/BloomFilter/ex2/example run 2.png" height="500" alt="img2">
+<img src="screenshots/BloomFilter/ex2/example run 3.png" height="500" alt="img3">
+<img src="screenshots/BloomFilter/ex2/example run 4.png" height="500" alt="img4">
+<img src="screenshots/BloomFilter/ex2/example run 5.png" height="500" alt="img5">
+<img src="screenshots/BloomFilter/ex2/client test results.png" height="500" alt="img6">
+<img src="screenshots/BloomFilter/ex2/server test results.png" height="500" alt="img7">
 </details>
 
 ---
@@ -54,7 +90,7 @@ In case we'll need to change IO method we could change the type at the start of 
 ---
 
 ## Useful links
-- [CPP server README]()
-- [Python client README]()
+- [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Ex2/server_cpp)
+- [Python client README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex2/python_client/README.md)
 
 ---

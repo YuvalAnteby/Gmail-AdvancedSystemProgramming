@@ -9,10 +9,9 @@
 - [Exiting the docker container in terminal](#reminder-exiting-the-docker-container)
 - [Rebuilding the code in case of code errors](#rebuilding-the-code-in-case-of-code-errors-deletes-txt-files)
 - [Testing locally with Docker](#testing-locally-with-docker)
-- [Screenshots](#screenshots)
 
 ## Setting up & running the server
-
+- <b>note</b>: we use default values for the command line arguments, if you would like to change do it from docker
 ### clone
 ```bash
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
@@ -20,7 +19,7 @@ cd Gmail-AdvancedSystemProgramming
 ```
 ### build
 ```bash
-docker-compose build runServer
+docker-compose build run_server
 ```
 ### run
 ```bash
@@ -35,8 +34,8 @@ docker run --rm -v gmail-advancedsystemprogramming_app_data:/data alpine sh -c "
 ### Rebuilding the code in case of code errors (deletes .txt files)
 ```bash
 docker-compose down -v
-docker-compose build server
-docker-compose run --rm server
+docker-compose build run_server
+docker-compose up run_server
 ```
 
 ### Testing locally with Docker
@@ -54,20 +53,5 @@ or
 ```bash
 control + c
 ```
-
-
----
-
-## Screenshots
-
-<details>
-<summary>Click to expand screenshots</summary>
-
-<img src="../screenshots/BloomFilter/example%20run%201.png" height="500" alt="img1">
-<img src="../screenshots/BloomFilter/example%20run%202.png" height="500" alt="img2">
-<img src="../screenshots/BloomFilter/example%20run%203.png" height="500" alt="img3">
-<img src="../screenshots/BloomFilter/test%20results.png" height="500" alt="img4">
-
-</details>
 
 ---
