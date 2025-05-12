@@ -7,7 +7,6 @@
 
 ## Table of Contents
 - [Screenshots](#screenshots)
-  - [Ex1](#ex1-screenshots)
   - [Ex2](#ex2-screenshots)
 - [Answers to Ex2 questions](#answers-to-ex2-questions)
 - [Useful links](#useful-links)
