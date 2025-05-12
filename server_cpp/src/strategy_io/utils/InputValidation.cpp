@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <regex>
 #include <sstream>
-#include "InputValidation.h"
-#include "data_persistence/IDataPersistence.h"
+#include "strategy_io/utils/InputValidation.h"
+#include "../../data_persistence/IDataPersistence.h"
 
 /**
  * Checks if the input line contains only digits separated by spaces.
@@ -78,6 +78,7 @@ bool hasValidCommandStructure(const std::string& line) {
     return !url.empty();
 }
 */
+
 /**
  * Compares a given config with persisted config, or saves it if no config exists.
  * @param firstInt The bloom filter bit size.

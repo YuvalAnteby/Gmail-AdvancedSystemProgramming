@@ -1,10 +1,10 @@
 // Author(s): Yuval Anteby
 
-#include "bloom/utils/BloomFilterStatusEnum.h"
+#include "bloom/utils/status_code/BloomFilterStatusEnum.h"
 #include "FilePersistence.h"
 #include <fstream>
 #include <iostream>
-#include <utils/InputValidation.h>
+#include "strategy_io/utils/InputValidation.h"
 
 /**
  * Constructor
@@ -42,11 +42,10 @@ std::vector<std::vector<bool>> FilePersistence::loadBitArrays() {
 
 /**
  * Insert the new bit array to the .txt file.
- * @param vector of bit array to save.
+ * @param bits vector of bit array to save.
  * @return true if added successfully, otherwise false
  */
 bool FilePersistence::appendBitArray(const std::vector<bool> &bits) {
-    //std::cout << "DEBUG: started appending bit array" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (bits.empty()) {
         return false;
@@ -62,7 +61,6 @@ bool FilePersistence::appendBitArray(const std::vector<bool> &bits) {
     }
     // End the line (new bit array)
     file << '\n';
-    //std::cout << "DEBUG: finished appending bit array" << std::endl; //TODO: remove debug print
     file.close();
     return true;
 }
@@ -90,11 +88,10 @@ std::vector<std::string> FilePersistence::loadBlacklist() {
 
 /**
  * Insert the blacklisted URL to the .txt file.
- * @param URLs The URL to save.
+ * @param url The URL to save.
  * @return true if added successfully, otherwise false
  */
 bool FilePersistence::appendBlacklistedUrl(const std::string &url) {
-    //std::cout << "DEBUG: started appending URL" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (url.empty()) {
         return false;
@@ -108,7 +105,6 @@ bool FilePersistence::appendBlacklistedUrl(const std::string &url) {
     // End the line (new URL)
     file << '\n';
     file.close();
-    //std::cout << "DEBUG: finished appending URL" << std::endl; //TODO: remove debug print
     return true;
 }
 
@@ -138,12 +134,11 @@ std::vector<int> FilePersistence::loadConfigInts() {
 
 /**
 * Load the config ints, given in a previous input of the user.
-* @param A vector where the first int is bit array size (first int in the input), the rest are how many times to run
-* hash functions
+* @param configInts vector where the first int is a bit array size (first int in the input), the rest are how many
+* times to run hash functions
 * @return true if added successfully, otherwise false
 */
 bool FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
-    //std::cout << "DEBUG: started appending config ints" << std::endl; //TODO: remove debug print
     // If the input is empty, throw an exception - invalid argument
     if (configInts.empty()) {
         return false;
@@ -159,7 +154,6 @@ bool FilePersistence::appendConfigInts(const std::vector<int>& configInts) {
         file << '\n';
     }
     file.close();
-    //std::cout << "DEBUG: finished appending config ints" << std::endl; //TODO: remove debug print
     return true;
 }
 

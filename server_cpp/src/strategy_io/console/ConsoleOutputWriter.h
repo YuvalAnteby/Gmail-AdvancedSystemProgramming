@@ -2,7 +2,7 @@
 #ifndef CONSOLE_OUTPUT_WRITER_H
 #define CONSOLE_OUTPUT_WRITER_H
 
-#include "strategyIO/IOutputWriter.h"
+#include "strategy_io/IOutputWriter.h"
 #include <string>
 
 /**

@@ -19,7 +19,7 @@
 ### Clone
 ```bash
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
-cd Gmail-AdvancedSystemProgramming/client_python
+cd Gmail-AdvancedSystemProgramming/python_client
 ``` 
 
  

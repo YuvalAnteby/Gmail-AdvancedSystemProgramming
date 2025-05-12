@@ -2,11 +2,11 @@
 #ifndef CHECK_URL_COMMAND_H
 #define CHECK_URL_COMMAND_H
 
-#include <strategyIO/IOutputWriter.h>
+#include "./strategy_io/IOutputWriter.h"
 
 #include "IBloomCommand.h"
 #include "data_persistence/IDataPersistence.h"
-#include "bloom/models/BloomCommandResult.h"
+#include "bloom/result/BloomCommandResult.h"
 
 /**
  * Class responsible for the check command of URLs against the bloom filter.

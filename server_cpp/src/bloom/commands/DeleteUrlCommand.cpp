@@ -1,8 +1,8 @@
 // Author(s): Yuval Anteby
 
 #include "DeleteUrlCommand.h"
-#include "utils/InputValidation.h"
-#include "bloom/utils/BloomFilterStatusCodeParser.h"
+#include "strategy_io/utils/InputValidation.h"
+#include "bloom/utils/status_code/BloomFilterStatusCodeParser.h"
 
 DeleteUrlCommand::DeleteUrlCommand(const std::string &url, IDataPersistence &persistence, IOutputWriter &outputWriter)
     : m_url(url), m_persistence(persistence), m_bloomResult(DELETE), m_outputWriter(outputWriter) {

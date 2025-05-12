@@ -1,9 +1,8 @@
 // Author(s): Yuval Anteby
 
 #include "CommandRequest.h"
-#include "BloomCommandCodeParser.h"
-#include "BloomFilterCommandEnum.h"
 #include <string>
+#include "bloom/utils/command_code/BloomCommandCodeParser.h"
 
 /**
  * Constructor
@@ -15,7 +14,7 @@ CommandRequest::CommandRequest(std::string& command, std::string& url)
  * Getter for the command
  * @return command as enum code
  */
-const BloomFilterCommandEnum CommandRequest::getCommand() {
+BloomFilterCommandEnum CommandRequest::getCommand() {
   return m_command;
 }
 
@@ -23,6 +22,6 @@ const BloomFilterCommandEnum CommandRequest::getCommand() {
  * Getter for the URL
  * @return the URL we got from the user
  */
-const std::string CommandRequest::getUrl() {
+std::string CommandRequest::getUrl() {
   return m_url;
 }

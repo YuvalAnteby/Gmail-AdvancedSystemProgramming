@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <sstream>
-#include "utils/InputValidation.h"
+#include "strategy_io/utils/InputValidation.h"
 
 /**
  * Test: check if a first line is regarded as valid or invalid input with mixed words and numbers

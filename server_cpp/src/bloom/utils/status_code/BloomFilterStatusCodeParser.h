@@ -3,7 +3,7 @@
 #define BLOOM_FILTER_STATUS_CODE_UTILS_H
 
 #include <string>
-#include "bloom/utils/BloomFilterStatusEnum.h"
+#include "bloom/utils/status_code/BloomFilterStatusEnum.h"
 
 std::string toStatusMessage(BloomFilterStatusEnum statusCode);
 

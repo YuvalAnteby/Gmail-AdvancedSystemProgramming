@@ -2,7 +2,7 @@
 #ifndef COMMAND_PARSER_H
 #define COMMAND_PARSER_H
 
-#include "CommandRequest.h"
+#include "bloom/commands/utils/CommandRequest.h"
 #include <string>
 
 /**

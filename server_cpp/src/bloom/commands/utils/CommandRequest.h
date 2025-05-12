@@ -3,23 +3,24 @@
 #define COMMAND_REQUEST_H
 
 #include <string>
-#include "BloomFilterCommandEnum.h"
+#include "bloom/utils/command_code/BloomFilterCommandEnum.h"
+
 
 /**
  * Class to represent a command request.
  * Made of the command enum and the URL.
  */
 class CommandRequest {
-  private:
     BloomFilterCommandEnum m_command; // e.g. POST, GET
     std::string m_url; // a valid URL
 
-  public:
-    CommandRequest(std::string& command, std::string& url);
-    const BloomFilterCommandEnum getCommand();
-    const std::string getUrl();
-};
+public:
+    CommandRequest(std::string &command, std::string &url);
 
+    BloomFilterCommandEnum getCommand();
+
+    std::string getUrl();
+};
 
 
 #endif

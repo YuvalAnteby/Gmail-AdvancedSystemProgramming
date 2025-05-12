@@ -1,10 +1,10 @@
 // Author(s): Yuval Anteby
 #include "InsertUrlCommand.h"
 
-#include <strategyIO/IOutputWriter.h>
+#include <strategy_io/IOutputWriter.h>
 
 #include "bloom/hash/Hasher.h"
-#include "bloom/utils/BloomFilterStatusCodeParser.h"
+#include "bloom/utils/status_code/BloomFilterStatusCodeParser.h"
 
 /**
  * Default constructor
@@ -12,6 +12,7 @@
  * @param persistence data source for the bits, URLs and config needed
  * @param configInts array of ints given by the user for the bloom filter
  * @param size bit array size
+ * @param outputWriter dynamic object to print the output to the user the correct way
  */
 InsertUrlCommand::InsertUrlCommand(
     const std::string &url,
@@ -60,6 +61,6 @@ void InsertUrlCommand::execute() {
 BloomCommandResult InsertUrlCommand::getResult() {
     // Set the message to the client as requested in the instructions (the same for errors and success
     m_bloomResult.appendToOutcomeMessage(toStatusMessage(m_bloomResult.getStatusCode()) + "\n");
-    m_bloomResult.setFullMessage(m_bloomResult.getStatusCode() + "\n");
+    m_bloomResult.setFullMessage(toStatusMessage(m_bloomResult.getStatusCode()) + "\n");
     return m_bloomResult;
 }

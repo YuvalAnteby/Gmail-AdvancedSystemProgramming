@@ -4,7 +4,7 @@
 #include "bloom/hash/Hasher.h"
 #include <vector>
 #include <string>
-#include <strategyIO/ConsoleOutputWriter.h>
+#include "strategy_io/console/ConsoleOutputWriter.h"
 
 // ==========================================
 // Mock class for IDataPersistence

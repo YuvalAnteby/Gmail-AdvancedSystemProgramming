@@ -1,10 +1,9 @@
 // Author(s): Yuval Anteby
 
-#include "CommandParser.h"
-#include "CommandRequest.h"
-#include "bloom/utils/BloomFilterStatusEnum.h"
-#include "bloom/utils/BloomCommandCodeParser.h"
-#include "utils/InputValidation.h"
+#include "./CommandParser.h"
+#include "./bloom/commands/utils/CommandRequest.h"
+#include "bloom/utils/command_code/BloomCommandCodeParser.h"
+#include "strategy_io/utils/InputValidation.h"
 #include <sstream>
 #include <string>
 

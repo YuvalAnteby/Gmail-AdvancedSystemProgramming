@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <vector>
 #include <string>
-#include "bloom/utils/BloomFilterStatusEnum.h"
+#include "bloom/utils/status_code/BloomFilterStatusEnum.h"
 
 /**
  * Interface for file management of Bloom Filter.
@@ -20,7 +20,7 @@ public:
 
     /**
      * Insert the new bit array.
-     * @param vector of bit array to save.
+     * @param bits vector of bit array to save.
      * @return true if added successfully, otherwise false
      */
     virtual bool appendBitArray(const std::vector<bool>& bits) = 0;
@@ -33,7 +33,7 @@ public:
 
     /**
      * Insert the blacklisted URL.
-     * @param URLs The URL to save.
+     * @param url The URL to save.
      * @return true if added successfully, otherwise false
      */
     virtual bool appendBlacklistedUrl(const std::string& url) = 0;
@@ -47,7 +47,7 @@ public:
 
     /**
      * Save the config ints, given by the user's input.
-     * @param vector first int is bit array size (first int in the input), the rest are how many times to run hash
+     * @param configInts vector first int is bit array size (first int in the input), the rest are how many times to run hash
      * functions
      * @return true if added successfully, otherwise false
      */

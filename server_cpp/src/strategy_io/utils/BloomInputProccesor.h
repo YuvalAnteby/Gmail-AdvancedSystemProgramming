@@ -5,23 +5,23 @@
 
 #include <vector>
 
-#include "bloom/utils/CommandRequest.h"
+#include "bloom/commands/utils/CommandRequest.h"
 #include "data_persistence/IDataPersistence.h"
-#include "strategyIO/IOutputWriter.h"
+#include "strategy_io/IOutputWriter.h"
 
 /**
  * Get the first number from the first line as a string, edit the line string to skip it.
  * @param line string of the user's input line. will be changed in function
  * @return string of the first number in the string (bit array size)
  */
-std::string processFirstInt(std::string& line);
+std::string processFirstInt(std::string &line);
 
 /**
- * Get the remaning ints from the user's first line of input, which contains ints only
+ * Get the remaining ints from the user's first line of input, which contains ints only
  * @param newLine the line after removing the first int
  * @return vector of ints representing the ints from the user
  */
-std::vector<int> processConfigInts(const std::string& newLine);
+std::vector<int> processConfigInts(const std::string &newLine);
 
 
 /**
@@ -34,8 +34,16 @@ std::vector<int> processConfigInts(const std::string& newLine);
  * @param port reference to an integer where the port value will be stored.
  * @param bloomSize reference to an integer where the bloom size will be stored.
  * @param hashMods reference to a vector where the hash mod values will be stored.
+ * @param dataSource data source to save the config ints at
  */
-void processInput(int argc, char* argv[], int& port, int& bloomSize, std::vector<int>& hashMods);
+void processInput(
+    int argc,
+    char *argv[],
+    int &port,
+    int &bloomSize,
+    std::vector<int> &hashMods,
+    IDataPersistence &dataSource
+);
 
 
 /**

@@ -2,14 +2,16 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <bloom/commands/DeleteUrlCommand.h>
-#include <bloom/utils/BloomFilterStatusCodeParser.h>
-#include <bloom/utils/CommandRequest.h>
-
-#include "data_persistence/IDataPersistence.h"
-#include "bloom/commands/InsertUrlCommand.h"
-#include "bloom/commands/CheckUrlCommand.h"
 #include "bloom/commands/BloomCommandInvoker.h"
+#include "bloom/commands/CheckUrlCommand.h"
+#include "bloom/commands/DeleteUrlCommand.h"
+#include "bloom/commands/InsertUrlCommand.h"
+#include "bloom/commands/utils//CommandRequest.h"
+#include "bloom/utils/status_code/BloomFilterStatusEnum.h"
+#include "bloom/utils/status_code/BloomFilterStatusCodeParser.h"
+#include "bloom/utils/command_code/BloomFilterCommandEnum.h"
+
+#include "../../data_persistence/IDataPersistence.h"
 
 
 /**
@@ -21,8 +23,16 @@
  * @param port reference to an integer where the port value will be stored.
  * @param bloomSize reference to an integer where the bloom size will be stored.
  * @param hashMods reference to a vector where the hash mod values will be stored.
+ * @param dataSource data source to save the config ints at
  */
-void processInput(int argc, char *argv[], int &port, int &bloomSize, std::vector<int> &hashMods) {
+void processInput(
+    int argc,
+    char *argv[],
+    int &port,
+    int &bloomSize,
+    std::vector<int> &hashMods,
+    IDataPersistence &dataSource
+) {
     // Get the port
     std::string portStr(argv[1]);
     port = std::stoi(portStr);
@@ -34,6 +44,11 @@ void processInput(int argc, char *argv[], int &port, int &bloomSize, std::vector
         int mod = std::stoi(argv[i]);
         hashMods.push_back(mod);
     }
+    // save the config ints
+    std::vector<int> allConfigInts;
+    allConfigInts.push_back(bloomSize);
+    allConfigInts.insert(allConfigInts.end(), hashMods.begin(), hashMods.end());
+    dataSource.appendConfigInts(allConfigInts);
 }
 
 /**
@@ -84,11 +99,11 @@ std::vector<int> processConfigInts(const std::string &newLine) {
  * @param outputWriter object responsible on output (e.g. output using a CLI or over a TCP socket)
  */
 void handleBloomCommandChoice(
-        int arrSize,
-        const std::vector<int> &configInts,
-        CommandRequest commandReq,
-        IDataPersistence &dataSource,
-        IOutputWriter &outputWriter
+    int arrSize,
+    const std::vector<int> &configInts,
+    CommandRequest commandReq,
+    IDataPersistence &dataSource,
+    IOutputWriter &outputWriter
 ) {
     // Create the invoker for the commands
     BloomCommandInvoker invoker;
