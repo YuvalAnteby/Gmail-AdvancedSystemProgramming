@@ -1,42 +1,73 @@
-# Gmail-AdvancedSystemProgramming
-
-## Dear TA please check main1-Ex1 for the final version of a specific assigment
-## Dear TA please check main1-Ex2 for the final version of a specific assigment
-
----
+# CPP server
 
 ## Table of Contents
+- [Setting up the server](#setting-up--running-the-server)
+  1. [Clone](#clone)
+  2. [Build](#build)
+  3. [run](#run)
+  4. [Deleting manually .txt files in docker (from terminal)](#deleting-manually-the-txt-files-in-terminal)
+- [Exiting the docker container in terminal](#reminder-exiting-the-docker-container)
+- [Rebuilding the code in case of code errors](#rebuilding-the-code-in-case-of-code-errors-deletes-txt-files)
+- [Testing locally with Docker](#testing-locally-with-docker)
 - [Screenshots](#screenshots)
-  - [Ex1](#ex1-screenshots)
-  - [Ex2](#ex2-screenshots)
-- [Useful links](#useful-links)
-  - [CPP server README]() 
-  - [Python client README]()
+
+## Setting up & running the server
+
+### clone
+```bash
+git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
+cd Gmail-AdvancedSystemProgramming
+```
+### build
+```bash
+docker-compose build runServer
+```
+### run
+```bash
+docker-compose run --rm runServer
+```
+
+### Deleting manually the .txt files (in terminal)
+```bash
+docker run --rm -v gmail-advancedsystemprogramming_app_data:/data alpine sh -c "rm -f /data/build/data/*.txt"
+```
+
+### Rebuilding the code in case of code errors (deletes .txt files)
+```bash
+docker-compose down -v
+docker-compose build server
+docker-compose run --rm server
+```
+
+### Testing locally with Docker
+```bash
+git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
+cd Gmail-AdvancedSystemProgramming
+docker-compose run --build --rm gtest
+```
+
+### (Reminder) Exiting the docker container
+```bash
+control + d
+```
+or 
+```bash
+control + c
+```
+
 
 ---
 
-### Screenshots
-#### Ex1 screenshots
+## Screenshots
+
 <details>
-<summary>Click to expand Ex1 screenshots</summary>
-<img src="/screenshots/BloomFilter/example%20run%201.png" height="500" alt="img1">
-<img src="/screenshots/BloomFilter/example%20run%202.png" height="500" alt="img2">
-<img src="/screenshots/BloomFilter/example%20run%203.png" height="500" alt="img3">
-<img src="/screenshots/BloomFilter/test%20results.png" height="500" alt="img4">
+<summary>Click to expand screenshots</summary>
+
+<img src="../screenshots/BloomFilter/example%20run%201.png" height="500" alt="img1">
+<img src="../screenshots/BloomFilter/example%20run%202.png" height="500" alt="img2">
+<img src="../screenshots/BloomFilter/example%20run%203.png" height="500" alt="img3">
+<img src="../screenshots/BloomFilter/test%20results.png" height="500" alt="img4">
+
 </details>
-
----
-
-#### Ex2 screenshots
-<details>
-<summary>Click to expand Ex2 screenshots</summary>
-TODO add
-</details>
-
----
-
-## Useful links
-- [CPP server README]()
-- [Python client README]()
 
 ---
