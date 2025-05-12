@@ -21,8 +21,16 @@
  * @param port reference to an integer where the port value will be stored.
  * @param bloomSize reference to an integer where the bloom size will be stored.
  * @param hashMods reference to a vector where the hash mod values will be stored.
+ * @param dataSource data source to save the config ints at
  */
-void processInput(int argc, char *argv[], int &port, int &bloomSize, std::vector<int> &hashMods) {
+void processInput(
+    int argc,
+    char *argv[],
+    int &port,
+    int &bloomSize,
+    std::vector<int> &hashMods,
+    IDataPersistence &dataSource
+    ) {
     // Get the port
     std::string portStr(argv[1]);
     port = std::stoi(portStr);
@@ -34,6 +42,11 @@ void processInput(int argc, char *argv[], int &port, int &bloomSize, std::vector
         int mod = std::stoi(argv[i]);
         hashMods.push_back(mod);
     }
+    // save the config ints
+    std::vector<int> allConfigInts;
+    allConfigInts.push_back(bloomSize);
+    allConfigInts.insert(allConfigInts.end(), hashMods.begin(), hashMods.end());
+    dataSource.appendConfigInts(allConfigInts);
 }
 
 /**
