@@ -32,36 +32,42 @@ int main(int argc, char *argv[]) {
     if (!server.acceptNewClient()) {
         std::cerr << "Failed to accept new client" << std::endl;
         return 1;
-    } else {
-        std::cout << "Accepted new client" << std::endl;
     }
+    std::cout << "Accepted new client" << std::endl;
     // Initialize IO and persistence components.
     // Note: TcpInputReader and TCPOutputWriter are assumed to use the given port.
     IDataPersistence *dataSource = new FilePersistence();
     IInputReader *inputReader = new TCPInputReader(server.getClientSocket());
     IOutputWriter *outputWriter = new TCPOutputWriter(server.getClientSocket());
-    bool shouldProcessInput = true;
+
     // Main loop: listen for commands from the client, process, respond.
     while (true) {
-        if (shouldProcessInput) {
-            std::string line = inputReader->readLine();
-            shouldProcessInput = false;
-            // Parse and process the command using existing Bloom Filter logic.
-            const CommandRequest cr = CommandParser::parseCommand(line);
-            handleBloomCommandChoice(bloomSize, configInts, cr, *dataSource, *outputWriter);
-            shouldProcessInput = true;
+        std::string line = inputReader->readLine();
+
+        // If empty, client probably disconnected
+        if (line.empty()) {
+            std::cout << "[Server] Client disconnected. Waiting for new client..." << std::endl;
+
+            // Clean up old IO handlers
+            delete inputReader;
+            delete outputWriter;
+
+            // Accept a new client
+            if (!server.acceptNewClient()) {
+                std::cerr << "Failed to accept new client" << std::endl;
+                continue; // Try again on next loop
+            }
+            std::cout << "Accepted new client" << std::endl;
+
+            // Reinitialize IO components
+            inputReader = new TCPInputReader(server.getClientSocket());
+            outputWriter = new TCPOutputWriter(server.getClientSocket());
+            continue; // Wait for input from new client
         }
+
+        // Parse and process
+        const CommandRequest cr = CommandParser::parseCommand(line);
+        handleBloomCommandChoice(bloomSize, configInts, cr, *dataSource, *outputWriter);
     }
 
-    //    // Exit mechanism — could be replaced with admin-only command later.
-    //  if (cr.getCommandName() == "exit") {
-    //    break;
-    // }
-
-
-    //delete allocated resources.
-    delete inputReader;
-    delete outputWriter;
-    delete dataSource;
-    return 0;
 }

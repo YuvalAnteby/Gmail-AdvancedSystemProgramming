@@ -1,21 +1,21 @@
 # Author: Dor Darmon
 import sys
-import os
+import socket
 
-from client_app import ClientApp
+# Run the main class for client
+if len(sys.argv) != 3:
+    sys.exit(1)
+# Take the ip and port from command-arg
+ip = sys.argv[1]
+port = int(sys.argv[2])
 
-sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((ip, port))
+message = input()
+while not message == 'close_client':
+    s.send(bytes(message, "utf-8"))
+    response = s.recv(4096)
+    print(response.decode("utf-8"))
+    message = input()
+s.close()
 
-#Run the main class for client
-def main():
-    if len(sys.argv) !=3:
-        sys.exit(1)
-    #Take the ip and port from command-arg
-    ip = sys.argv[1]
-    port = int(sys.argv[2])
-    #start the client app and connect to the server
-    app = ClientApp(ip, port)
-    app.run()
-
-if __name__== "__main__":
-    main()

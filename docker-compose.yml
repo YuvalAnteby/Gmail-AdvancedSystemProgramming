@@ -10,7 +10,7 @@ services:
     volumes:
       - app_data:/usr/src/run_server  # <-- only the "data" folder is persisted between runs
     ports:
-      - "42069:42069"
+      - "12347:12347"
   # Server gtest
   gtest:
     build:
@@ -32,10 +32,9 @@ services:
     tty: true
     environment:
       - SERVER_HOST=run_server
-      - SERVER_PORT=42069
+      - SERVER_PORT=12347
       - PYTHON=/python_client
-    # Change 'app' to desired server name here, '42069' to desired port (given as args)
-    command: [ "python", "main.py", "run_server", "42069" ]
+    command: [ "python", "main.py", "run_server", "12347" ]
   # Client test runner (Python).
   test_client:
     build:

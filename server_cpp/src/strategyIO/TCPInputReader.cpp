@@ -22,7 +22,12 @@ std::string TCPInputReader::readLine() {
     int readBytes = recv(m_clientSocket, buffer, sizeof(buffer), 0);
     if (readBytes > 0) {
         std::cout << "received: " << std::string(buffer, readBytes) << std::endl;
+        //return std::string(buffer, readBytes);
         return std::string(buffer, readBytes);
+    }
+    if (readBytes == 0) {
+        std::cout << "connection closed" << std::endl;
+        return "";
     }
     std::cout << "recv failed" << std::endl;
     return std::string("");
