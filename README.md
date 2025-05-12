@@ -20,7 +20,13 @@
 #### Ex2 screenshots
 <details>
 <summary>Click to expand Ex2 screenshots</summary>
-TODO add
+<img src="screenshots/BloomFilter/ex2/example run 1.png" height="500" alt="img1">
+<img src="screenshots/BloomFilter/ex2/example run 2.png" height="500" alt="img2">
+<img src="screenshots/BloomFilter/ex2/example run 3.png" height="500" alt="img3">
+<img src="screenshots/BloomFilter/ex2/example run 4.png" height="500" alt="img4">
+<img src="screenshots/BloomFilter/ex2/example run 5.png" height="500" alt="img5">
+<img src="screenshots/BloomFilter/ex2/client test results.png" height="500" alt="img6">
+<img src="screenshots/BloomFilter/ex2/server test results.png" height="500" alt="img7">
 </details>
 
 ---
@@ -54,7 +60,7 @@ In case we'll need to change IO method we could change the type at the start of 
 ---
 
 ## Useful links
-- [CPP server README]()
-- [Python client README]()
+- [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Ex2/server_cpp)
+- [Python client README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex2/python_client/README.md)
 
 ---
