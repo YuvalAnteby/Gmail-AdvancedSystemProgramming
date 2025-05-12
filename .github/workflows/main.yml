@@ -1,0 +1,34 @@
+name: CI
+
+# Trigger only 
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md' # Ignore changes to README files - no need to recheck the code
+    branches:
+      - main
+      - main-Ex2
+      - main-Ex3
+      - main-Ex4
+      - main-Ex5
+      # TODO: Add more main-ExN branches as we need for assignments
+
+jobs:
+  # ----- Build & tests the CPP server -----
+  build-and-test-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3        
+      - name: Build and run gtests
+        run: docker compose run --build --rm gtest
+       
+  # ----- Build the Python client -----
+  build-python-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Build and run Python client's tests
+        run: docker compose run --build test_client
