@@ -31,7 +31,17 @@ const getUserById = (id) => users.find(user => user.id === id);
  * @param image profile image
  */
 const createUser = (fullName, mail, dateOfBirth, image) => {
-
+    const newUser = {
+        id: ++countId,
+        fullName,
+        mail,
+        dateOfBirth,
+        image
+    };
+    users.push(newUser);
+    return newUser;
 };
+
+
 
 module.exports = {getAllUsers, getUserById};
