@@ -1,4 +1,5 @@
 services:
+  # Web server using JS express
   web_server:
     build:
       context: ./web_server
