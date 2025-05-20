@@ -46,4 +46,4 @@ const createUser = (fullName, mail, dateOfBirth, image) => {
 
 
 
-module.exports = {getAllUsers, getUserById};
+module.exports = {getAllUsers, getUserById, createUser};
