@@ -3,6 +3,7 @@
  *  id - positive number
  *  full name - string
  *  mail address - TODO decide
+ *  password
  *  date of birth - TODO decide
  *  image - placeholder string
  *
@@ -41,6 +42,7 @@ const createUser = (fullName, mail, dateOfBirth, image) => {
     users.push(newUser);
     return newUser;
 };
+
 
 
 
