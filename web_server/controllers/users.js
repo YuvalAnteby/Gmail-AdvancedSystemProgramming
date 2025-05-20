@@ -1,4 +1,4 @@
-const users = require('../models/users');
+const Users = require('../models/users');
 
 /// TODO set users controllers here
 

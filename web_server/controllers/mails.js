@@ -1,4 +1,4 @@
-const Inbox = require('../models/inbox');
+const Mails = require('../models/mails');
 
 /// TODO set inbox controllers here
 
