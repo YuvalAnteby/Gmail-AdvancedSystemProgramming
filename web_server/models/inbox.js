@@ -4,7 +4,7 @@
  *  subject - string
  *  body - string
  *  from - user id (e.g. positive int)
- *  to - list of user ids (e.g. positive ints)
+ *  sentTo - list of user ids (e.g. positive ints)
  *  sentAt - timestamp of when message was sent
  *  labels - list of labels set for the mail per user id
  *  readBy - list of user ids of who read it
@@ -30,7 +30,7 @@ let labelId = 0;
  */
 const getUserMails = (userId, limit) => {
     // filter by user id, then sort by last mails sent/received
-    return inbox.filter(mail => mail.to.includes(userId) || mail.from === userId)
+    return inbox.filter(mail => mail.sentTo.includes(userId) || mail.from === userId)
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
         .slice(0, limit);
 }
@@ -40,13 +40,13 @@ const getUserMails = (userId, limit) => {
  * @param subject of the mail
  * @param body main text context of the mail
  * @param from user id of the sender
- * @param to list of user ids of receivers
+ * @param sentTo list of user ids of receivers
  * @param sentAt timestamp of when sent
  * @param labels list of labels used per user id
- * @returns {{id: number, subject, body, from, to, sentAt, labels, readBy: *[], deletedBy: *[]}|null} new mail object,
- * null if invalid
+ * @returns {{id: number, subject, body, from, sentTo, sentAt, labels, readBy: *[], deletedBy: *[]}|null}
+ * new mail object, null if invalid
  */
-const createNewMail = (subject, body, from, to, sentAt, labels) => {
+const createNewMail = (subject, body, from, sentTo, sentAt, labels) => {
     if (!from)
         return null;
     const newMail = {
@@ -54,7 +54,7 @@ const createNewMail = (subject, body, from, to, sentAt, labels) => {
         subject: subject,
         body: body,
         from: from,
-        to: to,
+        sentTo: sentTo,
         sentAt: sentAt,
         labels: labels,
         readBy: [],
@@ -76,13 +76,13 @@ const getMailById = (mailId) => inbox.find(mailId);
  * @param mailId id of a mail to edit
  * @param subject new subject
  * @param body new body text
- * @param to new receivers list
+ * @param sentTo new receivers list
  * @param labels new labels for the mail
  * @param readBy new read status list
  * @param deletedBy new deleted status list
  * @returns the new mail object, if no such email was found returns null
  */
-const editMail = (mailId, subject, body, to, labels, readBy, deletedBy) => {
+const editMail = (mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
     // find the index of the wanted mail
     const index = inbox.findIndex(mail => mail.id === mailId);
     // make sure the mail was found
@@ -93,8 +93,8 @@ const editMail = (mailId, subject, body, to, labels, readBy, deletedBy) => {
         inbox[index].subject = subject;
     if (body !== undefined)
         inbox[index].body = body;
-    if (to !== undefined && Array.isArray(to))
-        inbox[index].to = to;
+    if (sentTo !== undefined && Array.isArray(sentTo))
+        inbox[index].sentTo = sentTo;
     if (readBy !== undefined && Array.isArray(readBy))
         inbox[index].readBy = readBy;
     if (labels !== undefined && Array.isArray(labels))
@@ -182,15 +182,32 @@ const deleteLabel = (labelId) => {
 }
 
 const addToBlacklist = (url) => {
-
+    /// TODO send the url to the CPP server and add it to blacklist
 }
 
 const deleteFromBlacklist = (url) => {
-
+    /// TODO send the url to the CPP server and remove it from blacklist
 }
 
+/// TODO according to instructions - need to check if an attribute has the query, many use ids so might need to be changed later on
+/**
+ * Searches in inbox for a query
+ * @param query value to be searched in inbox
+ * @returns {*[]} mails objects with the query value in an attribute
+ */
 const searchInInbox = (query) => {
-
+    const lowerCased = query.toString().toLowerCase();
+    return inbox.filter(
+        mail =>
+            mail.subject.toLowerCase().includes(lowerCased) // search subject string
+            || mail.body.toLowerCase().includes(lowerCased) // search body string
+            || String(mail.from).includes(lowerCased) // search 'from' user id
+            || mail.sentTo.some(userId => String(userId).includes(query)) // search 'sent to' user ids
+            || new Date(mail.sentAt).toISOString().includes(query) // search the time sent at
+            || mail.labels.some(label => String(label.id).includes(query)) // search labels names
+            || mail.readBy.some(userId => String(userId).includes(query)) //
+            || mail.deletedBy.some(userId => String(userId).includes(lowerCased)) // search deleted by user ids
+    );
 }
 
 module.exports = {
@@ -200,11 +217,14 @@ module.exports = {
     getMailById,
     editMail,
     deleteMail,
+    searchInInbox,
     // labels
     getAllLabels,
     createNewLabel,
     getLabelById,
     editLabel,
-    deleteLabel
+    deleteLabel,
     // blacklist
+    addToBlacklist,
+    deleteFromBlacklist
 };
