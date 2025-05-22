@@ -1,4 +1,5 @@
 const net = require('net');
+const url = require("node:url");
 const HOST = 'run_server';
 const PORT = 12347;
 
@@ -51,16 +52,22 @@ async function sendToCppServer(message) {
  * @returns {Promise<*>} true if added successfully
  */
 const addToBlacklist = async (url) => {
-    // connect to CPP server and send the command
-    await connectToServer();
-    const command = `POST ${url}`;
-    const result = await sendToCppServer(command);
-    // check the outcome and return matching true/false
-    if (result.trim().toLowerCase().includes('201 created')) {
+    try {
+        // connect to CPP server and send the command
+        await connectToServer();
+        const command = `POST ${url}`;
+        const result = await sendToCppServer(command);
+        // check the outcome and return matching true/false
+        if (result.trim().toLowerCase().includes('201 created')) {
+            await disconnectFromServer();
+            return true;
+        }
+    } catch (err) {
+        console.error(`addToBlacklist ${url} error:`, err);
+        return false;
+    } finally {
         await disconnectFromServer();
-        return true;
     }
-    await disconnectFromServer();
     return false;
 }
 
@@ -70,18 +77,24 @@ const addToBlacklist = async (url) => {
  * @returns {Promise<boolean>} true if at least one URL is blacklisted, otherwise false
  */
 const isInBlacklist = async (urls) => {
-    await connectToServer()
-    // Check every URL
-    for (const url of urls) {
-        const command = `GET ${url}`;
-        const result = await sendToCppServer(command);
-        // if found a blacklisted URL stop the check
-        if (result.trim().toLowerCase().includes("true true")) {
-            await disconnectFromServer();
-            return true;
+    try {
+        await connectToServer()
+        // Check every URL
+        for (const url of urls) {
+            const command = `GET ${url}`;
+            const result = await sendToCppServer(command);
+            // if found a blacklisted URL stop the check
+            if (result.trim().toLowerCase().includes("true true")) {
+                await disconnectFromServer();
+                return true;
+            }
         }
+    } catch (err) {
+        console.error(`isInBlacklist ${url} error:`, err);
+        return false;
+    } finally {
+        await disconnectFromServer();
     }
-    await disconnectFromServer();
     return false;
 }
 
@@ -91,16 +104,22 @@ const isInBlacklist = async (urls) => {
  * @returns {Promise<boolean>} true of deleted successfully, otherwise false
  */
 const deleteFromBlacklist = async (url) => {
-    // connect to CPP server and send the command
-    await connectToServer();
-    const command = `DELETE ${url}`;
-    const result = await sendToCppServer(command);
-    // check the outcome and return matching true/false
-    if (result.trim().toLowerCase().includes('204 no content')) {
+    try {
+        // connect to CPP server and send the command
+        await connectToServer();
+        const command = `DELETE ${url}`;
+        const result = await sendToCppServer(command);
+        // check the outcome and return matching true/false
+        if (result.trim().toLowerCase().includes('204 no content')) {
+            await disconnectFromServer();
+            return true;
+        }
+    } catch (err) {
+        console.error(`deleteFromBlacklist ${url} error:`, err);
+        return false;
+    } finally {
         await disconnectFromServer();
-        return true;
     }
-    await disconnectFromServer();
     return false;
 }
 
