@@ -1,4 +1,16 @@
 services:
+  # Web server using JS express
+  web_server:
+    build:
+      context: ./web_server
+      dockerfile: Dockerfile
+    container_name: web_server
+    ports:
+      - "3000:3000"
+    depends_on:
+      - run_server
+    networks:
+      - gmail-net
   # Server itself (CPP)
   run_server:
     build:
@@ -11,6 +23,8 @@ services:
       - app_data:/usr/src/run_server  # <-- only the "data" folder is persisted between runs
     ports:
       - "12347:12347"
+    networks:
+      - gmail-net
   # Server gtest
   gtest:
     build:
@@ -48,3 +62,6 @@ services:
 
 volumes:
   app_data:   # <-- define the named volume
+
+networks:
+  gmail-net:
