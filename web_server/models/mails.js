@@ -17,12 +17,12 @@ let mailId = 0;
  * Gets the last X mails sent and received by a user
  * @param userId user id we want to search for
  * @param limit max amount of mails to receive
- * @returns {any[]} list of mails objects
+ * @returns {any[]} list of ordered mails objects from the most recent to less recent
  */
 const getUserMails = (userId, limit) => {
     // filter by user id, then sort by last mails sent/received
     return mails.filter(mail => mail.sentTo.includes(userId) || mail.from === userId)
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt))
         .slice(0, limit);
 }
 
@@ -60,7 +60,7 @@ const createNewMail = (subject, body, from, sentTo, sentAt, labels) => {
  * @param mailId id of a mail to find
  * @returns {*} mail object with the same id
  */
-const getMailById = (mailId) => mails.find(mailId);
+const getMailById = (mailId) => mails.find(mail => mail.id === mailId);
 
 /**
  * Edits an existing mail with allowed fields
