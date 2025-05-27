@@ -3,13 +3,13 @@ const express = require('express')
 var router = express.Router();
 const controller = require('../controllers/users');
 
-//signup
+// Signup regster a new user
 router.post('/api/users',controller.signupUser);
 
-//regster 
-router.post('/api/users/:id',controller.getUser);
+// Get user by ID
+router.get('/api/users/:id',controller.getUser);
 
-//login
+// Login in to user
 router.post('/api/tokens',controller.loginUser);
 
 module.exports = router;
