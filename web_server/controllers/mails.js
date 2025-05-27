@@ -1,4 +1,5 @@
 const Mails = require('../models/mails');
+const Blacklist = require('../models/blacklist');
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
  * @param req request
@@ -9,7 +10,7 @@ const getLastMailsOrdered = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
     const userId = parseInt(req.header('userId'));
     if (!userId)
-        return res.status(400)
+        return res.status(400).json({ error: 'User not authenticated'});
     // limit is 50 according to instructions
     const mails = Mails.getUserMails(userId, 50);
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
@@ -23,13 +24,36 @@ const getLastMailsOrdered = (req, res) => {
  * @param req request
  * @param res response
  */
-const createNewMail = (req, res) => {
+const createNewMail = async (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
     const userId = parseInt(req.header('userId'));
     if (!userId)
-        return res.status(400)
+        return res.status(400).json({ error: 'User not authenticated'});
+    // Fetch the mail object's attributes from the request, for later use
+    const {subject, body, from, sentTo, sentAt, labels} = req.body;
+    if (!from || !sentTo)
+        return res.status(400).json({ error: 'Missing basic fields'});
+    // Check if the mail contains a blacklisted URL, if it is - don't send it
+    const urls = extractUrls(body)
+    const blacklisted = await Blacklist.isInBlacklist(urls)
+    if (blacklisted)
+        return res.status(500).json({ error: 'Mail contains blacklisted URLs'});
+    // No blacklisted URLs found, create the new mail
+    const newMail = createNewMail(subject, body, from, sentTo, sentAt || new Date(), labels);
+    if (!newMail)
+        return res.status(400).json({ error: 'Failed to create new mail'});
+    return res.status(201).json(newMail);
+}
 
-
+/**
+ * Finds and returns URLs from a given string
+ * @param text string to check
+ * @returns {*|*[]} array of URLs according to regex
+ */
+function extractUrls(text) {
+    if (!text) return [];
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.match(urlRegex) || [];
 }
 
 module.exports = {getLastMailsOrdered, createNewMail};
