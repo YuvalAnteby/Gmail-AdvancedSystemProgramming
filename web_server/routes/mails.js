@@ -2,6 +2,6 @@ const express = require('express')
 var router = express.Router();
 const controller = require('../controllers/mails');
 
-/// TODO set inbox routes here
+router.get('/:query', controller.getMailsByQuery);
 
 module.exports = router;
