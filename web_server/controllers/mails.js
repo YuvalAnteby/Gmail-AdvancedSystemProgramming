@@ -4,7 +4,7 @@ const Blacklist = require('../models/blacklist');
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
  * @param req request
  * @param res response
- * @returns {*[]} list of ordered by the time sent mails objects, if user isn't authenticated - code 400
+ * @returns list of ordered by the time sent mails objects, if user isn't authenticated - code 400
  */
 const getLastMailsOrdered = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
@@ -23,6 +23,8 @@ const getLastMailsOrdered = (req, res) => {
  * If the mail contains a blacklisted URL, the mail will not be created.
  * @param req request
  * @param res response
+ * @returns code 201 and the mail as a json object if created a new mail successfully, if the user isn't authenticated
+ * or contains a blacklisted URL or encountered any other problem will return a 400 code and a description.
  */
 const createNewMail = async (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
@@ -37,7 +39,7 @@ const createNewMail = async (req, res) => {
     const urls = extractUrls(body)
     const blacklisted = await Blacklist.isInBlacklist(urls)
     if (blacklisted)
-        return res.status(500).json({ error: 'Mail contains blacklisted URLs'});
+        return res.status(400).json({ error: 'Mail contains blacklisted URLs'});
     // No blacklisted URLs found, create the new mail
     const newMail = createNewMail(subject, body, from, sentTo, sentAt || new Date(), labels);
     if (!newMail)
