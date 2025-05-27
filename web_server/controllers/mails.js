@@ -1,7 +1,4 @@
 const Mails = require('../models/mails');
-const {router} = require("express/lib/application");
-const {getUserMails} = require("../models/mails");
-
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
  * @param req request
@@ -14,7 +11,7 @@ const getLastMailsOrdered = (req, res) => {
     if (!userId)
         return res.status(400)
     // limit is 50 according to instructions
-    const mails = getUserMails(userId, 50);
+    const mails = Mails.getUserMails(userId, 50);
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
     return res.status(200).send(mails);
 }
