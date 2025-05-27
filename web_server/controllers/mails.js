@@ -14,7 +14,7 @@ const getLastMailsOrdered = (req, res) => {
     // limit is 50 according to instructions
     const mails = Mails.getUserMails(userId, 50);
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
-    return res.status(200).send(mails);
+    return res.status(200).json(mails);
 }
 
 /**
