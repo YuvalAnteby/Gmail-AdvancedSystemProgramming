@@ -52,7 +52,7 @@ const createNewMail = async (req, res) => {
  */
 function extractUrls(text) {
     if (!text) return [];
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urlRegex = /(http?:\/\/[^\s]+|www\.[^\s]+)/g;
     return text.match(urlRegex) || [];
 }
 
