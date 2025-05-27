@@ -60,10 +60,11 @@ const createNewMail = (subject, body, from, sentTo, sentAt, labels) => {
  * @param mailId id of a mail to find
  * @returns {*} mail object with the same id
  */
-const getMailById = (mailId) => mails.find(mailId);
+const getMail = (mailId) => mails.find(mail => mail.id === mailId);
 
 /**
  * Edits an existing mail with allowed fields
+ * @param userId the user doing the operation (authenticated)
  * @param mailId id of a mail to edit
  * @param subject new subject
  * @param body new body text
@@ -71,14 +72,17 @@ const getMailById = (mailId) => mails.find(mailId);
  * @param labels new labels for the mail
  * @param readBy new read status list
  * @param deletedBy new deleted status list
- * @returns the new mail object, if no such email was found returns null
+ * @returns the new mail object, if no such email was found returns 404, if user has no access to it returns 400
  */
-const editMail = (mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
+const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
     // find the index of the wanted mail
     const index = mails.findIndex(mail => mail.id === mailId);
     // make sure the mail was found
     if (index === -1)
-        return null
+        return 404;
+    // make sure the user has access to the mail
+    if (mails[index].from !== userId && !mails[index].sentTo.includes(userId))
+        return 400;
     // check each input, if it's valid edit them in the mail
     if (subject !== undefined)
         mails[index].subject = subject;
@@ -132,4 +136,4 @@ const searchInInbox = (query) => {
     );
 }
 
-module.exports = {getUserMails, createNewMail, getMailById, editMail, deleteMail, searchInInbox,};
+module.exports = {getUserMails, createNewMail, getMail, editMail, deleteMail, searchInInbox,};
