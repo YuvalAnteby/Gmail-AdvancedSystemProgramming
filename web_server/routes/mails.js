@@ -5,6 +5,6 @@ const controller = require('../controllers/mails');
 router.route('/:id')
     .get(controller.getMailById)
     .patch(controller.editMailById)
-
+    .delete(controller.deleteMailById);
 
 module.exports = router;

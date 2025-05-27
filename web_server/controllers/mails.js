@@ -10,7 +10,7 @@ const getMailById = (req, res) => {
     // Make sure we got an id in the request
     const id = parseInt(req.params.id);
     if (isNaN(id))
-        return res.status(400).json({error: 'No ID was given'});
+        return res.status(400).json({error: 'No valid mail ID was given'});
 
     // Find the mail with the given id
     const mail = Mails.getMailById(id);
@@ -31,7 +31,7 @@ const editMailById = (req, res) => {
     // Make sure we got an id in the request
     const mailId = parseInt(req.params.id);
     if (isNaN(mailId))
-        return res.status(400).json({error: 'No ID was given'});
+        return res.status(400).json({error: 'No valid mail ID was given'});
     // Make sure the user is authenticated, if not - a bad request (400)
     const userId = parseInt(req.header('userId'));
     if (isNaN(userId))
@@ -55,4 +55,29 @@ const editMailById = (req, res) => {
     return res.status(200).json(mail);
 }
 
-module.exports = {getMailById, editMailById};
+/**
+ * Finds and deletes the mail with a given id.
+ * @param req request
+ * @param res response
+ * @returns code 200 with message of mail deleted if successfully deleted, 404 if mail not found, 400 if missing input
+ * or user isn't authenticated or has no access to the mail
+ */
+const deleteMailById = (req, res) => {
+    // Make sure we got an id in the request
+    const mailId = parseInt(req.params.id);
+    if (isNaN(mailId))
+        return res.status(400).json({error: 'No valid mail ID was given'});
+    // Make sure the user is authenticated, if not - a bad request (400)
+    const userId = parseInt(req.header('userId'));
+    if (isNaN(userId))
+        return res.status(400).json({ error: 'User not authenticated'});
+    // Delete the desired mail and return matching result
+    const mail = Mails.deleteMail(userId, mailId);
+    if (mail === 404)
+        return res.status(404).json({error: 'mail was not found'});
+    if (mail === 400)
+        return res.status(400).json({error: 'mail doesn\'t belong to user'});
+    return res.status(204).end();
+}
+
+module.exports = {getMailById, editMailById, deleteMailById};

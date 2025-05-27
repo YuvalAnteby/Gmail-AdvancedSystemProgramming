@@ -101,18 +101,22 @@ const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deleted
 
 /**
  * Deletes a mail
+ * @param userId id of the user that wants to remove the mail
  * @param mailId id of a mail to delete
- * @returns {boolean} true if deleted the mail, otherwise false
+ * @returns {Number} 204 if deleted successfully, 400 if user has no access to it, 404 if mail not found
  */
-const deleteMail = (mailId) => {
+const deleteMail = (userId, mailId) => {
     // find the index of the wanted mail
     const index = mails.findIndex(mail => mail.id === mailId);
     // make sure the mail was found
     if (index === -1)
-        return false
+        return 404
+    // make sure the user has access to the mail
+    if (mails[index].from !== userId && !mails[index].sentTo.includes(userId))
+        return 400;
     // remove the mail
     mails.splice(index, 1);
-    return true;
+    return 204;
 }
 
 /// TODO according to instructions - need to check if an attribute has the query, many use ids so might need to be changed later on
