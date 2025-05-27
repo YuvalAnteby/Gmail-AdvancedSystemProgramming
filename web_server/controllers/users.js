@@ -23,10 +23,12 @@ const signupUser = (req, res) => {
     // check if email already esists
     if (mailExist)
         return res.status(400).json({ error: 'email already esists' });
+        return res.status(400).json({ error: 'email already esists' });
 
     const newUser = createUser(fullName, mail, password, dateOfBirth, image || null)
     return res.status(201).location('/api/users/${newUser.id}').send();
 }
+
 
 // check if email already esists
 const mailExist = (mail) => {
@@ -40,12 +42,14 @@ const getUser = (req, res) => {
 
     if (!user) {
         return res.status(404).json({ error: 'Not Found' });
+        return res.status(404).json({ error: 'Not Found' });
     }
 
     const { password, ...safeUser } = user;
     return res.status(200).json(safeUser);
 }
 
+// login using email and password 
 // login using email and password 
 const loginUser = (req, res) => {
     const { mail, password } = req.body;
@@ -62,5 +66,6 @@ const loginUser = (req, res) => {
 
     return res.status(200).json({ id: user.id });
 }
+
 
 module.exports = { signupUser, getUser, loginUser };
