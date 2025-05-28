@@ -1,7 +1,6 @@
 #include <vector>
 #include <string>
 #include <mutex>
-#include <memory>
 #include "data_persistence/FilePersistence.h"    // concrete persistence implementation
 #include "strategy_io/utils/InputValidation.h" // argument validation utilities
 #include "server_runner/ServerRunner.h"        // runServer declaration

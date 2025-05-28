@@ -1,7 +1,6 @@
 #include "ServerRunner.h"
 #include "../network/TCPSocketServer.h"
 #include <pthread.h>
-#include <memory>
 #include "../strategy_io/IInputReader.h"
 #include "../strategy_io/IOutputWriter.h"
 #include "../strategy_io/tcp/TCPInputReader.h"
