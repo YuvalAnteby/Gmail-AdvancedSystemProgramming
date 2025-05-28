@@ -6,33 +6,24 @@ const Users = require('../models/users')
  */
 const signupUser = (req, res) => {
     const { fullName, mail, password, dateOfBirth, image } = req.body;
-
-    if (!fullName) {
-        return res.status(400).json({ error: 'Name is required' });
-
-    } else if (!mail) {
-        return res.status(400).json({ error: 'mail is required' });
-
-    } else if (!password) {
-        return res.status(400).json({ error: 'password is required' });
-
-    } else if (!dateOfBirth) {
-        return res.status(400).json({ error: 'date Of Birth is required' });
-    }
+    if (!fullName) { return res.status(400).json({ error: 'Name is required' }); }
+    if (!mail) { return res.status(400).json({ error: 'mail is required' }); }
+    if (!password) { return res.status(400).json({ error: 'password is required' }); }
+    if (!dateOfBirth) { return res.status(400).json({ error: 'date Of Birth is required' }); }
 
     // check if email already esists
-    if (mailExist)
+    if (userExist(mail)) {
         return res.status(400).json({ error: 'email already esists' });
-        return res.status(400).json({ error: 'email already esists' });
-
-    const newUser = createUser(fullName, mail, password, dateOfBirth, image || null)
-    return res.status(201).location('/api/users/${newUser.id}').send();
+    } else {
+        // Create the user
+        const newUser = Users.createUser(fullName, mail, password, dateOfBirth, image || null);
+        return res.status(201).json(newUser);
+    }
 }
 
-
 // check if email already esists
-const mailExist = (mail) => {
-    mailExist =  Users.getAllUsers().find(user => user.mail === mail)
+const userExist = (mail) => {
+    return Users.getAllUsers().find(user => user.mail === mail)
 }
 
 //Get user by ID
@@ -42,14 +33,12 @@ const getUser = (req, res) => {
 
     if (!user) {
         return res.status(404).json({ error: 'Not Found' });
-        return res.status(404).json({ error: 'Not Found' });
     }
 
     const { password, ...safeUser } = user;
     return res.status(200).json(safeUser);
 }
 
-// login using email and password 
 // login using email and password 
 const loginUser = (req, res) => {
     const { mail, password } = req.body;
