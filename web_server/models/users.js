@@ -31,7 +31,7 @@ const getUserById = (id) => users.find(user => user.id === id);
  * @returns {boolean} true if user with the gien email address alredy exists
  */
 const userExist = (mail) => {
-    return Users.getAllUsers().find(user => user.mail === mail)
+    return users.find(user => user.mail === mail)
 }
 
 /**
