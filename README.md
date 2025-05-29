@@ -39,7 +39,7 @@ cd Gmail-AdvancedSystemProgramming/python_client
 ```
 2. Run the client
 ```bash
-  docker-compose run --build --rm python_client
+  docker-compose run  python_client
 ```
 - Remainder, to exit the container gracefully use
 ```bash

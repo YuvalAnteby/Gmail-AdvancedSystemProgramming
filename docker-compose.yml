@@ -39,7 +39,7 @@ services:
     build:
       context: python_client
       dockerfile: Dockerfile
-    container_name: python_client
+    # container_name: python_client
     depends_on:
       - run_server
     stdin_open: true
@@ -49,6 +49,8 @@ services:
       - SERVER_PORT=12347
       - PYTHON=/python_client
     command: [ "python", "main.py", "run_server", "12347" ]
+    networks:
+      - gmail-net
   # Client test runner (Python).
   test_client:
     build:
@@ -58,7 +60,7 @@ services:
     depends_on:
       - run_server
     command: ["python","python_client/tests/test_client_unittest.py"]
-  
+
 
 volumes:
   app_data:   # <-- define the named volume

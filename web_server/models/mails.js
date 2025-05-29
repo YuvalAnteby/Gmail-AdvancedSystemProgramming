@@ -17,12 +17,12 @@ let mailId = 0;
  * Gets the last X mails sent and received by a user
  * @param userId user id we want to search for
  * @param limit max amount of mails to receive
- * @returns {any[]} list of mails objects
+ * @returns {any[]} list of ordered mails objects from the most recent to less recent
  */
 const getUserMails = (userId, limit) => {
     // filter by user id, then sort by last mails sent/received
     return mails.filter(mail => mail.sentTo.includes(userId) || mail.from === userId)
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt))
         .slice(0, limit);
 }
 
@@ -60,10 +60,11 @@ const createNewMail = (subject, body, from, sentTo, sentAt, labels) => {
  * @param mailId id of a mail to find
  * @returns {*} mail object with the same id
  */
-const getMailById = (mailId) => mails.find(mailId);
+const getMail = (mailId) => mails.find(mail => mail.id === mailId);
 
 /**
  * Edits an existing mail with allowed fields
+ * @param userId the user doing the operation (authenticated)
  * @param mailId id of a mail to edit
  * @param subject new subject
  * @param body new body text
@@ -71,14 +72,17 @@ const getMailById = (mailId) => mails.find(mailId);
  * @param labels new labels for the mail
  * @param readBy new read status list
  * @param deletedBy new deleted status list
- * @returns the new mail object, if no such email was found returns null
+ * @returns the new mail object, if no such email was found returns 404, if user has no access to it returns 400
  */
-const editMail = (mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
+const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
     // find the index of the wanted mail
     const index = mails.findIndex(mail => mail.id === mailId);
     // make sure the mail was found
     if (index === -1)
-        return null
+        return 404;
+    // make sure the user has access to the mail
+    if (mails[index].from !== userId && !mails[index].sentTo.includes(userId))
+        return 400;
     // check each input, if it's valid edit them in the mail
     if (subject !== undefined)
         mails[index].subject = subject;
@@ -97,39 +101,46 @@ const editMail = (mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
 
 /**
  * Deletes a mail
+ * @param userId id of the user that wants to remove the mail
  * @param mailId id of a mail to delete
- * @returns {boolean} true if deleted the mail, otherwise false
+ * @returns {Number} 204 if deleted successfully, 400 if user has no access to it, 404 if mail not found
  */
-const deleteMail = (mailId) => {
+const deleteMail = (userId, mailId) => {
     // find the index of the wanted mail
     const index = mails.findIndex(mail => mail.id === mailId);
     // make sure the mail was found
     if (index === -1)
-        return false
+        return 404
+    // make sure the user has access to the mail
+    if (mails[index].from !== userId && !mails[index].sentTo.includes(userId))
+        return 400;
     // remove the mail
     mails.splice(index, 1);
-    return true;
+    return 204;
 }
 
 /// TODO according to instructions - need to check if an attribute has the query, many use ids so might need to be changed later on
 /**
  * Searches in inbox for a query
  * @param query value to be searched in inbox
+ * @param userId the user's id - to search only in their mails
  * @returns {*[]} mails objects with the query value in an attribute
  */
-const searchInInbox = (query) => {
+const searchInInbox = (query, userId) => {
     const lowerCased = query.toString().toLowerCase();
+    userId = parseInt(userId);
+    const isNum = !isNaN(Number(query));
     return mails.filter(
         mail =>
-            mail.subject.toLowerCase().includes(lowerCased) // search subject string
-            || mail.body.toLowerCase().includes(lowerCased) // search body string
-            || String(mail.from).includes(lowerCased) // search 'from' user id
-            || mail.sentTo.some(userId => String(userId).includes(query)) // search 'sent to' user ids
-            || new Date(mail.sentAt).toISOString().includes(query) // search the time sent at
-            || mail.labels.some(label => String(label.id).includes(query)) // search labels names
-            || mail.readBy.some(userId => String(userId).includes(query)) //
-            || mail.deletedBy.some(userId => String(userId).includes(lowerCased)) // search deleted by user ids
-    );
+            (mail.from === userId // search 'from' user id
+                || mail.sentTo.some(id => id === userId)) // search 'sent to' user ids
+            && (
+                (mail.subject && mail.subject.toLowerCase().includes(lowerCased)) // search subject string
+                || (mail.body && mail.body.toLowerCase().includes(lowerCased)) // search body string
+                || (mail.sentAt && new Date(mail.sentAt).toISOString().includes(query)) // search the time sent at
+                || (isNum && mail.labels && mail.labels.some(label => label.id === parseInt(query))) // search labels names
+                || mail.readBy.some(id => String(id).includes(lowerCased)) // check if it's a user that e
+            ));
 }
 
-module.exports = {getUserMails, createNewMail, getMailById, editMail, deleteMail, searchInInbox,};
+module.exports = {getUserMails, createNewMail, getMail, editMail, deleteMail, searchInInbox,};
