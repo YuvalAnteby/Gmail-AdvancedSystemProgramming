@@ -26,6 +26,15 @@ const getAllUsers = () => users;
 const getUserById = (id) => users.find(user => user.id === id);
 
 /**
+ * 
+ * @param  mail 
+ * @returns {boolean} true if user with the gien email address alredy exists
+ */
+const userExist = (mail) => {
+    return Users.getAllUsers().find(user => user.mail === mail)
+}
+
+/**
  * Creates a new user and save it in RAM only
  * @param fullName full name of the user
  * @param mail desired mail address
@@ -49,4 +58,4 @@ const createUser = (fullName, mail,password, dateOfBirth, image) => {
 
 
 
-module.exports = {getAllUsers, getUserById, createUser};
+module.exports = {getAllUsers, getUserById, createUser,userExist};
