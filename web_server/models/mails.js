@@ -123,21 +123,24 @@ const deleteMail = (userId, mailId) => {
 /**
  * Searches in inbox for a query
  * @param query value to be searched in inbox
+ * @param userId the user's id - to search only in their mails
  * @returns {*[]} mails objects with the query value in an attribute
  */
-const searchInInbox = (query) => {
+const searchInInbox = (query, userId) => {
     const lowerCased = query.toString().toLowerCase();
+    userId = parseInt(userId);
+    const isNum = !isNaN(Number(query));
     return mails.filter(
         mail =>
-            mail.subject.toLowerCase().includes(lowerCased) // search subject string
-            || mail.body.toLowerCase().includes(lowerCased) // search body string
-            || String(mail.from).includes(lowerCased) // search 'from' user id
-            || mail.sentTo.some(userId => String(userId).includes(query)) // search 'sent to' user ids
-            || new Date(mail.sentAt).toISOString().includes(query) // search the time sent at
-            || mail.labels.some(label => String(label.id).includes(query)) // search labels names
-            || mail.readBy.some(userId => String(userId).includes(query)) //
-            || mail.deletedBy.some(userId => String(userId).includes(lowerCased)) // search deleted by user ids
-    );
+            (mail.from === userId // search 'from' user id
+                || mail.sentTo.some(id => id === userId)) // search 'sent to' user ids
+            && (
+                (mail.subject && mail.subject.toLowerCase().includes(lowerCased)) // search subject string
+                || (mail.body && mail.body.toLowerCase().includes(lowerCased)) // search body string
+                || (mail.sentAt && new Date(mail.sentAt).toISOString().includes(query)) // search the time sent at
+                || (isNum && mail.labels && mail.labels.some(label => label.id === parseInt(query))) // search labels names
+                || mail.readBy.some(id => String(id).includes(lowerCased)) // check if it's a user that e
+            ));
 }
 
 module.exports = {getUserMails, createNewMail, getMail, editMail, deleteMail, searchInInbox,};
