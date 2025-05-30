@@ -1,5 +1,4 @@
-const Blacklist = require('../models/blacklist');
-const {addToBlacklist} = require("../models/blacklist");
+const { addToBlacklist, isInBlacklist, deleteFromBlacklist } = require("../models/blacklist");
 
 exports.addToBlacklist = async (req, res) => {
     const raw = req.body.url;
@@ -9,7 +8,7 @@ exports.addToBlacklist = async (req, res) => {
 
     let validated;
     try {
-        validated = new URL(raw).toString();
+        validated = new URL(raw).toString().replace(/\/+$/, '');  // Remove trailing slashes
     } catch {
         return res.status(400).json({ error: 'Invalid URL' });
     }
@@ -23,14 +22,14 @@ exports.addToBlacklist = async (req, res) => {
         return res.status(204).end();
     } catch (err) {
         console.error('Error in addToBlacklist controller:', err);
-        return res.status(502);
+        return res.status(502).end();
     }
 };
 
 exports.isInBlacklist = async (req, res) => {
     let decoded;
     try {
-        decoded = decodeURIComponent(req.params.url);
+        decoded = decodeURIComponent(req.params.url).replace(/\/+$/, '');  // Normalize
     } catch {
         return res.status(400).json({ error: 'Invalid URL encoding' });
     }
@@ -40,14 +39,14 @@ exports.isInBlacklist = async (req, res) => {
         return res.json({ blacklisted: found });
     } catch (err) {
         console.error('Error in isInBlacklist controller:', err);
-        return res.status(502);
+        return res.status(502).end();
     }
 };
 
 exports.deleteFromBlacklist = async (req, res) => {
     let decoded;
     try {
-        decoded = decodeURIComponent(req.params.url);
+        decoded = decodeURIComponent(req.params.url).replace(/\/+$/, '');  // Normalize
     } catch {
         return res.status(400).json({ error: 'Invalid URL encoding' });
     }
@@ -60,6 +59,6 @@ exports.deleteFromBlacklist = async (req, res) => {
         return res.status(404).json({ error: 'Not found' });
     } catch (err) {
         console.error('Error in deleteFromBlacklist controller:', err);
-        return res.status(502);
+        return res.status(502).end();
     }
 };
