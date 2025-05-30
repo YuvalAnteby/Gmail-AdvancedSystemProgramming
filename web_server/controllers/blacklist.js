@@ -1,38 +1,65 @@
 const Blacklist = require('../models/blacklist');
 const {addToBlacklist} = require("../models/blacklist");
 
-
-
-/**
- * POST /api/blacklist
- * Body: { url: string }
- * - 201 Created + Location if new
- * - 204 No Content if already existed (idempotent)
- * - 400 Bad Request if missing URL
- * - 500 Internal Server Error on failure
- */
 exports.addToBlacklist = async (req, res) => {
-    const { url } = req.body;
-    if (!url) {
+    const raw = req.body.url;
+    if (!raw) {
         return res.status(400).json({ error: 'URL is required' });
     }
 
+    let validated;
     try {
-        const created = addToBlacklist(url);
+        validated = new URL(raw).toString();
+    } catch {
+        return res.status(400).json({ error: 'Invalid URL' });
+    }
+
+    try {
+        const created = await addToBlacklist(validated);
         if (created) {
-            // new resource created
-            res.set('Location', `/api/blacklist/${encodeURIComponent(url)}`);
+            res.set('Location', `/api/blacklist/${encodeURIComponent(validated)}`);
             return res.status(201).end();
-        } else {
-            // already exists, treat as success
-            return res.status(204).end();
         }
+        return res.status(204).end();
     } catch (err) {
-        console.error('Error adding to blacklist:', err);
-        //TODO: make sure if i need this
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error('Error in addToBlacklist controller:', err);
+        return res.status(502);
     }
 };
 
+exports.isInBlacklist = async (req, res) => {
+    let decoded;
+    try {
+        decoded = decodeURIComponent(req.params.url);
+    } catch {
+        return res.status(400).json({ error: 'Invalid URL encoding' });
+    }
 
-module.exports = {addToBlacklist};
+    try {
+        const found = await isInBlacklist([decoded]);
+        return res.json({ blacklisted: found });
+    } catch (err) {
+        console.error('Error in isInBlacklist controller:', err);
+        return res.status(502);
+    }
+};
+
+exports.deleteFromBlacklist = async (req, res) => {
+    let decoded;
+    try {
+        decoded = decodeURIComponent(req.params.url);
+    } catch {
+        return res.status(400).json({ error: 'Invalid URL encoding' });
+    }
+
+    try {
+        const removed = await deleteFromBlacklist(decoded);
+        if (removed) {
+            return res.status(204).end();
+        }
+        return res.status(404).json({ error: 'Not found' });
+    } catch (err) {
+        console.error('Error in deleteFromBlacklist controller:', err);
+        return res.status(502);
+    }
+};
