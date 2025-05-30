@@ -23,7 +23,8 @@ const createNewLabel = (req, res) => {
     // Respond with 201 Created, Location header
     res.status(201)
         .location(`/api/labels/${newLabel.id}`)
-        .end
+        .end()
+
 };
 
 module.exports = {getAllLabels, createNewLabel}
