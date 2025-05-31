@@ -21,7 +21,7 @@ let mailId = 0;
  */
 const getUserMails = (userId, limit) => {
     // filter by user id, then sort by last mails sent/received
-    return mails.filter(mail => mail.sentTo.includes(userId) || mail.from === userId)
+    return mails.filter(mail => (mail.sentTo && mail.sentTo.includes(userId)) || (mail.from && mail.from === userId))
         .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt))
         .slice(0, limit);
 }
@@ -77,7 +77,7 @@ const getMail = (mailId) => mails.find(mail => mail.id === mailId);
 const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
     // find the index of the wanted mail
     const index = mails.findIndex(mail => mail.id === mailId);
-    // make sure the mail was found
+    // make sure the mail wa s found
     if (index === -1)
         return 404;
     // make sure the user has access to the mail

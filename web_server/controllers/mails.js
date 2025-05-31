@@ -8,9 +8,9 @@ const Blacklist = require('../models/blacklist');
  */
 const getLastMailsOrdered = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = parseInt(req.header('userId'));
+    const userId = req.headers['user-id'];
     if (!userId)
-        return res.status(400).json({ error: 'User not authenticated'});
+        return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
     // limit is 50 according to instructions
     const mails = Mails.getUserMails(userId, 50);
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
@@ -30,7 +30,7 @@ const getMailById = (req, res) => {
         return res.status(400).json({error: 'No valid mail ID was given'});
 
     // Find the mail with the given id
-    const mail = Mails.getMailById(id);
+    const mail = Mails.getMail(id);
     // Return 404 if not found, or a 200 with the mail as a json object
     if (!mail)
         return res.status(404).json({error: `No mail found with ID: ${id}`});
@@ -48,22 +48,27 @@ const getMailById = (req, res) => {
  */
 const createNewMail = async (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = parseInt(req.header('userId'));
+    const userId = req.headers['user-id'];
     if (!userId)
-        return res.status(400).json({ error: 'User not authenticated'});
+        return res.status(400).json({error: 'User not authenticated - failed creating a new mail'});
     // Fetch the mail object's attributes from the request, for later use
-    const {subject, body, from, sentTo, sentAt, labels} = req.body;
-    if (!from || !sentTo)
-        return res.status(400).json({ error: 'Missing basic fields'});
+    const from = userId;
+    const subject = req.body?.subject;
+    const body = req.body?.body;
+    const sentTo = req.body?.sentTo;
+    const labels = req.body?.labels;
+    const sentAt = req.body?.sentAt || new Date();
+    if (!from)
+        return res.status(400).json({error: 'Missing basic fields - failed creating a new mail'});
     // Check if the mail contains a blacklisted URL, if it is - don't send it
     const urls = extractUrls(body)
     const blacklisted = await Blacklist.isInBlacklist(urls)
     if (blacklisted)
-        return res.status(400).json({ error: 'Mail contains blacklisted URLs'});
+        return res.status(400).json({error: 'Mail contains blacklisted URLs - failed creating a new mail'});
     // No blacklisted URLs found, create the new mail
-    const newMail = createNewMail(subject, body, from, sentTo, sentAt || new Date(), labels);
+    const newMail = Mails.createNewMail(subject, body, from, sentTo, sentAt , labels);
     if (!newMail)
-        return res.status(400).json({ error: 'Failed to create new mail'});
+        return res.status(400).json({error: 'Failed to create new mail'});
     return res.status(201).json(newMail);
 }
 
@@ -89,13 +94,13 @@ const editMailById = (req, res) => {
     // Make sure we got an id in the request
     const mailId = parseInt(req.params.id);
     if (isNaN(mailId))
-        return res.status(400).json({error: 'No valid mail ID was given'});
+        return res.status(400).json({error: 'No valid mail ID was given - failed editing a mail'});
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = parseInt(req.header('userId'));
+    const userId = req.headers['user-id'];
     if (isNaN(userId))
-        return res.status(400).json({ error: 'User not authenticated'});
+        return res.status(400).json({error: 'User not authenticated - failed editing a mail'});
     // Get the input params and edit the mail
-    const { subject , body, sentTo, readBy, labels, deletedBy} = req.body;
+    const {subject, body, sentTo, readBy, labels, deletedBy} = req.body;
     const mail = Mails.editMail(
         userId, mailId,
         subject || undefined,
@@ -104,12 +109,12 @@ const editMailById = (req, res) => {
         labels || undefined,
         readBy || undefined,
         deletedBy || undefined
-        );
+    );
     // Check the outcome of the edit and return a matching result
     if (mail === 404)
-        return res.status(404).json({error: 'mail was not found'});
+        return res.status(404).json({error: 'mail was not found - failed editing a mail'});
     if (mail === 400)
-        return res.status(400).json({error: 'mail doesn\'t belong to user'});
+        return res.status(400).json({error: 'mail doesn\'t belong to user - failed editing a mail'});
     return res.status(200).json(mail);
 }
 
@@ -126,9 +131,9 @@ const deleteMailById = (req, res) => {
     if (isNaN(mailId))
         return res.status(400).json({error: 'No valid mail ID was given'});
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = parseInt(req.header('userId'));
+    const userId = req.headers['user-id'];
     if (isNaN(userId))
-        return res.status(400).json({ error: 'User not authenticated'});
+        return res.status(400).json({error: 'User not authenticated'});
     // Delete the desired mail and return matching result
     const mail = Mails.deleteMail(userId, mailId);
     if (mail === 404)
@@ -147,13 +152,13 @@ const deleteMailById = (req, res) => {
  */
 const getMailsByQuery = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = parseInt(req.header('userId'));
+    const userId = req.headers['user-id'];
     if (!userId)
-        return res.status(400).json({ error: 'User not authenticated'});
+        return res.status(400).json({error: 'User not authenticated'});
     // If the query is empty - returns 400 bad request
     const query = req.params.query?.trim();
     if (!query)
-        return res.status(400).json({ error: 'Empty query' });
+        return res.status(400).json({error: 'Empty query'});
     // Find the mails and return them, if there are no mails returns an empty array
     const mails = Mails.searchInInbox(query, userId);
     return res.status(200).json(mails);
