@@ -1,4 +1,4 @@
-//# Author: Yuval Anteby ,dor darmon 
+// Author: Yuval Anteby ,dor darmon
 /**
  * User object structure:
  *  id - positive number
@@ -38,12 +38,13 @@ const userExist = (mail) => {
  * Checks if a given mail and password match a user to authorize them
  * @param mail mail of user
  * @param password password of user
- * @returns {boolean} true if mail and password match the user, otherwise false
+ * @returns {{id, mail, fullName: *, dateOfBirth: *, image: *}} true if mail and password match the user, otherwise false
  */
 const isAuthorizeUser = (mail, password) => {
     const u = users.find(user => user.mail === mail && user.password === password);
-    return !!u;
-
+    if (!u)
+        return undefined;
+    return {id: u.id, mail: mail, fullName: u.fullName, dateOfBirth: u.dateOfBirth, image: u.image};
 }
 
 

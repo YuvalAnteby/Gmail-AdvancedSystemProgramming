@@ -1,4 +1,3 @@
-// controllers/users.js
 const Users = require('../models/users');
 
 const signupUser = (req, res) => {
@@ -38,7 +37,7 @@ const loginUser = (req, res) => {
     if (!user) {
         return res.status(401).json({ error: 'wrong mail or password' });
     }
-    return res.status(200).json({ id: user.id });
+    return res.status(200).json({id: user.id});
 };
 
 module.exports = { signupUser, getUser, loginUser };
