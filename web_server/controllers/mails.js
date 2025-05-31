@@ -100,7 +100,12 @@ const editMailById = (req, res) => {
     if (isNaN(userId))
         return res.status(400).json({error: 'User not authenticated - failed editing a mail'});
     // Get the input params and edit the mail
-    const {subject, body, sentTo, readBy, labels, deletedBy} = req.body;
+    const subject = req.body?.subject;
+    const body = req.body?.body;
+    const sentTo = req.body?.sentTo;
+    const labels = req.body?.labels;
+    const readBy = req.body?.readBy;
+    const deletedBy = req.body?.deletedBy;
     const mail = Mails.editMail(
         userId, mailId,
         subject || undefined,
