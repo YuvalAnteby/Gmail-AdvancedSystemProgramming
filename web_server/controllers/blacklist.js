@@ -9,13 +9,13 @@ exports.addToBlacklist = async (req, res) => {
 
     let validated;
     try {
-        validated = new URL(raw).toString().replace(/\/+$/, '');  // Remove trailing slashes
+        validated = String(raw).toString().replace(/\/+$/, '');  // Remove trailing slashes
     } catch {
         return res.status(400).json({ error: 'Invalid URL' });
     }
 
     try {
-        const created = await Blacklist.addToBlacklist(validated);
+        const created = await Blacklist.addToBlacklist(String(validated));
         if (created) {
             res.set('Location', `/api/blacklist/${encodeURIComponent(validated)}`);
             return res.status(201).end();
