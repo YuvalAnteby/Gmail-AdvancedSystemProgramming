@@ -1,4 +1,5 @@
-const { addToBlacklist, isInBlacklist, deleteFromBlacklist } = require("../models/blacklist");
+const Blacklist = require('../models/blacklist');
+
 
 exports.addToBlacklist = async (req, res) => {
     const raw = req.body.url;
@@ -14,7 +15,7 @@ exports.addToBlacklist = async (req, res) => {
     }
 
     try {
-        const created = await addToBlacklist(validated);
+        const created = await Blacklist.addToBlacklist(validated);
         if (created) {
             res.set('Location', `/api/blacklist/${encodeURIComponent(validated)}`);
             return res.status(201).end();
@@ -35,7 +36,7 @@ exports.isInBlacklist = async (req, res) => {
     }
 
     try {
-        const found = await isInBlacklist([decoded]);
+        const found = await Blacklist.isInBlacklist([decoded]);
         return res.json({ blacklisted: found });
     } catch (err) {
         console.error('Error in isInBlacklist controller:', err);
@@ -52,7 +53,7 @@ exports.deleteFromBlacklist = async (req, res) => {
     }
 
     try {
-        const removed = await deleteFromBlacklist(decoded);
+        const removed = await Blacklist.deleteFromBlacklist(decoded);
         if (removed) {
             return res.status(204).end();
         }
