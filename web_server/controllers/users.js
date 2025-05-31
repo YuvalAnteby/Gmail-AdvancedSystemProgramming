@@ -34,9 +34,7 @@ const loginUser = (req, res) => {
     if (!mail || !password) {
         return res.status(400).json({ error: 'mail and password required' });
     }
-    const user = Users.getAllUsers().find(
-        u => u.mail === mail && u.password === password
-    );
+    const user = Users.isAuthorizeUser(mail, password);
     if (!user) {
         return res.status(401).json({ error: 'wrong mail or password' });
     }

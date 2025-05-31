@@ -9,7 +9,7 @@ const labels = require('./routes/labels');
 const blacklist = require('./routes/blacklist');
 
 app.use('/api/mails', inbox);
-app.use('/api/users', users);
+app.use('/api', users);
 app.use('/api/labels', labels);
 app.use('/api/blacklist', blacklist);
 

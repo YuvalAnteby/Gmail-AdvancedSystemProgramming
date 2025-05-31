@@ -26,8 +26,8 @@ const getAllUsers = () => users;
 const getUserById = (id) => users.find(user => user.id === id);
 
 /**
- * 
- * @param  mail 
+ *
+ * @param  mail
  * @returns {boolean} true if user with the gien email address alredy exists
  */
 const userExist = (mail) => {
@@ -35,14 +35,27 @@ const userExist = (mail) => {
 }
 
 /**
+ * Checks if a given mail and password match a user to authorize them
+ * @param mail mail of user
+ * @param password password of user
+ * @returns {boolean} true if mail and password match the user, otherwise false
+ */
+const isAuthorizeUser = (mail, password) => {
+    const u = users.find(user => user.mail === mail && user.password === password);
+    return !!u;
+
+}
+
+
+/**
  * Creates a new user and save it in RAM only
  * @param fullName full name of the user
  * @param mail desired mail address
- * @param password string to guard mail  
+ * @param password string to guard mail
  * @param dateOfBirth date of birth in format YEAR/MONTH/DAY
  * @param image profile image
  */
-const createUser = (fullName, mail,password, dateOfBirth, image) => {
+const createUser = (fullName, mail, password, dateOfBirth, image) => {
     const newUser = {
         id: ++countId,
         fullName,
@@ -56,6 +69,4 @@ const createUser = (fullName, mail,password, dateOfBirth, image) => {
 };
 
 
-
-
-module.exports = {getAllUsers, getUserById, createUser,userExist};
+module.exports = {getAllUsers, getUserById, createUser, userExist, isAuthorizeUser};
