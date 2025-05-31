@@ -20,7 +20,7 @@ const getAllLabels = () => labels
  * @returns {{id: number, name, owner}|null} null if input is invalid, otherwise the label object
  */
 const createNewLabel = (owner, name) => {
-    if (!owner || !name)
+    if (!name)
         return null;
     const newLabel = {
         id: ++labelId,
@@ -45,8 +45,8 @@ const getLabelById = (id) => labels.find(label => label.id === id);
  * @returns {*|null} if invalid or not found null, otherwise the updated label object
  */
 const editLabel = (labelId, name) => {
-    if (!labelId || !name)
-        return null;
+ //   if (!labelId || !name)
+ //       return null;
     // search the label with the index
     const index = labels.findIndex(label => label.id === labelId);
     if (index === -1)
