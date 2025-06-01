@@ -106,6 +106,10 @@ const editMailById = (req, res) => {
     const labels = req.body?.labels;
     const readBy = req.body?.readBy;
     const deletedBy = req.body?.deletedBy;
+    // nothing to change was received - end it here
+    if (!subject && !body && !sentTo && !labels && !readBy && !deletedBy) {
+        return res.status(200).json({msg: "nothing to edit"})
+    }
     const mail = Mails.editMail(
         userId, mailId,
         subject || undefined,
