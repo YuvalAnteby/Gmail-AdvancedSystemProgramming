@@ -3,9 +3,9 @@
  * User object structure:
  *  id - positive number
  *  full name - string
- *  mail address - TODO decide
+ *  mail address - string
  *  password
- *  date of birth - TODO decide
+ *  date of birth - string in format of YYYY/MM/DD
  *  image - placeholder string
  *
  */
@@ -21,14 +21,15 @@ const getAllUsers = () => users;
 /**
  *
  * @param id of a user
- * @returns {*} user object with the same id
+ * @returns {{id: Number, fullName: String, mail: String, password: String, dateOfBirth: String, image: *}}
+ * user object with the same id
  */
 const getUserById = (id) => users.find(user => user.id === id);
 
 /**
  *
  * @param  mail
- * @returns {boolean} true if user with the gien email address alredy exists
+ * @returns {boolean} true if user with the same email address already exists
  */
 const userExist = (mail) => {
     return users.find(user => user.mail === mail)
@@ -38,7 +39,8 @@ const userExist = (mail) => {
  * Checks if a given mail and password match a user to authorize them
  * @param mail mail of user
  * @param password password of user
- * @returns {{id, mail, fullName: *, dateOfBirth: *, image: *}} true if mail and password match the user, otherwise false
+ * @returns {{id: Number, mail: String, fullName: String, dateOfBirth: String, image: *}}
+ * true if mail and password match the user, otherwise false
  */
 const isAuthorizeUser = (mail, password) => {
     const u = users.find(user => user.mail === mail && user.password === password);
@@ -55,6 +57,7 @@ const isAuthorizeUser = (mail, password) => {
  * @param password string to guard mail
  * @param dateOfBirth date of birth in format YEAR/MONTH/DAY
  * @param image profile image
+ * @returns {{id, fullName, mail, password, dateOfBirth, image}} the object of the new user
  */
 const createUser = (fullName, mail, password, dateOfBirth, image) => {
     const newUser = {
