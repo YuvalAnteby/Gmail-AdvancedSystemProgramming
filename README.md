@@ -7,102 +7,76 @@
 ---
 
 ## Table of Contents
-- [Running server and client](#testing-or-running-the-server-and-client-as-project)
+- [Running server and client](#testing-and-running)
+  - [Testing bloom filter server and python client](#to-test-the-pyton-client-and-bloom-filter-server) 
+  - [Running the web server](#running-the-servers)
+- [Examples](#)
 - [Screenshots](#screenshots)
-  - [Ex2](#ex2-screenshots)
-- [Answers to Ex2 questions](#answers-to-ex2-questions)
+  - [Ex3](#ex3-screenshots)
 - [Useful links](#useful-links)
   - [CPP server README]() 
   - [Python client README]()
 
 ---
 
-### Testing or Running the server and client as project
-Clone the project
+## Testing and Running
+First clone the project
 ```bash
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
 cd Gmail-AdvancedSystemProgramming/python_client
 ```
+And build it
+```bash
+  docker-compose build
+```
 
-- To test the project
+### To test the pyton client and bloom filter server
+**Make sure you already cloned the project and built it using docker compose**
 ```bash
   docker-compose run --build --rm gtest
   docker-compose run --build --rm test_client
 ```
-1. Build the project
+
+#### Running the servers
+**Make sure you already cloned the project and built it using docker compose**
+- To run the web server and bloom filter server
 ```bash
-  docker-compose build
+  docker-compose up web_server
 ```
-3. Run the server
+- To run the python client 
 ```bash
-  docker-compose up run_server
+  docker-compose run python_client
 ```
-2. Run the client
-```bash
-  docker-compose run  python_client
-```
+**NOTE: The Ex3 instructions didn't ask to run the python client and express server together using the same command** 
 - Remainder, to exit the container gracefully use
 ```bash
 control+c
 ```
 
-### Screenshots
-
-**#### Ex2 screenshots
-<details>
-<summary>Click to expand Ex2 screenshots</summary>
-<img src="screenshots/BloomFilter/ex2/example run 1.png" height="1440" alt="img1">
-<img src="screenshots/BloomFilter/ex2/example run 2.png" height="1440" alt="img2">
-<img src="screenshots/BloomFilter/ex2/example run 3.png" height="1440" alt="img3">
-<img src="screenshots/BloomFilter/ex2/example run 4.png" height="1440" alt="img4">
-<img src="screenshots/BloomFilter/ex2/example run 5.png" height="1440" alt="img5">
-<img src="screenshots/BloomFilter/ex2/client test results.png" height="1552" alt="img6">
-<img src="screenshots/BloomFilter/ex2/server test results.png" height="1552" alt="img7">
-</details>**
-
 ---
 
-### Answers to Ex2 questions
-1. Did the change of commands names made us modify closed to modification code?
-Partially, previously we had '1' and '2' options, we didn't have to modify the code since we could use a
-function to convert commands like GET or POST to the correct numbers.
-To make the code more readable we decided to use enums instead of numbers, allowing us to convert the 
-new names to ints and back as needed.
-This small change ensured we still have readable code and doesn't have to modify the code in the future.
+### Screenshots
+#### Ex3 screenshots
+<details>
+<summary>Click to expand Ex3 screenshots</summary>
 
-2. Did the addition of DELETE command made us modify closed to modification code?
-No, we only added the new delete function to the data persistence related class and interface without
-modifying any previous code.
-In Ex1 we decided on using an interface with different functions related to each data type (bits, urls etc.)
-and different use cases (getting, inserting), therefore we could just add a new function of delete url now.
+<img src="screenshots/ex3/curl runexample1.png" height="50%" alt="">
+<img src="screenshots/ex3/curl runexample2.png" height="50%" alt="">
+<img src="screenshots/ex3/curl runexample3.png" height="50%" alt="">
+<img src="screenshots/ex3/curl runexample4.png" height="50%" alt="">
+<img src="screenshots/ex3/curl runexample5.png" height="50%" alt="">
 
-3. Did the change of commands' output made us modify closed to modification code?
-Yes, previously we had the prints in the execute function of each command.
-We decided to use a new object of result which includes if we succeeded and messages to print as needed.
-In addition, we used enums for results, and a helper function to convert them to messages, 
-this change ensures we would only need to add new messages to the conversion function and not modify.
+</details>
 
-4. Did the change of console IO to TCP made us modify closed to modification code?
-Yes, previously we used cout/cin for IO needs.
-To prevent future modifications we use a decorator and strategy design patterns, using an interface for input
-and one for output, each has concrete classes for TCP, console and in future more as needed.
-In case we'll need to change IO method we could change the type at the start of main function.
-5. 
+For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/main-Ex3/screenshots/ex3)
+
+
 ---
 
 ## Useful links
 - [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Ex2/server_cpp)
 - [Python client README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex2/python_client/README.md)
+- [JavaScript server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/web_server/README.md)
 
 ---
-#### Ex3 screenshots
-<details>
-<summary>Click to expand Ex3 screenshots</summary>
 
-<img src="screenshots/ex3/runexample1.png" height="1032" alt="">
-<img src="screenshots/ex3/runexample2.png" height="1032" alt="">
-<img src="screenshots/ex3/runexample3.png" height="1032" alt="">
-<img src="screenshots/ex3/runexample4.png" height="1032" alt="">
-<img src="screenshots/ex3/runexample5.png" height="1032" alt="">
-
-</details>
