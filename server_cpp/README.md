@@ -11,6 +11,7 @@
 - [Testing locally with Docker](#testing-locally-with-docker)
 
 ## Setting up & running the server
+**These instructions were made for Ex1, please follow the main README file for instructions on running for the current assignment**
 - <b>note</b>: we use default values for the command line arguments, if you would like to change do it from docker
 ### clone
 ```bash
