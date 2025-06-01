@@ -128,18 +128,17 @@ const deleteMail = (userId, mailId) => {
  */
 const searchInInbox = (query, userId) => {
     const lowerCased = query.toString().toLowerCase();
-    userId = parseInt(userId);
     const isNum = !isNaN(Number(query));
     return mails.filter(
         mail =>
             (mail.from === userId // search 'from' user id
-                || mail.sentTo.some(id => id === userId)) // search 'sent to' user ids
+                || (mail.sentTo && mail.sentTo.some(id => id === userId))) // search 'sent to' user ids
             && (
                 (mail.subject && mail.subject.toLowerCase().includes(lowerCased)) // search subject string
                 || (mail.body && mail.body.toLowerCase().includes(lowerCased)) // search body string
                 || (mail.sentAt && new Date(mail.sentAt).toISOString().includes(query)) // search the time sent at
                 || (isNum && mail.labels && mail.labels.some(label => label.id === parseInt(query))) // search labels names
-                || mail.readBy.some(id => String(id).includes(lowerCased)) // check if it's a user that e
+                || (mail.readBy && mail.readBy.some(id => String(id).includes(lowerCased))) // check if it's a user that e
             ));
 }
 

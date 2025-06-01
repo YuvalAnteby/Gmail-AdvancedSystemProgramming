@@ -4,7 +4,9 @@ const Blacklist = require('../models/blacklist');
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
  * @param req request
  * @param res response
- * @returns list of ordered by the time sent mails objects, if user isn't authenticated - code 400
+ * @returns
+ * - code 200 and list of ordered by the time sent mails objects
+ * - code 400 if user isn't authenticated
  */
 const getLastMailsOrdered = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
@@ -21,7 +23,10 @@ const getLastMailsOrdered = (req, res) => {
  * Finds and returns a mail with the given id.
  * @param req request
  * @param res response
- * @returns a mail object, if there's no id in input returns 400, if there's no mail with the id returns 404.
+ * @returns
+ * - code 200 and a mail object if successful
+ * - code 400 if there's no id in input
+ * - code 404 if there's no mail with the id
  */
 const getMailById = (req, res) => {
     // Make sure we got an id in the request
@@ -43,8 +48,9 @@ const getMailById = (req, res) => {
  * If the mail contains a blacklisted URL, the mail will not be created.
  * @param req request
  * @param res response
- * @returns code 201 and the mail as a json object if created a new mail successfully, if the user isn't authenticated
- * or contains a blacklisted URL or encountered any other problem will return a 400 code and a description.
+ * @returns
+ * - code 201 and the mail as a json object if created a new mail successfully
+ * - code 400 if the user isn't authenticated or contains a blacklisted URL or encountered any other problem
  */
 const createNewMail = async (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
@@ -87,8 +93,10 @@ function extractUrls(text) {
  * Finds and edits the mail with a given id.
  * @param req request
  * @param res response
- * @returns code 200 with the edits mail, if the user isn't authenticated or mail id wasn't given returns code 400,
- * if the mail wasn't found while editing returns code 400.
+ * @returns
+ * - code 200 with the edited mail if successful
+ * - code 400 if the user isn't authenticated or mail id wasn't given returns or the mail wasn't found
+ * - code 404 if the mail wasn't found while editing
  */
 const editMailById = (req, res) => {
     // Make sure we got an id in the request
@@ -153,6 +161,7 @@ const deleteMailById = (req, res) => {
         return res.status(400).json({error: 'mail doesn\'t belong to user'});
     return res.status(204).json({msg: "mail deleted"});
 }
+
 /**
  * Gets all the mails with the given query to search in the mails.
  * Will search in several fields of the mails.
