@@ -9,7 +9,7 @@
 ## Table of Contents
 - [Running server and client](#testing-and-running)
   - [Getting started](#getting-started)
-  - [Testing bloom filter server and python client](#to-test-the-pyton-client-and-bloom-filter-server) 
+  - [Testing bloom filter server and python client](#to-test-the-python-client-and-bloom-filter-server) 
   - [Running the web server](#running-the-servers)
 
 - [Screenshots & routes examples](#screenshots)
@@ -33,7 +33,7 @@ And build it
   docker-compose build
 ```
 
-### To test the pyton client and bloom filter server
+### To test the python client and bloom filter server
 **Make sure you already cloned the project and built it using docker compose**
 ```bash
   docker-compose run --build --rm gtest
