@@ -1,5 +1,5 @@
 # Gmail-AdvancedSystemProgramming
-
+Daily meeting summaries are uploaded to `Issues` tab
 ## Dear TA please check main-Ex1 for the final version of Ex1
 ## Dear TA please check main-Ex2 for the final version of Ex2
 ## Dear TA please check main-Ex3 for the final version of Ex3
