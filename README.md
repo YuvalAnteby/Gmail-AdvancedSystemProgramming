@@ -8,18 +8,21 @@
 
 ## Table of Contents
 - [Running server and client](#testing-and-running)
+  - [Getting started](#getting-started)
   - [Testing bloom filter server and python client](#to-test-the-pyton-client-and-bloom-filter-server) 
   - [Running the web server](#running-the-servers)
-- [Examples](#)
-- [Screenshots](#screenshots)
+
+- [Screenshots & routes examples](#screenshots)
   - [Ex3](#ex3-screenshots)
 - [Useful links](#useful-links)
-  - [CPP server README]() 
-  - [Python client README]()
+  - [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Exe/server_cpp) 
+  - [Python client README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/python_client/README.md)
+  - [JavaScript server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/web_server/README.md)
 
 ---
 
 ## Testing and Running
+### Getting started
 First clone the project
 ```bash
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
@@ -38,7 +41,9 @@ And build it
 ```
 
 #### Running the servers
-**Make sure you already cloned the project and built it using docker compose**
+**Make sure you already cloned the project and built it using docker compose** </br>
+In case you want to change any configuration value (port, bloom filter integers etc.) change the relevant dockerfile or docker compose file.
+
 - To run the web server and bloom filter server
 ```bash
   docker-compose up web_server
@@ -47,7 +52,8 @@ And build it
 ```bash
   docker-compose run python_client
 ```
-**NOTE: The Ex3 instructions didn't ask to run the python client and express server together using the same command** 
+**NOTE: The Ex3 instructions didn't ask to run the python client and express server together using the same command**
+
 - Remainder, to exit the container gracefully use
 ```bash
 control+c
@@ -70,12 +76,11 @@ control+c
 
 For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/main-Ex3/screenshots/ex3)
 
-
 ---
 
 ## Useful links
-- [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Ex2/server_cpp)
-- [Python client README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex2/python_client/README.md)
+- [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Exe/server_cpp)
+- [Python client README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/python_client/README.md)
 - [JavaScript server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/web_server/README.md)
 
 ---
