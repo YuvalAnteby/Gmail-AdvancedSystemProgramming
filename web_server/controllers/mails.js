@@ -131,12 +131,14 @@ const editMailById = (req, res) => {
  * Finds and deletes the mail with a given id.
  * @param req request
  * @param res response
- * @returns code 200 with message of mail deleted if successfully deleted, 404 if mail not found, 400 if missing input
- * or user isn't authenticated or has no access to the mail
+ * @returns
+ * - code 200 with message of mail deleted if successfully deleted
+ * - 404 if mail not found
+ * - 400 if missing input or user isn't authenticated or has no access to the mail
  */
 const deleteMailById = (req, res) => {
     // Make sure we got an id in the request
-    const mailId = parseInt(req.params.id);
+    const mailId = Number(req.params.id);
     if (isNaN(mailId))
         return res.status(400).json({error: 'No valid mail ID was given'});
     // Make sure the user is authenticated, if not - a bad request (400)
@@ -149,7 +151,7 @@ const deleteMailById = (req, res) => {
         return res.status(404).json({error: 'mail was not found'});
     if (mail === 400)
         return res.status(400).json({error: 'mail doesn\'t belong to user'});
-    return res.status(204).end();
+    return res.status(204).json({msg: "mail deleted"});
 }
 /**
  * Gets all the mails with the given query to search in the mails.
