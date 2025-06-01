@@ -72,7 +72,10 @@ const getMail = (mailId) => mails.find(mail => mail.id === mailId);
  * @param labels new labels for the mail
  * @param readBy new read status list
  * @param deletedBy new deleted status list
- * @returns the new mail object, if no such email was found returns 404, if user has no access to it returns 400
+ * @returns
+ * - the new mail object if successfully edited
+ * - code 404 if no such email was found
+ * - code 400 if user has no access to it
  */
 const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
     // find the index of the wanted mail
@@ -103,7 +106,10 @@ const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deleted
  * Deletes a mail
  * @param userId id of the user that wants to remove the mail
  * @param mailId id of a mail to delete
- * @returns {Number} 204 if deleted successfully, 400 if user has no access to it, 404 if mail not found
+ * @returns {Number}
+ * - 204 if deleted successfully
+ * - 400 if user has no access to it
+ * - 404 if mail not found
  */
 const deleteMail = (userId, mailId) => {
     // find the index of the wanted mail
