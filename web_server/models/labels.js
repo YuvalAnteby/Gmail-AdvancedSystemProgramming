@@ -9,7 +9,7 @@ let labelId = 0;
 
 /**
  * Returns all labels saved
- * @returns {*[]}
+ * @returns {*[]} all labels saved
  */
 const getAllLabels = () => labels
 
