@@ -21,7 +21,7 @@ let mailId = 0;
  */
 const getUserMails = (userId, limit) => {
     // filter by user id, then sort by last mails sent/received
-    return mails.filter(mail => mail.sentTo.includes(userId) || mail.from === userId)
+    return mails.filter(mail => (mail.sentTo && mail.sentTo.includes(userId)) || (mail.from && mail.from === userId))
         .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt))
         .slice(0, limit);
 }
@@ -72,12 +72,15 @@ const getMail = (mailId) => mails.find(mail => mail.id === mailId);
  * @param labels new labels for the mail
  * @param readBy new read status list
  * @param deletedBy new deleted status list
- * @returns the new mail object, if no such email was found returns 404, if user has no access to it returns 400
+ * @returns
+ * - the new mail object if successfully edited
+ * - code 404 if no such email was found
+ * - code 400 if user has no access to it
  */
 const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
     // find the index of the wanted mail
     const index = mails.findIndex(mail => mail.id === mailId);
-    // make sure the mail was found
+    // make sure the mail wa s found
     if (index === -1)
         return 404;
     // make sure the user has access to the mail
@@ -103,7 +106,10 @@ const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deleted
  * Deletes a mail
  * @param userId id of the user that wants to remove the mail
  * @param mailId id of a mail to delete
- * @returns {Number} 204 if deleted successfully, 400 if user has no access to it, 404 if mail not found
+ * @returns {Number}
+ * - 204 if deleted successfully
+ * - 400 if user has no access to it
+ * - 404 if mail not found
  */
 const deleteMail = (userId, mailId) => {
     // find the index of the wanted mail
@@ -128,18 +134,17 @@ const deleteMail = (userId, mailId) => {
  */
 const searchInInbox = (query, userId) => {
     const lowerCased = query.toString().toLowerCase();
-    userId = parseInt(userId);
     const isNum = !isNaN(Number(query));
     return mails.filter(
         mail =>
             (mail.from === userId // search 'from' user id
-                || mail.sentTo.some(id => id === userId)) // search 'sent to' user ids
+                || (mail.sentTo && mail.sentTo.some(id => id === userId))) // search 'sent to' user ids
             && (
                 (mail.subject && mail.subject.toLowerCase().includes(lowerCased)) // search subject string
                 || (mail.body && mail.body.toLowerCase().includes(lowerCased)) // search body string
                 || (mail.sentAt && new Date(mail.sentAt).toISOString().includes(query)) // search the time sent at
                 || (isNum && mail.labels && mail.labels.some(label => label.id === parseInt(query))) // search labels names
-                || mail.readBy.some(id => String(id).includes(lowerCased)) // check if it's a user that e
+                || (mail.readBy && mail.readBy.some(id => String(id).includes(lowerCased))) // check if it's a user that e
             ));
 }
 

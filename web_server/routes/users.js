@@ -1,15 +1,16 @@
-//# Author: Yuval Anteby ,dor darmon 
-const express = require('express')
-var router = express.Router();
+// Author: Yuval Anteby, Dor Darmon
+
+const express = require('express');
+const router = express.Router();
 const controller = require('../controllers/users');
 
-// Signup regster a new user
-router.post('/api/users',controller.signupUser);
+// POST /api/users
+router.post('/users', controller.signupUser);
 
-// Get user by ID
-router.get('/api/users/:id',controller.getUser);
+// GET /api/users/:id
+router.get('/users/:id', controller.getUser);
 
-// Login in to user
-router.post('/api/tokens',controller.loginUser);
+// POST /api/users/login    (login)
+router.post('/tokens', controller.loginUser);
 
 module.exports = router;

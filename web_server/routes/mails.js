@@ -9,6 +9,6 @@ router.route('/:id')
     .get(controller.getMailById)
     .patch(controller.editMailById)
     .delete(controller.deleteMailById);
-router.get('/:query', controller.getMailsByQuery);
+router.get('/search/:query/', controller.getMailsByQuery);
 
 module.exports = router;

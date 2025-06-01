@@ -1,10 +1,8 @@
-// controllers/labels.js
-
 const Labels = require('../models/labels');
 
 /**
  * GET /api/labels
- * Returns a pretty-printed JSON array of all labels with newlines and indentation.
+ * @returns a pretty-printed JSON array of all labels with newlines and indentation.
  */
 const getAllLabels = (req, res) => {
     const rawLabels = Labels.getAllLabels();
@@ -21,14 +19,14 @@ const getAllLabels = (req, res) => {
 
 /**
  * POST /api/labels
- * Creates a new label. Expects a numeric “userid” header and a JSON body { "name": "<labelName>" }.
- * Returns 201 Created with Location header only (no body).
+ * Creates a new label. Expects a numeric “userid” header and a JSON
+ * @returns 201 Created with Location header only
  * Errors:
  *   - 400 Bad Request if name is missing
  *   - 400 Bad Request if creation fails
  */
 const createNewLabel = (req, res) => {
-    const userId = parseInt(req.headers['userid'], 10);
+    const userId = Number(req.headers['user-id']);
     const labelName = req.body.name;
 
     if (!labelName) {
@@ -62,11 +60,11 @@ const createNewLabel = (req, res) => {
 
 /**
  * GET /api/labels/:id
- * Returns the label object { id, name } pretty-printed, or 404 if not found.
+ * @returns the label object { id, name } pretty-printed, or 404 if not found.
  */
 const getLabelById = (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const label = Labels.getLabelById(id);
+    const labelId = Number(req.params.id);
+    const label = Labels.getLabelById(labelId);
 
     if (!label) {
         return res
@@ -92,13 +90,13 @@ const getLabelById = (req, res) => {
 /**
  * PATCH /api/labels/:id
  * Updates the name of an existing label. Expects JSON body { "name": "<newName>" }.
- * Returns 204 No Content on success.
+ * @returns 204 No Content on success.
  * Errors:
  *   - 400 Bad Request if name is missing
  *   - 404 Not Found if label does not exist
  */
 const editLabel = (req, res) => {
-    const id = parseInt(req.params.id, 10);
+    const labelId = Number(req.params.id);
     const name = req.body.name;
 
     if (!name) {
@@ -112,7 +110,7 @@ const editLabel = (req, res) => {
             ));
     }
 
-    const updated = Labels.editLabel(id, name);
+    const updated = Labels.editLabel(labelId, name);
     if (!updated) {
         return res
             .status(404)
@@ -130,13 +128,13 @@ const editLabel = (req, res) => {
 /**
  * DELETE /api/labels/:id
  * Deletes an existing label by ID.
- * Returns 204 No Content on success.
+ * @returns 204 No Content on success.
  * Errors:
  *   - 404 Not Found if label does not exist
  */
 const deleteLabel = (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const success = Labels.deleteLabel(id);
+    const labelId = Number(req.params.id);
+    const success = Labels.deleteLabel(labelId);
 
     if (!success) {
         return res
