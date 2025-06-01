@@ -40,8 +40,6 @@ async function sendToCppServer(message) {
         client.once('data', (data) => {
             resolve(data.toString().trim());
         });
-        /// TODO test if works good or if a newline char is needed
-        //client.write(message + '\n');
         client.write(message);
     });
 }
