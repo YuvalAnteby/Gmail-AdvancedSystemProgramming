@@ -63,8 +63,8 @@ const createNewLabel = (req, res) => {
  * @returns the label object { id, name } pretty-printed, or 404 if not found.
  */
 const getLabelById = (req, res) => {
-    const id = Number(req.body.id);
-    const label = Labels.getLabelById(id);
+    const labelId = Number(req.params.id);
+    const label = Labels.getLabelById(labelId);
 
     if (!label) {
         return res
@@ -96,7 +96,7 @@ const getLabelById = (req, res) => {
  *   - 404 Not Found if label does not exist
  */
 const editLabel = (req, res) => {
-    const id = Number(req.body.id);
+    const labelId = Number(req.params.id);
     const name = req.body.name;
 
     if (!name) {
@@ -110,7 +110,7 @@ const editLabel = (req, res) => {
             ));
     }
 
-    const updated = Labels.editLabel(id, name);
+    const updated = Labels.editLabel(labelId, name);
     if (!updated) {
         return res
             .status(404)
@@ -133,8 +133,8 @@ const editLabel = (req, res) => {
  *   - 404 Not Found if label does not exist
  */
 const deleteLabel = (req, res) => {
-    const id = Number(req.body.id);
-    const success = Labels.deleteLabel(id);
+    const labelId = Number(req.params.id);
+    const success = Labels.deleteLabel(labelId);
 
     if (!success) {
         return res
