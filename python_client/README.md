@@ -11,6 +11,7 @@
 ---
 
 ## Setting up and running the client.
+**These instructions were made for Ex2, please follow the main README file for instructions on running for the current assignment**
 - <b>note</b>: we use default values for the command line arguments, if you would like to change do it from docker
 ### Clone
 

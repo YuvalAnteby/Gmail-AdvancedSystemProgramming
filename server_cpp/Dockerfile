@@ -14,5 +14,6 @@ WORKDIR /usr/src/run_server/build
 
 # Compile the CPP project, add more files and flags as needed
 RUN cmake .. && make
+
 # Run the compiled project
 CMD ["./run_server", "12347", "8", "1", "2"]

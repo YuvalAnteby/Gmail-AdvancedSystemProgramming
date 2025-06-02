@@ -39,3 +39,4 @@
 server_cpp/build/
 server_cpp/cmake-build-debug/
 cmake-build-debug/
+/web_server/node_modules/
