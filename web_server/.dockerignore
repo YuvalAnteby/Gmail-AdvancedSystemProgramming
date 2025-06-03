@@ -1,0 +1,22 @@
+# Node modules should be installed inside the container
+node_modules/
+
+# Log files
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+*.log
+
+# Environment files (if any)
+.env
+
+# OS/IDE files
+.DS_Store
+.vscode/
+.idea/
+
+# Test/coverage outputs (if you ever add tests here)
+coverage/
+
+# READMEs
+*.md
