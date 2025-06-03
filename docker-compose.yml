@@ -1,6 +1,7 @@
 services:
   # React frontend
   web_front:
+    profiles: ["web_app"]
     build:
       context: frontend
       dockerfile: Dockerfile
@@ -14,6 +15,7 @@ services:
 
   # Web server using JS express
   web_server:
+    profiles: ["web_app"]
     build:
       context: ./web_server
       dockerfile: Dockerfile
@@ -27,6 +29,7 @@ services:
 
   # Server itself (CPP)
   run_server:
+    profiles: ["web_app", "tests"]
     build:
       context: ./server_cpp
       dockerfile: Dockerfile
@@ -42,6 +45,7 @@ services:
 
   # Server gtest
   gtest:
+    profiles: [ "tests" ]
     build:
       context: ./server_cpp
       dockerfile: Dockerfile_test
@@ -52,6 +56,7 @@ services:
 
   # Client (Python)
   python_client:
+    profiles: [ "client" ]
     build:
       context: ./python_client
       dockerfile: Dockerfile
@@ -70,6 +75,7 @@ services:
 
   # Client test runner (Python).
   test_client:
+    profiles: [ "tests" ]
     build:
       context: ./python_client
       dockerfile: Dockerfile.tests
