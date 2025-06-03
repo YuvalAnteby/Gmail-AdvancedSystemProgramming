@@ -13,5 +13,5 @@ app.use('/api', users);
 app.use('/api/labels', labels);
 app.use('/api/blacklist', blacklist);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT);

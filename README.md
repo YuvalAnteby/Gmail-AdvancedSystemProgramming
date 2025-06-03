@@ -28,32 +28,25 @@ First clone the project
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
 cd Gmail-AdvancedSystemProgramming/python_client
 ```
-And build it
-```bash
-  docker-compose build
-```
+**If you want to change the configuration (ports, names, bloom filter integers etc.) you can do it in dockerfiles and docker compose.**
 
 ### To test the python client and bloom filter server
-**Make sure you already cloned the project and built it using docker compose**
+This will build and run only the test related containers (CPP server, gtest, python test)
 ```bash
-  docker-compose run --build --rm gtest
-  docker-compose run --build --rm test_client
+  docker-compose --profile tests up --build
 ```
 
-#### Running the servers
-**Make sure you already cloned the project and built it using docker compose** </br>
-In case you want to change any configuration value (port, bloom filter integers etc.) change the relevant dockerfile or docker compose file. </br>
-Changing the port and the name of the cpp server also requires changing models/blacklist.js global vars (since we shouldn't include .env files)
+### Running the entire web app
+This will build and run only the web application related containers (react, Node.js, CPP server)
+```bash
+  docker-compose --profile web_app up --build
+```
 
-- To run the web server and bloom filter server
+### Running the python client
+**NOTE: The instructions didn't ask to run the python client and express server together using the same command**
 ```bash
-  docker-compose up web_server
+  docker-compose run client --build
 ```
-- To run the python client 
-```bash
-  docker-compose run python_client
-```
-**NOTE: The Ex3 instructions didn't ask to run the python client and express server together using the same command**
 
 - Remainder, to exit the container gracefully use
 ```bash

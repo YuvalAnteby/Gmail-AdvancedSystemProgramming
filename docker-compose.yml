@@ -1,18 +1,35 @@
 services:
+  # React frontend
+  web_front:
+    profiles: ["web_app"]
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: react_frontend
+    depends_on:
+      - web_server
+    ports:
+      - "3000:3000"
+    networks:
+      - gmail-net
+
   # Web server using JS express
   web_server:
+    profiles: ["web_app"]
     build:
       context: ./web_server
       dockerfile: Dockerfile
     container_name: web_server
     ports:
-      - "3000:3000"
+      - "3001:3001"
     depends_on:
       - run_server
     networks:
       - gmail-net
+
   # Server itself (CPP)
   run_server:
+    profiles: ["web_app", "tests"]
     build:
       context: ./server_cpp
       dockerfile: Dockerfile
@@ -25,8 +42,10 @@ services:
       - "12347:12347"
     networks:
       - gmail-net
+
   # Server gtest
   gtest:
+    profiles: [ "tests" ]
     build:
       context: ./server_cpp
       dockerfile: Dockerfile_test
@@ -34,10 +53,12 @@ services:
     # Prevent the use of terminal input during test runs
     stdin_open: false
     tty: false
+
   # Client (Python)
   python_client:
+    profiles: [ "client" ]
     build:
-      context: python_client
+      context: ./python_client
       dockerfile: Dockerfile
     # container_name: python_client
     depends_on:
@@ -51,19 +72,21 @@ services:
     command: [ "python", "main.py", "run_server", "12347" ]
     networks:
       - gmail-net
+
   # Client test runner (Python).
   test_client:
+    profiles: [ "tests" ]
     build:
-      context: .
-      dockerfile: python_client/Dockerfile.tests
+      context: ./python_client
+      dockerfile: Dockerfile.tests
     container_name: client_tests
     depends_on:
       - run_server
-    command: ["python","python_client/tests/test_client_unittest.py"]
+    command: ["python","tests/test_client_unittest.py"]
 
 
 volumes:
-  app_data:   # <-- define the named volume
+  app_data:
 
 networks:
   gmail-net:
