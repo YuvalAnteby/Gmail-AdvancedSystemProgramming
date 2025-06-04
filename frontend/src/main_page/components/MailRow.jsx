@@ -15,6 +15,7 @@ const MailRow = ({id, sender, subject, body, date, isSelected, onSelect}) => {
 
     const handleMailOpen = () => {
         console.log(">> Open Mail Row:", {id, sender, subject, body, date});
+        /// TODO open the mail to read
     }
 
     return (
