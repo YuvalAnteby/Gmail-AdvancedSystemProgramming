@@ -40,6 +40,8 @@ const DUMMY_EMAILS = [
 const MainPage = () => {
     const [selectedIds, setSelectedIds] = useState(new Set());
     const allSelected = selectedIds.size === DUMMY_EMAILS.length;
+    const anySelected = selectedIds.size > 0;
+
 
     const handleSelect = (id, isChecked) => {
         setSelectedIds((prev) => {
@@ -99,6 +101,7 @@ const MainPage = () => {
                         {/* ---- TOOLBAR ---- */}
                         <ToolBar
                             allSelected={allSelected}
+                            anySelected={anySelected}
                             handleSelectAll={handleSelectAll}
                             handleRefresh={handleRefresh}
                             handleDelete={handleDelete}
