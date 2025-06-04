@@ -73,6 +73,11 @@ const MainPage = () => {
         // TODO: call API to mark read/unread
         setSelectedIds(new Set()); // un‐select everything after marking as read
     };
+    const handleMarkSpam = () => {
+        console.log(">> Marking Spam:", Array.from(selectedIds));
+        // TODO: call API to mark with blacklist
+        setSelectedIds(new Set());
+    };
 
     return (
         <div className="container-fluid p-3">
@@ -90,28 +95,31 @@ const MainPage = () => {
                 </div>
                 {/* ---- MAIL LIST CONTAINER ---- */}
                 <div className="col-md-9 mb-3">
-                    {/* ---- TOOLBAR ---- */}
-                    <ToolBar
-                        allSelected={allSelected}
-                        handleSelectAll={handleSelectAll}
-                        handleRefresh={handleRefresh}
-                        handleDelete={handleDelete}
-                        handleMarkAsRead={handleMarkAsRead}
-                    />
-
-                    {/* ---- ACTUAL MAIL ROWS ---- */}
-                    {DUMMY_EMAILS.map((email) => (
-                        <MailRow
-                            key={email.id}
-                            id={email.id}
-                            sender={email.sender}
-                            subject={email.subject}
-                            body={email.snippet}
-                            date={email.date}
-                            isSelected={selectedIds.has(email.id)}
-                            onSelect={handleSelect}
+                    <div className="mail-container">
+                        {/* ---- TOOLBAR ---- */}
+                        <ToolBar
+                            allSelected={allSelected}
+                            handleSelectAll={handleSelectAll}
+                            handleRefresh={handleRefresh}
+                            handleDelete={handleDelete}
+                            handleMarkAsRead={handleMarkAsRead}
+                            handleMarkSpam={handleMarkSpam}
                         />
-                    ))}
+
+                        {/* ---- ACTUAL MAIL ROWS ---- */}
+                        {DUMMY_EMAILS.map((email) => (
+                            <MailRow
+                                key={email.id}
+                                id={email.id}
+                                sender={email.sender}
+                                subject={email.subject}
+                                body={email.snippet}
+                                date={email.date}
+                                isSelected={selectedIds.has(email.id)}
+                                onSelect={handleSelect}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

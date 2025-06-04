@@ -1,7 +1,7 @@
 import React from "react";
 import './ToolBar.css'
 
-const ToolBar = ({allSelected, handleSelectAll, handleRefresh, handleDelete, handleMarkAsRead}) => {
+const ToolBar = ({allSelected, handleSelectAll, handleRefresh, handleDelete, handleMarkAsRead, handleMarkSpam}) => {
 
     return (
         <div className="col-md-9 mb-3">
@@ -18,21 +18,35 @@ const ToolBar = ({allSelected, handleSelectAll, handleRefresh, handleDelete, han
                 <button
                     className="btn btn-outline-secondary me-2"
                     onClick={handleRefresh}
+                    title="Refresh"
                 >
-                    Refresh
+                    <i className="bi bi-arrow-clockwise"></i>
                 </button>
+
                 <button
                     className="btn btn-outline-danger me-2"
                     onClick={handleDelete}
+                    title="Delete"
                 >
-                    Delete
+                    <i className="bi bi-trash"></i>
                 </button>
+
                 <button
-                    className="btn btn-outline-primary"
+                    className="btn btn-outline-primary me-2"
                     onClick={handleMarkAsRead}
+                    title="Mark as Read"
                 >
-                    Mark as Read
+                    <i className="bi bi-envelope-open"></i>
                 </button>
+
+                <button
+                    className="btn btn-outline-warning"
+                    onClick={handleMarkSpam}
+                    title="Report Spam"
+                >
+                    <i className="bi bi-exclamation-octagon"></i>
+                </button>
+
             </div>
         </div>
     )

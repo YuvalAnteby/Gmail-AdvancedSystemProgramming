@@ -1,3 +1,7 @@
-.custom-checkbox {
-    margin-right: 4px;
+.mail-container .custom-checkbox {
+    margin-right: 12px;
+}
+
+.mail-container .btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
