@@ -1,11 +1,36 @@
 .mail-row {
-    border-bottom: 1px solid #dee2e6;
+    background-color: rgba(255, 255, 255, 0.2); /* slight white tint */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     cursor: pointer;
-    text-align: center;
+    transition: background-color 0.2s ease-in-out;
 }
 
-/* Highlight on hover */
+/* Base styles for each mail row */
+.mail-row {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 0.75rem 1.5rem;
+    transition:
+            background-color 0.2s ease,      /* fade background */
+            box-shadow 0.2s ease,             /* elevate */
+            transform 0.15s ease;             /* slide slightly */
+    cursor: pointer;
+}
+
+/* On hover, lift the row and slide it in from the left */
 .mail-row:hover {
-    background-color: #f8f9fa;
+    background-color: #f1f3f5;          /* very light gray */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    transform: translateX(4px);         /* shift 4px to the right */
 }
 
+/* (Optional) If you want a colored accent on the left side */
+.mail-row:hover {
+    border-left: 4px solid #0d6efd;     /* Bootstrap’s primary blue */
+    padding-left: 1.25rem;              /* account for the new left border */
+}
+
+
+.mail-row .col,
+.mail-row .col-auto {
+    text-align: left;
+}
