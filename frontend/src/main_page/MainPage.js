@@ -22,6 +22,7 @@ const DUMMY_EMAILS = [
         subject: "Project update",
         snippet: "Here’s what we changed in v2.0...",
         date: "2025/06/04",
+        is_read: true
     },
     {
         id: 2,
@@ -29,6 +30,7 @@ const DUMMY_EMAILS = [
         subject: "Meeting reminder",
         snippet: "Don’t forget the team meeting at 9AM tomorrow.",
         date: "2025/06/03",
+        is_read: false
     },
     {
         id: 3,
@@ -36,6 +38,7 @@ const DUMMY_EMAILS = [
         subject: "Your daily digest",
         snippet: "Top tech news today: React 21.0 is out...",
         date: "2025/06/02",
+        is_read: true
     },
 ];
 
@@ -95,6 +98,7 @@ const MainPage = () => {
                                 subject={email.subject}
                                 body={email.snippet}
                                 date={email.date}
+                                isRead={email.is_read}
                                 isSelected={selectedIds.has(email.id)}
                                 onSelect={handleSelect}
                             />

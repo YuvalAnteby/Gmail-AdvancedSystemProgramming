@@ -8,18 +8,21 @@ import "./MailRow.css"
  *   - subject: {string}
  *   - body: {string}
  *   - date: {string} in format YYYY/MM/DD
+ *   - isRead: {boolean} true if read the mail already
  *   - isSelected: {boolean} (whether this row is currently checked)
  *   - onSelect: function when marking a mail as selected for mass actions on them
  */
-const MailRow = ({id, sender, subject, body, date, isSelected, onSelect}) => {
+const MailRow = ({id, sender, subject, body, date, isRead, isSelected, onSelect}) => {
 
     const handleMailOpen = () => {
         console.log(">> Open Mail Row:", {id, sender, subject, body, date});
         /// TODO open the mail to read
     }
 
+    const rowClass = isRead ? "mail-row read" : "mail-row unread";
+
     return (
-        <div className="row align-items-center mail-row py-2"
+        <div className={`row align-items-center ${rowClass} py-2`}
              onClick={handleMailOpen}>
             <div className="col-auto">
                 <input
