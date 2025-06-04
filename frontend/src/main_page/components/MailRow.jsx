@@ -9,7 +9,7 @@ import "./MailRow.css"
  *   - body: {string}
  *   - date: {string} in format YYYY/MM/DD
  *   - isSelected: {boolean} (whether this row is currently checked)
- *   - onSelect: (id: string, checked: boolean) => void
+ *   - onSelect: function when marking a mail as selected for mass actions on them
  */
 const MailRow = ({id, sender, subject, body, date, isSelected, onSelect}) => {
 
@@ -20,12 +20,14 @@ const MailRow = ({id, sender, subject, body, date, isSelected, onSelect}) => {
 
     return (
         <div className="row align-items-center mail-row py-2"
-        onClick={handleMailOpen}>
+             onClick={handleMailOpen}>
             <div className="col-auto">
                 <input
                     type="checkbox"
                     checked={isSelected}
                     onChange={(e) => onSelect(id, e.target.checked)}
+                    onClick={(e) => e.stopPropagation()} // <-- prevents row click
+
                 />
             </div>
 
@@ -33,17 +35,11 @@ const MailRow = ({id, sender, subject, body, date, isSelected, onSelect}) => {
                 <strong>{sender}</strong>
             </div>
 
-            <div className="col">
-                {subject}
-            </div>
+            <div className="col">{subject}</div>
 
-            <div className="col">
-                {body}
-            </div>
+            <div className="col">{body}</div>
 
-            <div className="col text-end">
-                {date}
-            </div>
+            <div className="col text-end">{date}</div>
         </div>
     );
 }
