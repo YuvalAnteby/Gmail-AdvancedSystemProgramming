@@ -90,7 +90,7 @@ const MainPage = () => {
                 </div>
                 {/* ---- MAIL LIST CONTAINER ---- */}
                 <div className="col-md-9 mb-3">
-                    {/* ---- TOOLBAR: only show when ≥1 mail is selected --- */}
+                    {/* ---- TOOLBAR ---- */}
                     <ToolBar
                         allSelected={allSelected}
                         handleSelectAll={handleSelectAll}
@@ -99,8 +99,7 @@ const MainPage = () => {
                         handleMarkAsRead={handleMarkAsRead}
                     />
 
-
-                    {/* 3.3) ACTUAL MAIL ROWS */}
+                    {/* ---- ACTUAL MAIL ROWS ---- */}
                     {DUMMY_EMAILS.map((email) => (
                         <MailRow
                             key={email.id}
