@@ -76,7 +76,7 @@ const MainPage = () => {
                         <ToolBar
                             allSelected={allSelected}
                             anySelected={anySelected}
-                            handleSelectAll={handleSelectAll}
+                            handleSelectAll={handlers.handleSelectAll}
                             handleRefresh={handlers.handleRefresh}
                             handleDelete={handlers.handleDelete}
                             handleMarkAsRead={handlers.handleMarkAsRead}
