@@ -5,3 +5,18 @@
 .mail-container .btn:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+
+/* Disabled buttons - used when no mail is selected */
+.btn:disabled, .btn[disabled] {
+    background-color: #dee2e6 !important;   /* dull gray */
+    border-color: #cfd3d7 !important;       /* matching gray border */
+    color: #6c757d !important;              /* dark muted text/icon */
+    opacity: 1 !important;                  /* remove Bootstrap fade */
+    box-shadow: none !important;           /* no elevation */
+    cursor: not-allowed !important;        /* no cursor */
+    filter: grayscale(100%);               /* remove icon color */
+}
+/* Disabled icon - used when no mail is selected */
+.btn:disabled i {
+    opacity: 0.6;
+}
