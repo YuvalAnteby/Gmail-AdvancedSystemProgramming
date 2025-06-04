@@ -1,12 +1,14 @@
 import React from "react";
+import './ToolBar.css'
 
 const ToolBar = ({allSelected, handleSelectAll, handleRefresh, handleDelete, handleMarkAsRead}) => {
 
     return (
         <div className="col-md-9 mb-3">
             <div className="d-flex align-items-center mb-2">
-                <div className="col-auto">
+                <div className="col-auto custom-checkbox">
                     <input
+                        className="custom-checkbox"
                         type="checkbox"
                         checked={allSelected}
                         onChange={handleSelectAll}
