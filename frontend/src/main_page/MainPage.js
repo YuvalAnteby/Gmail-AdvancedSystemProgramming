@@ -1,9 +1,11 @@
 import React, {useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './MainPage.css'
-import MailRow from "./components/MailRow";
-import ToolBar from "./components/ToolBar";
+import MailRow from "./mail_row/MailRow";
+import ToolBar from "./toolbar/ToolBar";
+import {useMailToolbarHandlers} from "./toolbar/useMailToolbarHandlers";
 
+/// TODO replace the placeholders with the real menus and real data
 // Placeholder for top menu
 const TopMenuPlaceholder = () => (
     <div className="custom-navbar">Top menu</div>
@@ -42,6 +44,7 @@ const MainPage = () => {
     const allSelected = selectedIds.size === DUMMY_EMAILS.length;
     const anySelected = selectedIds.size > 0;
 
+    const handlers = useMailToolbarHandlers(selectedIds, setSelectedIds);
 
     const handleSelect = (id, isChecked) => {
         setSelectedIds((prev) => {
@@ -50,35 +53,6 @@ const MainPage = () => {
             else copy.delete(id);
             return copy;
         });
-    };
-
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            const allIds = DUMMY_EMAILS.map((mail) => mail.id);
-            setSelectedIds(new Set(allIds));
-        } else {
-            setSelectedIds(new Set());
-        }
-    };
-
-    const handleRefresh = () => {
-        console.log(">> Refresh clicked");
-        // TODO: re‐fetch from server, etc.
-    };
-    const handleDelete = () => {
-        console.log(">> Deleting:", Array.from(selectedIds));
-        // TODO: call API to delete or mark as deleted
-        setSelectedIds(new Set()); // un‐select everything after “deletion”
-    };
-    const handleMarkAsRead = () => {
-        console.log(">> Marking as Read:", Array.from(selectedIds));
-        // TODO: call API to mark read/unread
-        setSelectedIds(new Set()); // un‐select everything after marking as read
-    };
-    const handleMarkSpam = () => {
-        console.log(">> Marking Spam:", Array.from(selectedIds));
-        // TODO: call API to mark with blacklist
-        setSelectedIds(new Set());
     };
 
     return (
@@ -103,10 +77,10 @@ const MainPage = () => {
                             allSelected={allSelected}
                             anySelected={anySelected}
                             handleSelectAll={handleSelectAll}
-                            handleRefresh={handleRefresh}
-                            handleDelete={handleDelete}
-                            handleMarkAsRead={handleMarkAsRead}
-                            handleMarkSpam={handleMarkSpam}
+                            handleRefresh={handlers.handleRefresh}
+                            handleDelete={handlers.handleDelete}
+                            handleMarkAsRead={handlers.handleMarkAsRead}
+                            handleMarkSpam={handlers.handleMarkSpam}
                         />
 
                         {/* ---- ACTUAL MAIL ROWS ---- */}
