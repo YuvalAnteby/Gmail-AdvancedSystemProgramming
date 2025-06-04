@@ -17,21 +17,21 @@ const SideMenuPlaceholder = () => (
 
 const DUMMY_EMAILS = [
     {
-        id: "1",
+        id: 1,
         sender: "alice@example.com",
         subject: "Project update",
         snippet: "Here’s what we changed in v2.0...",
         date: "2025/06/04",
     },
     {
-        id: "2",
+        id: 2,
         sender: "bob@work.org",
         subject: "Meeting reminder",
         snippet: "Don’t forget the team meeting at 9AM tomorrow.",
         date: "2025/06/03",
     },
     {
-        id: "3",
+        id: 3,
         sender: "newsletter@site.com",
         subject: "Your daily digest",
         snippet: "Top tech news today: React 21.0 is out...",
@@ -40,11 +40,14 @@ const DUMMY_EMAILS = [
 ];
 
 const MainPage = () => {
+    const allEmailIds = DUMMY_EMAILS.map((mail) => mail.id);
+
+
     const [selectedIds, setSelectedIds] = useState(new Set());
     const allSelected = selectedIds.size === DUMMY_EMAILS.length;
     const anySelected = selectedIds.size > 0;
 
-    const handlers = useMailToolbarHandlers(selectedIds, setSelectedIds);
+    const handlers = useMailToolbarHandlers(selectedIds, setSelectedIds, allEmailIds);
 
     const handleSelect = (id, isChecked) => {
         setSelectedIds((prev) => {

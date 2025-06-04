@@ -15,7 +15,7 @@ export const useMailToolbarHandlers = (selectedIds, setSelectedIds, allEmailIds)
     const handleRefresh = useCallback(() => {
         console.log(">> Refresh clicked");
         // TODO: re‐fetch from server, etc.
-    }, [selectedIds, setSelectedIds]);
+    }, []);
 
     // Delete selected mails
     const handleDelete = useCallback(() => {
@@ -39,6 +39,7 @@ export const useMailToolbarHandlers = (selectedIds, setSelectedIds, allEmailIds)
     }, [selectedIds, setSelectedIds]);
 
     return {
+        handleSelectAll,
         handleRefresh,
         handleDelete,
         handleMarkAsRead,
