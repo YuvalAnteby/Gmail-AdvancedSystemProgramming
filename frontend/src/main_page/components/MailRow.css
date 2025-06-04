@@ -1,0 +1,11 @@
+.mail-row {
+    border-bottom: 1px solid #dee2e6;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* Highlight on hover */
+.mail-row:hover {
+    background-color: #f8f9fa;
+}
+
