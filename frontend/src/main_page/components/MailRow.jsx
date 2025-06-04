@@ -33,7 +33,7 @@ const MailRow = ({id, sender, subject, body, date, isSelected, onSelect}) => {
             </div>
 
             <div className="col">
-                <p>{subject}</p>
+                {subject}
             </div>
 
             <div className="col">
