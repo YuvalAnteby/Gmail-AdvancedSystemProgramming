@@ -1,8 +1,14 @@
-.mail-row {
-    background-color: rgba(255, 255, 255, 0.2); /* slight white tint */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+@import "../../theme.css";
+
+/* ─── LIGHT THEME ───────────────────────────────── */
+.light-mail-row {
+    text-align: left;
+    background-color: var(--light-bg-mail-row);
     cursor: pointer;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid var(--light-strong-border-mail-row);
+    border-top: 1px solid var(--light-strong-border-mail-row);
+    border-left: 1px solid var(--light-strong-border-mail-row);
+    border-right: 1px solid var(--light-strong-border-mail-row);
     padding: 0.75rem 1.5rem;
     transition:
             background-color 0.2s ease,      /* fade background */
@@ -11,35 +17,58 @@
 }
 
 /* Give unread a light-gray background */
-.mail-row.unread {
-    background-color: #efefef;
-}
-
-/* If mail is unread, make subject/body bold (or a slightly different background) */
-.mail-row.unread .subject-col,
-.mail-row.unread .body-col {
+.light-mail-row.unread {
+    background-color: var(--light-bg-unread-mail-row);
     font-weight: 600;
 }
 
 /* If already read, normal text */
-.mail-row.read .subject-col,
-.mail-row.read .body-col {
+.light-mail-row.read {
+    background-color: var(--light-bg-read-mail-row);
     font-weight: 400;
 }
 
 /* On hover, lift the row and slide it in from the left */
-.mail-row:hover {
-    background-color: #f1f3f5;          /* very light gray */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+.light-mail-row:hover {
+    background-color: var(--light-hover-bg-mail-row);
+    box-shadow: 0 2px 8px var(--light-shadow-bg-mail-row);
     transform: translateX(4px);         /* shift 4px to the right */
     border-left: 4px solid #0d6efd;     /* Bootstrap’s primary blue */
     padding-left: 1.25rem;              /* account for the new left border */
 }
 
-/* Ensure columns of text aligned to the left like in Gmail */
-.mail-row .col,
-.mail-row .col-auto {
+
+/* ─── DARK THEME ───────────────────────────────── */
+.dark-mail-row {
     text-align: left;
+    background-color: var(--dark-bg-read-mail-row);
+    cursor: pointer;
+    border-bottom: 1px solid var(--dark-strong-border-mail-row);
+    border-top: 1px solid var(--dark-strong-border-mail-row);
+    border-right: 1px solid var(--dark-strong-border-mail-row);
+    border-left: 1px solid var(--dark-strong-border-mail-row);
+    padding: 0.75rem 1.5rem;
+    transition:
+            background-color 0.2s ease,      /* fade background */
+            box-shadow 0.2s ease,             /* elevate */
+            transform 0.15s ease;             /* slide slightly */
 }
 
+.dark-mail-row.unread {
+    background-color: var(--dark-bg-unread-mail-row);
+    font-weight: 600;
+}
 
+.dark-mail-row.read {
+    font-weight: 400;
+    background-color: var(--dark-bg-read-mail-row);
+}
+
+/* On hover, lift the row and slide it in from the left */
+.dark-mail-row:hover {
+    background-color: var(--dark-hover-bg-mail-row);
+    box-shadow: 0 2px 8px var(--dark-shadow-bg-mail-row);
+    transform: translateX(4px);         /* shift 4px to the right */
+    border-left: 4px solid #0d6efd;     /* Bootstrap’s primary blue */
+    padding-left: 1.25rem;              /* account for the new left border */
+}

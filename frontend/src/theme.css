@@ -1,0 +1,37 @@
+:root {
+    /* ----- Light theme palette ----- */
+    /* FROM DARKEST TO LIGHTEST: fdfdfd eeeeee f4f4f4
+    /* page */
+    --light-bg-page: #f4f4f4;
+    --light-bg-mails: #fdfdfd;
+    --light-text-color: #000000;
+    /* mail rows */
+    --light-bg-mail-row: rgba(255, 255, 255, 0.2);
+    --light-strong-border-mail-row: rgba(255, 255, 255, 0.3);
+    --light-weak-border-mail-row: rgba(0, 0, 0, 0.08);
+    --light-bg-unread-mail-row: #fdfdfd;
+    --light-bg-read-mail-row: #eeeeee;
+    --light-hover-bg-mail-row: #f1f3f5;
+    --light-shadow-bg-mail-row: rgba(0, 0, 0, 0.12);
+    /* tool bar */
+    --light-disabled-icon-bg-toolbar: #dee2e6;
+    --light-disabled-icon-border-toolbar: #cfd3d7;
+    --light-disabled-icon-text-toolbar: #6c757d;
+
+    /* ----- Dark theme palette ----- */
+    /* FROM DARKEST TO LIGHTEST: 121212 161616 272727
+    /* page */
+    --dark-bg-page: #121212;
+    --dark-bg-mails: #161616;
+    --dark-text-color: #eef4ed;
+    /* mail rows */
+    --dark-bg-unread-mail-row: #272727;
+    --dark-bg-read-mail-row: #161616;
+
+    --dark-strong-border-mail-row: rgba(255, 255, 255, 0.3); /* or pick a darker/lighter tone if desired */
+    --dark-weak-border-mail-row: rgba(0, 0, 0, 0.08);
+
+    /* Hover/background effects for dark rows */
+    --dark-hover-bg-mail-row: rgba(255, 255, 255, 0.1);     /* subtle light tint on hover */
+    --dark-shadow-bg-mail-row: rgba(0, 0, 0, 0.3);
+}
