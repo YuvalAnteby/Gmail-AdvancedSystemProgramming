@@ -20,55 +20,52 @@ const ToolBar = ({
     }, [allSelected, anySelected]);
 
     return (
-        <div className="col-md-9 mb-3">
-            <div className="d-flex align-items-center mb-2">
-                {/* SELECT ALL */}
-                <div className="col-auto custom-checkbox">
-                    <input
-                        ref={selectAllRef}
-                        className="custom-checkbox"
-                        type="checkbox"
-                        checked={allSelected}
-                        onChange={handleSelectAll}
-                    />
-                </div>
-                {/* --- REFRESH --- */}
-                <button
-                    className="btn btn-outline-secondary me-2"
+        // The d-flex container is what we want to directly style.
+        // We removed the outer col-md-9 mb-3 because it was the wrong level of abstraction here.
+        <div className="d-flex align-items-center mb-2 mail-toolbar-alignment"> {/* Add a new class for styling */}
+            {/* SELECT ALL */}
+            <div className="col-auto" style={{marginRight: '12px'}}>
+                <input
+                    ref={selectAllRef}
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={handleSelectAll}
+                />
+            </div>
+            {/* --- REFRESH --- */}
+            <button className="btn btn-info btn-sm me-2"
                     onClick={handleRefresh}
                     title="Refresh"
-                >
-                    <i className="bi bi-arrow-clockwise"></i>
-                </button>
-                {/* --- DELETE --- */}
-                <button
-                    className="btn btn-outline-danger me-2"
-                    onClick={handleDelete}
-                    disabled={!anySelected}
-                    title="Delete"
-                >
-                    <i className="bi bi-trash"></i>
-                </button>
-                {/* MARK READ */}
-                <button
-                    className="btn btn-outline-primary me-2"
-                    onClick={handleMarkAsRead}
-                    disabled={!anySelected}
-                    title="Mark as Read"
-                >
-                    <i className="bi bi-envelope-open"></i>
-                </button>
-                {/* REPORT SPAM */}
-                <button
-                    className="btn btn-outline-warning"
-                    onClick={handleMarkSpam}
-                    disabled={!anySelected}
-                    title="Report Spam"
-                >
-                    <i className="bi bi-exclamation-octagon"></i>
-                </button>
-
-            </div>
+            >
+                <i className="bi bi-arrow-clockwise"></i>
+            </button>
+            {/* MARK READ */}
+            <button
+                className="btn btn-success btn-sm me-2"
+                onClick={handleMarkAsRead}
+                disabled={!anySelected}
+                title="Mark as Read"
+            >
+                <i className="bi bi-envelope-open"></i>
+            </button>
+            {/* --- DELETE --- */}
+            <button
+                className="btn btn-danger btn-sm me-2"
+                onClick={handleDelete}
+                disabled={!anySelected}
+                title="Delete"
+            >
+                <i className="bi bi-trash"></i>
+            </button>
+            {/* REPORT SPAM */}
+            <button
+                className="btn btn-warning btn-sm"
+                onClick={handleMarkSpam}
+                disabled={!anySelected}
+                title="Report Spam"
+            >
+                <i className="bi bi-exclamation-octagon"></i>
+            </button>
         </div>
     )
 }

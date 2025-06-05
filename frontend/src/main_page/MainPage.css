@@ -1,9 +1,45 @@
-/* FOR THE TOP MENU PLACEHOLDER */
-.custom-navbar {
+@import "../theme.css";
+
+/* ──── FOR THE TOP MENU PLACEHOLDER ───────────────────────────────── */
+.light-custom-navbar {
+    /* Stronger drop shadow for Material feel: */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
     border-radius: 0;
     align-content: center;
     padding: 20px;
-    background-color: #f1f1f1;
+    background-color: var(--light-bg-mails);
+}
+.dark-custom-navbar {
+    /* Stronger drop shadow for Material feel: */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-radius: 0;
+    align-content: center;
+    padding: 20px;
+    color: white;
+    background-color: #13315C;
+}
+/* Set gray background color and 100% height */
+.light-custom-sidenav {
+    /* Stronger drop shadow for Material feel: */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+    padding-top: 20px;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    align-content: center;
+    background-color: var(--light-bg-mails);
+}
+/* Set gray background color and 100% height */
+.dark-custom-sidenav {
+    /* Stronger drop shadow for Material feel: */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+    padding-top: 20px;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    align-content: center;
+    color: white;
+    background-color: #13315C;
 }
 
 /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
@@ -11,34 +47,57 @@
     height: 450px
 }
 
-/* Set gray background color and 100% height */
-.custom-side-col .custom-sidenav {
-    padding-top: 20px;
-    margin: 0;
-    width: 100%;
+
+
+/* ─── LIGHT THEME ───────────────────────────────── */
+.light-main-page {
+    background-color: var(--light-bg-page);
     height: 100%;
-    align-content: center;
-    background-color: #f1f1f1;
+    margin: 0;
+    padding: 1px;
 }
 
-/* ─── MAIL CONTAINER (glass effect) ───────────────────────────────── */
-.mail-container {
+/* MAIL CONTAINER (glass effect) */
+.light-mail-container {
     /* Override default card radius to be slightly larger: */
     border-radius: 0.75rem; /* 12px */
-
     /* Stronger drop shadow for Material feel: */
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12),
     0 1px 4px rgba(0, 0, 0, 0.08);
-
     /* Ensure the card’s background is pure white: */
-    background-color: #ffffff;
+    background-color: var(--light-bg-mails);
 
-    /* If your parent container is light gray, you can add a thin border:
-       border: 1px solid rgba(0, 0, 0, 0.05);
-    */
+    padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 24px;
+    padding-right: 24px;
 }
 
-.mail-container {
+/* ─── DARK THEME ───────────────────────────────── */
+
+.dark-main-page {
+    background-color: var(--dark-bg-page);
+    height: 100%;
+    margin: 0;
+    padding: 1px;
+}
+
+.dark-main-layout {
+    background-color: var(--dark-bg-unread-mail-row);
+    padding: 2px;
+    border-radius: 0.75rem; /* 12px */
+}
+
+/* MAIL CONTAINER (glass effect) */
+.dark-mail-container {
+    /* Override default card radius to be slightly larger: */
+    border-radius: 0.75rem; /* 12px */
+    /* Stronger drop shadow for Material feel: */
+    box-shadow: 0 4px 12px #252525,
+    0 1px 2px #555555;
+    /* Ensure the card’s background is pure white: */
+    background-color: var(--dark-bg-mails);
+
     padding-top: 16px;
     padding-bottom: 16px;
     padding-left: 24px;
@@ -46,15 +105,9 @@
 }
 
 
-
-
-
+/*  ─── SHARED ─────────────────────────────────  */
 /* On small screens, set height to 'auto' for sidenav and grid */
 @media screen and (max-width: 767px) {
-    .sidenav {
-        height: auto;
-        padding: 15px;
-    }
 
     .row.content {
         height: auto;

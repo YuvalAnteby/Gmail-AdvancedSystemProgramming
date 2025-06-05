@@ -3,6 +3,7 @@ import "./MailRow.css"
 
 /**
  * props:
+ *   - theme: {String} dark or light according to user prefrence
  *   - id: {Number} unique identifier for an email
  *   - sender: {String} name of the sender
  *   - subject: {string}
@@ -12,17 +13,17 @@ import "./MailRow.css"
  *   - isSelected: {boolean} (whether this row is currently checked)
  *   - onSelect: function when marking a mail as selected for mass actions on them
  */
-const MailRow = ({id, sender, subject, body, date, isRead, isSelected, onSelect}) => {
+const MailRow = ({theme, id, sender, subject, body, date, isRead, isSelected, onSelect}) => {
 
     const handleMailOpen = () => {
         console.log(">> Open Mail Row:", {id, sender, subject, body, date});
         /// TODO open the mail to read
     }
 
-    const rowClass = isRead ? "mail-row read" : "mail-row unread";
+    const rowClass = isRead ? "read" : "unread";
 
     return (
-        <div className={`row align-items-center ${rowClass} py-2`}
+        <div className={`row align-items-center ${theme}-mail-row ${rowClass} py-2`}
              onClick={handleMailOpen}>
             <div className="col-auto">
                 <input
@@ -35,14 +36,14 @@ const MailRow = ({id, sender, subject, body, date, isRead, isSelected, onSelect}
             </div>
 
             <div className="col">
-                <strong>{sender}</strong>
+                <strong style={{color: `var(--${theme}-text-color)`}}>{sender}</strong>
             </div>
 
-            <div className="col">{subject}</div>
+            <div className="col" style={{color: `var(--${theme}-text-color)`}}>{subject}</div>
 
-            <div className="col">{body}</div>
+            <div className="col" style={{color: `var(--${theme}-text-color)`}}>{body}</div>
 
-            <div className="col text-end">{date}</div>
+            <div className="col text-end" style={{color: `var(--${theme}-text-color)`}}>{date}</div>
         </div>
     );
 }

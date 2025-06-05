@@ -5,14 +5,15 @@ import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
 import {useMailToolbarHandlers} from "./toolbar/useMailToolbarHandlers";
 
+
 /// TODO replace the placeholders with the real menus and real data
 // Placeholder for top menu
-const TopMenuPlaceholder = () => (
-    <div className="custom-navbar">Top menu</div>
+const TopMenuPlaceholder = ({theme}) => (
+    <div className={`${theme}-custom-navbar`}>Top menu</div>
 );
 // Placeholder for side menu
-const SideMenuPlaceholder = () => (
-    <div className="custom-sidenav">Side menu</div>
+const SideMenuPlaceholder = ({theme}) => (
+    <div className={`${theme}-custom-sidenav`}>Side menu</div>
 );
 
 const DUMMY_EMAILS = [
@@ -30,7 +31,7 @@ const DUMMY_EMAILS = [
         subject: "Meeting reminder",
         snippet: "Don’t forget the team meeting at 9AM tomorrow.",
         date: "2025/06/03",
-        is_read: false
+        is_read: true
     },
     {
         id: 3,
@@ -38,11 +39,19 @@ const DUMMY_EMAILS = [
         subject: "Your daily digest",
         snippet: "Top tech news today: React 21.0 is out...",
         date: "2025/06/02",
-        is_read: true
+        is_read: false
     },
+    {
+        id: 4,
+        sender: "bob@work.org",
+        subject: "blublublu",
+        snippet: "Don’t forget....",
+        date: "2025/06/03",
+        is_read: true
+    }
 ];
 
-const MainPage = () => {
+const MainPage = ({theme}) => {
     const allEmailIds = DUMMY_EMAILS.map((mail) => mail.id);
 
 
@@ -61,23 +70,19 @@ const MainPage = () => {
         });
     };
 
+
     return (
-        <div className="container-fluid p-3">
-            {/* ---- TOP MENU ---- */}
-            <div className="row mb-3">
-                <div className="col-12">
-                    <TopMenuPlaceholder/>
-                </div>
-            </div>
+        <div className={`container-fluid p-3 ${theme}-main-page`}>
+            {/* ---- TODO TOP MENU ---- */}
+            <div className="row mb-3"><div className="col-12"><TopMenuPlaceholder theme={theme}/></div></div>
             {/* ---- MAIN LAYOUT ---- */}
             <div className="row">
-                {/* ---- SIDE MENU ---- */}
-                <div className="col-md-3 mb-3 custom-side-col">
-                    <SideMenuPlaceholder/>
-                </div>
+                {/* ---- TODO SIDE MENU ---- */}
+                <div className="col-md-3 mb-3 custom-side-col"><SideMenuPlaceholder theme={theme}/></div>
                 {/* ---- MAIL LIST CONTAINER ---- */}
                 <div className="col-md-9 mb-3">
-                    <div className="mail-container">
+                    <div className={`${theme}-mail-container`}
+                         style={{backgroundColor: `var(--${theme}-bg-unread-mail-row)`}}>
                         {/* ---- TOOLBAR ---- */}
                         <ToolBar
                             allSelected={allSelected}
@@ -88,10 +93,10 @@ const MainPage = () => {
                             handleMarkAsRead={handlers.handleMarkAsRead}
                             handleMarkSpam={handlers.handleMarkSpam}
                         />
-
                         {/* ---- ACTUAL MAIL ROWS ---- */}
                         {DUMMY_EMAILS.map((email) => (
                             <MailRow
+                                theme={theme}
                                 key={email.id}
                                 id={email.id}
                                 sender={email.sender}
