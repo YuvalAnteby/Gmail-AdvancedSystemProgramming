@@ -1,5 +1,7 @@
 const Mails = require('../models/mails');
 const Blacklist = require('../models/blacklist');
+const {replaceToUsers} = require("../utils/mails");
+
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
  * @param req request
@@ -15,9 +17,12 @@ const getLastMailsOrdered = (req, res) => {
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
     const inboxType = req.body?.inboxType;
     // limit is 50 according to instructions
-    const mails = Mails.getUserMails(userId, 50, inboxType || undefined);
+    const rawMails = Mails.getUserMails(userId, 50, inboxType || undefined);
+    // replace in the mails the user ids with user elements so we can show names and emails
+    const fullMails = replaceToUsers(rawMails);
+
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
-    return res.status(200).json(mails);
+    return res.status(200).json(fullMails);
 }
 
 /**
@@ -73,7 +78,7 @@ const createNewMail = async (req, res) => {
     if (blacklisted)
         return res.status(400).json({error: 'Mail contains blacklisted URLs - failed creating a new mail'});
     // No blacklisted URLs found, create the new mail
-    const newMail = Mails.createNewMail(subject, body, from, sentTo, sentAt , labels);
+    const newMail = Mails.createNewMail(subject, body, from, sentTo, sentAt, labels);
     if (!newMail)
         return res.status(400).json({error: 'Failed to create new mail'});
     return res.status(201).json(newMail);

@@ -36,7 +36,7 @@ const MailRow = ({theme, id, sender, subject, body, date, isRead, isSelected, on
             </div>
 
             <div className="col">
-                <strong style={{color: `var(--${theme}-text-color)`}}>{sender}</strong>
+                <strong style={{color: `var(--${theme}-text-color)`}}>{sender.mail}</strong>
             </div>
 
             <div className="col" style={{color: `var(--${theme}-text-color)`}}>{subject}</div>

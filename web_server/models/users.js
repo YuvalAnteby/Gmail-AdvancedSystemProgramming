@@ -2,15 +2,40 @@
 /**
  * User object structure:
  *  id - positive number
- *  full name - string
- *  mail address - string
+ *  fullName - string
+ *  mail - string
  *  password
  *  date of birth - string in format of YYYY/MM/DD
  *  image - placeholder string
  *
  */
-const users = []
-let countId = 0;
+const users = [
+    {
+        id: 1,
+        fullName: "Yuval Anteby",
+        mail: "yuval@gmail.com",
+        password: "asd123",
+        dateOfBirth: "2025-06-02",
+        image: "",
+    },
+    {
+        id: 2,
+        fullName: "Dor Darmon",
+        mail: "dor@gmail.com",
+        password: "asd",
+        dateOfBirth: "2025-06-02",
+        image: "",
+    },
+    {
+        id: 3,
+        fullName: "Roee Chaim",
+        mail: "roee@gmail.com",
+        password: "123",
+        dateOfBirth: "2025-06-02",
+        image: "",
+    }
+]
+let countId = users ? users.length : 0;
 
 /**
  *

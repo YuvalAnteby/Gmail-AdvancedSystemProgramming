@@ -1,3 +1,6 @@
+const Users = require('../models/users');
+const {getUserById} = require("../models/users");
+
 const inboxFilters = {
     // Fetch all mails belonging to the user
     all: {
@@ -37,4 +40,37 @@ const inboxFilters = {
     /// TODO get by labels
 };
 
-module.exports = {inboxFilters};
+const replaceToUsers = (rawMails) => {
+    const fullMails = rawMails.map(mail => {
+        // replace the 'from' attribute
+        const sender = Users.getUserById(mail.from);
+        const fromObj = sender
+            ? {id: sender.id, fullName: sender.fullName, mail: sender.mail }
+            : {id: mail.from, fullName: "Unknown", mail: "" };
+        // replace the 'sentTo' attributes
+        const recipients = (mail.sentTo || []).map(rid => {
+            const ru = getUserById(rid);
+            return ru
+                ? {id: ru.id, fullName: ru.fullName, mail: ru.mail}
+                : {id: rid, fullName: "Unknown", mail: ""};
+        })
+
+        return {
+            id: mail.id,
+            owner: mail.owner,
+            from: fromObj,
+            sentTo: recipients,
+            subject: mail.subject,
+            body: mail.body,
+            createdAt: mail.createdAt,
+            sentAt: mail.sentAt || "",
+            labels: mail.labels || [],
+            isRead: mail.isRead,
+            isStarred: mail.isStarred,
+            isTrashed: mail.isTrashed,
+        }
+    })
+    return fullMails;
+}
+
+module.exports = {inboxFilters, replaceToUsers};
