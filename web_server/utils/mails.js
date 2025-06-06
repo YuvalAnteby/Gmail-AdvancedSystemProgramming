@@ -40,13 +40,18 @@ const inboxFilters = {
     /// TODO get by labels
 };
 
+/**
+ * Replaces users ids in a mail with safe user objects (including only id, name, mail)
+ * @param rawMails mails with ids instead of user objects
+ * @returns {*} mails with user objects instead of user ids in 'from' and 'sentTo'
+ */
 const replaceToUsers = (rawMails) => {
-    const fullMails = rawMails.map(mail => {
+    return rawMails.map(mail => {
         // replace the 'from' attribute
         const sender = Users.getUserById(mail.from);
         const fromObj = sender
-            ? {id: sender.id, fullName: sender.fullName, mail: sender.mail }
-            : {id: mail.from, fullName: "Unknown", mail: "" };
+            ? {id: sender.id, fullName: sender.fullName, mail: sender.mail}
+            : {id: mail.from, fullName: "Unknown", mail: ""};
         // replace the 'sentTo' attributes
         const recipients = (mail.sentTo || []).map(rid => {
             const ru = getUserById(rid);
@@ -69,8 +74,7 @@ const replaceToUsers = (rawMails) => {
             isStarred: mail.isStarred,
             isTrashed: mail.isTrashed,
         }
-    })
-    return fullMails;
+    });
 }
 
 module.exports = {inboxFilters, replaceToUsers};
