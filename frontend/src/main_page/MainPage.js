@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './MainPage.css'
 import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
-import {useMailToolbarHandlers} from "./toolbar/useMailToolbarHandlers";
-import {getMails} from "../api/mailApi";
+import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
+import {useMails} from "./hooks/useMails";
+
+const DEFAULT_USER_ID = 1; /// TODO replace with JWT
 
 
 /// TODO replace the placeholders with the real menus and real data
@@ -18,32 +20,19 @@ const SideMenuPlaceholder = ({theme}) => (
 );
 
 const MainPage = ({theme}) => {
-    const userId = 1; /// TODO replace with JWT
-    const [emails, setEmails] = useState([]);
-    const allEmailIds = emails.map((mail) => mail.id);
+    const userId = DEFAULT_USER_ID;
 
-    // Function that fetches mails from the server & puts them into state
-    const refreshMails = async () => {
-        try {
-            const data = await getMails(userId);
-            // assuming data is an array like [{ id, sender, subject, snippet, date, read, ... }, …]
-            setEmails(data);
-        } catch (err) {
-            console.error("Failed to fetch mails:", err);
-            // You could set an error state here to show a notification
-        }
-    };
+    const [inboxType, setInboxType] = useState('all');
+    const {emails, loading, error, refreshMails } = useMails(userId, inboxType);
 
-    // (B) On mount, fetch inbox once
-    useEffect(() => {
-        refreshMails();
-    }, []);
-
+    // selected mail ids logic
     const [selectedIds, setSelectedIds] = useState(new Set());
+    const allEmailIds = emails.map((mail) => mail.id);
     const allSelected = selectedIds.size === emails.length;
     const anySelected = selectedIds.size > 0;
 
-    const handlers = useMailToolbarHandlers(selectedIds, setSelectedIds, allEmailIds);
+    const handlers =
+        useMailToolbarHandlers(selectedIds, setSelectedIds, allEmailIds, refreshMails);
 
     const handleSelect = (id, isChecked) => {
         setSelectedIds((prev) => {

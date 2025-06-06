@@ -15,7 +15,7 @@ const getLastMailsOrdered = (req, res) => {
     const userId = req.headers['user-id'];
     if (!userId)
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
-    const inboxType = req.body?.inboxType;
+    const inboxType = req.query.inboxType;
     // limit is 50 according to instructions
     const rawMails = Mails.getUserMails(userId, 50, inboxType || undefined);
     // replace in the mails the user ids with user elements so we can show names and emails

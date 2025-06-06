@@ -204,7 +204,7 @@ const deleteMail = (userId, mailId) => {
     if (index === -1)
         return 404
     // make sure the user has access to the mail
-    if (mails[index].from !== userId && !mails[index].sentTo.includes(userId))
+    if (mails[index].owner != userId)
         return 400;
     // remove the mail
     mails.splice(index, 1);

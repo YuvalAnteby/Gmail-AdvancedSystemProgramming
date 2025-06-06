@@ -1,6 +1,21 @@
 import {useCallback} from "react";
 
-export const useMailToolbarHandlers = (selectedIds, setSelectedIds, allEmailIds) => {
+
+/**
+ * @param {Set<number>} selectedIds
+ * @param {function} setSelectedIds
+ * @param {number[]} allEmailIds
+ * @param {function} refreshMails     // ← new parameter
+ *
+ * @returns {{
+ *   handleSelectAll: function,
+ *   handleRefresh: function,
+ *   handleDelete: function,
+ *   handleMarkAsRead: function,
+ *   handleMarkSpam: function
+ * }}
+ */
+export const useMailToolbarHandlers = (selectedIds, setSelectedIds, allEmailIds, refreshMails) => {
 
     // Handle selection of all mails (or canceling) using the checkbox
     const handleSelectAll = useCallback((e) => {
@@ -14,8 +29,10 @@ export const useMailToolbarHandlers = (selectedIds, setSelectedIds, allEmailIds)
     // Refresh current inbox
     const handleRefresh = useCallback(() => {
         console.log(">> Refresh clicked");
-        // TODO: re‐fetch from server, etc.
-    }, []);
+        setSelectedIds(new Set());    // clear selection
+        if (typeof refreshMails === 'function')
+            refreshMails();
+    }, [refreshMails, setSelectedIds]);
 
     // Delete selected mails
     const handleDelete = useCallback(() => {
