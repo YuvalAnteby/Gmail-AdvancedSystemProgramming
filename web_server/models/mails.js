@@ -1,30 +1,45 @@
-/**
- * mail object structure:
- *  id - positive number now
- *  subject - string
- *  body - string
- *  from - user id (e.g. positive int)
- *  sentTo - list of user ids (e.g. positive ints)
- *  sentAt - timestamp of when message was sent
- *  labels - list of labels set for the mail per user id
- *  readBy - list of user ids of who read it
- *  deletedBy - list of user ids of who deleted it
- */
-const mails = [];
-let mailId = 0;
+const {inboxFilters} = require("../utils/mails");
 
 /**
- * Gets the last X mails sent and received by a user
+ * When sending an email we will create an element for each user that receives it and the sender.
+ * Deleting/ editing will edit only the specific user's element
+ * mail object structure:
+ * id - positive number now
+ * owner - user id of the owner of this specific mail element, there will be identical elements for each receiver
+ * and sender, this way we can ensure changed before editing or deleting.
+ * from - user id (e.g. positive int)
+ * sentTo - list of user ids (e.g. positive ints)
+ * subject - string
+ * body - string
+ * createdAt - timestamp of when draft message created
+ * sentAt - timestamp of when message was sent
+ * labels - list of labels set for the mail per user id
+ * isRead - boolean if user read the mail
+ * isStarred - boolean if the user put it as starred
+ * isTrashed - boolean if the user moved the mail to trash, deleting from trash will fully delete the mail
+ */
+const mails = [];
+let mailId = mails ? mails.length : 0;
+
+/**
+ * Gets the last X mails belonging to a user according to different types of inboxes.
  * @param userId user id we want to search for
  * @param limit max amount of mails to receive
+ * @param inboxType type of inbox to get. e.g. starred or drafts
  * @returns {any[]} list of ordered mails objects from the most recent to less recent
  */
-const getUserMails = (userId, limit) => {
-    // filter by user id, then sort by last mails sent/received
-    return mails.filter(mail => (mail.sentTo && mail.sentTo.includes(userId)) || (mail.from && mail.from === userId))
-        .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt))
+const getUserMails = (userId, limit, inboxType) => {
+    // Default to 'all' if inboxType is invalid or missing
+    const lowerCasedKey = (typeof inboxType === 'string' && inboxType.toLowerCase()) || 'all';
+    const key = inboxFilters.hasOwnProperty(lowerCasedKey) ? lowerCasedKey : 'all';
+    const {predicate, sortKey} = inboxFilters[key];
+    // Fetch the mails with the chosen predicate and sort key
+    return mails
+        .filter((mail) => predicate(mail, userId))
+        .sort((a, b) => sortKey(b) - sortKey(a))
         .slice(0, limit);
 }
+
 
 /**
  * Creates a new mail and add it to the total inbox
