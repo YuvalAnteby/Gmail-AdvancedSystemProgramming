@@ -13,8 +13,9 @@ const getLastMailsOrdered = (req, res) => {
     const userId = req.headers['user-id'];
     if (!userId)
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
+    const inboxType = req.body?.inboxType;
     // limit is 50 according to instructions
-    const mails = Mails.getUserMails(userId, 50);
+    const mails = Mails.getUserMails(userId, 50, inboxType || undefined);
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
     return res.status(200).json(mails);
 }
