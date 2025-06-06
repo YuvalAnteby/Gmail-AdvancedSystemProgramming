@@ -81,4 +81,15 @@ const replaceToUsers = (rawMails) => {
     });
 }
 
-module.exports = {inboxFilters, replaceToUsers};
+/**
+ * Finds and returns URLs from a given string
+ * @param text string to check
+ * @returns {*|*[]} array of URLs according to regex
+ */
+function extractUrls(text) {
+    if (!text) return [];
+    const urlRegex = /(http?:\/\/[^\s]+|www\.[^\s]+)/g;
+    return text.match(urlRegex) || [];
+}
+
+module.exports = {inboxFilters, replaceToUsers, extractUrls};

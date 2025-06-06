@@ -1,6 +1,6 @@
 const Mails = require('../models/mails');
 const Blacklist = require('../models/blacklist');
-const {replaceToUsers} = require("../utils/mails");
+const {replaceToUsers, extractUrls} = require("../utils/mails");
 
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
@@ -84,16 +84,7 @@ const createNewMail = async (req, res) => {
     return res.status(201).json(newMail);
 }
 
-/**
- * Finds and returns URLs from a given string
- * @param text string to check
- * @returns {*|*[]} array of URLs according to regex
- */
-function extractUrls(text) {
-    if (!text) return [];
-    const urlRegex = /(http?:\/\/[^\s]+|www\.[^\s]+)/g;
-    return text.match(urlRegex) || [];
-}
+
 
 /**
  * Finds and edits the mail with a given id.
