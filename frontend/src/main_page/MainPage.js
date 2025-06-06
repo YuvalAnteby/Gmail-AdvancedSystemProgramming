@@ -31,8 +31,13 @@ const MainPage = ({theme}) => {
     const allSelected = selectedIds.size === emails.length;
     const anySelected = selectedIds.size > 0;
 
-    const handlers =
-        useMailToolbarHandlers(selectedIds, setSelectedIds, allEmailIds, refreshMails);
+    const handlers = useMailToolbarHandlers(
+        userId,
+        selectedIds,
+        setSelectedIds,
+        allEmailIds,
+        refreshMails
+    );
 
     const handleSelect = (id, isChecked) => {
         setSelectedIds((prev) => {
@@ -76,7 +81,7 @@ const MainPage = ({theme}) => {
                                 subject={email.subject}
                                 body={email.body}
                                 date={email.sentAt || email.createdAt}
-                                isRead={email.is_read}
+                                isRead={email.isRead}
                                 isSelected={selectedIds.has(email.id)}
                                 onSelect={handleSelect}
                             />

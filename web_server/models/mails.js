@@ -29,6 +29,7 @@ const mails = [
         createdAt: "2025/06/03",
         sentAt: "2025/06/04",
         labels: [],
+        isDraft: false,
         isRead: true,
         isStarred: false,
         isTrashed: false,
@@ -43,6 +44,7 @@ const mails = [
         createdAt: "2025/06/03",
         sentAt: "2025/06/04",
         labels: [],
+        isDraft: false,
         isRead: false,
         isStarred: false,
         isTrashed: false,
@@ -57,6 +59,7 @@ const mails = [
         createdAt: "2025/06/03",
         sentAt: "2025/06/03",
         labels: [],
+        isDraft: false,
         isRead: true,
         isStarred: false,
         isTrashed: false,
@@ -71,12 +74,13 @@ const mails = [
         createdAt: "2025/06/03",
         sentAt: "2025/06/03",
         labels: [],
+        isDraft: false,
         isRead: false,
         isStarred: true,
         isTrashed: false,
     },
     {
-        id: 3,
+        id: 5,
         owner: 1,
         from: 1,
         sentTo: [2],
@@ -85,6 +89,7 @@ const mails = [
         createdAt: "2025/06/02",
         sentAt: "",
         labels: [],
+        isDraft: true,
         is_read: false,
         isStarred: false,
         isTrashed: false,
@@ -206,8 +211,13 @@ const deleteMail = (userId, mailId) => {
     // make sure the user has access to the mail
     if (mails[index].owner != userId)
         return 400;
-    // remove the mail
-    mails.splice(index, 1);
+    // if the mail is a draft no need to send to trash bin, if it's already in the trash - remove it
+    if (mails[index].isDraft || mails[index].isTrashed) {
+        mails.splice(index, 1);
+    } else if (!mails[index].isTrashed) {
+        mails[index].isTrashed = true;
+    }
+    // return matching code either way
     return 204;
 }
 

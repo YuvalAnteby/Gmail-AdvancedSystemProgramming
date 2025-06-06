@@ -1,11 +1,13 @@
 import {useCallback} from "react";
+import {deleteMail} from "../../api/mailApi";
 
 
 /**
+ * @param {number} userId id of the current user
  * @param {Set<number>} selectedIds
  * @param {function} setSelectedIds
  * @param {number[]} allEmailIds
- * @param {function} refreshMails     // ← new parameter
+ * @param {function} refreshMails
  *
  * @returns {{
  *   handleSelectAll: function,
@@ -15,7 +17,7 @@ import {useCallback} from "react";
  *   handleMarkSpam: function
  * }}
  */
-export const useMailToolbarHandlers = (selectedIds, setSelectedIds, allEmailIds, refreshMails) => {
+export const useMailToolbarHandlers = (userId, selectedIds, setSelectedIds, allEmailIds, refreshMails) => {
 
     // Handle selection of all mails (or canceling) using the checkbox
     const handleSelectAll = useCallback((e) => {
@@ -28,18 +30,26 @@ export const useMailToolbarHandlers = (selectedIds, setSelectedIds, allEmailIds,
 
     // Refresh current inbox
     const handleRefresh = useCallback(() => {
-        console.log(">> Refresh clicked");
-        setSelectedIds(new Set());    // clear selection
+        setSelectedIds(new Set());
         if (typeof refreshMails === 'function')
             refreshMails();
     }, [refreshMails, setSelectedIds]);
 
     // Delete selected mails
-    const handleDelete = useCallback(() => {
+    const handleDelete = useCallback(async () => {
+        // nothing to delete
+        if (selectedIds.size === 0)
+            return;
         console.log(">> Deleting:", Array.from(selectedIds));
-        // TODO: call API to delete or mark as deleted
-        setSelectedIds(new Set()); // un‐select everything after “deletion”
-    }, [selectedIds, setSelectedIds]);
+        try {
+            await Promise.all(Array.from(selectedIds).map((mid) => deleteMail(userId, mid)));
+            setSelectedIds(new Set());
+            refreshMails();
+        } catch (error) {
+            console.error("Error deleting mails:", error);
+        }
+
+    }, [userId, selectedIds, setSelectedIds, refreshMails]);
 
     // Mark selected mails as read
     const handleMarkAsRead = useCallback(() => {
@@ -54,6 +64,9 @@ export const useMailToolbarHandlers = (selectedIds, setSelectedIds, allEmailIds,
         // TODO: call API to mark with blacklist
         setSelectedIds(new Set());
     }, [selectedIds, setSelectedIds]);
+
+
+    // TODO add a return trashed mail to be regular
 
     return {
         handleSelectAll,

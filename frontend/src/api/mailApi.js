@@ -13,12 +13,10 @@ const API_BASE = "http://localhost:3001/api";
 export async function getMailsByType(userId, inboxType = "all") {
     // change the URL to include the optional query param
     let url = `${API_BASE}/mails`;
-    if (inboxType) {
-        // encode just in case; but these are simple words
+    // encode just in case but these are simple words
+    if (inboxType)
         url += `?inboxType=${encodeURIComponent(inboxType)}`;
-    }
-
-    // 2. Perform GET with user-id header
+    // Perform GET with user-id header
     const res = await fetch(url, {
         method: 'GET',
         headers: {
@@ -26,10 +24,22 @@ export async function getMailsByType(userId, inboxType = "all") {
             'Content-Type': 'application/json',
         },
     });
-
-    if (!res.ok) {
+    if (!res.ok)
         throw new Error(`getMails failed: ${res.status}`);
-    }
+    return await res.json();
+}
 
-    return await res.json(); // → array of mail objects
+
+export async function deleteMail(userId, mailId) {
+    const url = `${API_BASE}/mails/${mailId}`;
+    const res = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'user-id': userId,
+            'Content-Type': 'application/json',
+        }
+    })
+    if (!res.ok)
+        throw new Error(`getMails failed: ${res.status}`);
+    console.log(`deletion: ${res.status}`);
 }
