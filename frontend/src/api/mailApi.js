@@ -2,7 +2,7 @@
 const API_BASE = "http://localhost:3001/api";
 
 /**
- * POST /api/mails
+ * GET /api/mails
  * Body: { inboxType: string (e.g. "all", "incoming", "sent", "draft", "star", "trash") }
  * Must include the 'user-id' header for auth.
  *
@@ -29,7 +29,12 @@ export async function getMailsByType(userId, inboxType = "all") {
     return await res.json();
 }
 
-
+/**
+ * DELETE api/mails/:id
+ * @param {number|string} userId
+ * @param {number|string} mailId
+ * @returns {Promise<void>}
+ */
 export async function deleteMail(userId, mailId) {
     const url = `${API_BASE}/mails/${mailId}`;
     const res = await fetch(url, {
@@ -42,4 +47,22 @@ export async function deleteMail(userId, mailId) {
     if (!res.ok)
         throw new Error(`getMails failed: ${res.status}`);
     console.log(`deletion: ${res.status}`);
+}
+
+
+export async function reportSpam(userId, mailId) {
+    const url = `${API_BASE}/blacklist`;
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'user-id': userId,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            mailId: mailId
+        })
+    })
+    if (!res.ok)
+        throw new Error(`getMails failed: ${res.status}`);
+    console.log(`marking spam: ${res.status}`);
 }

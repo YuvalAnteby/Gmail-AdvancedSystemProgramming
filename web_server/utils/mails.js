@@ -41,6 +41,12 @@ const inboxFilters = {
             mail.owner == userId && mail.isTrashed === true,
         sortKey: (mail) => new Date(mail.sentAt || mail.createdAt).getTime(),
     },
+    // Fetch mails in the marked as spam
+    spam: {
+        predicate: (mail, userId) =>
+            mail.owner == userId && mail.isSpam === true,
+        sortKey: (mail) => new Date(mail.sentAt).getTime(),
+    }
     /// TODO get by labels
 };
 

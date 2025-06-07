@@ -1,5 +1,5 @@
 import {useCallback} from "react";
-import {deleteMail} from "../../api/mailApi";
+import {deleteMail, reportSpam} from "../../api/mailApi";
 
 
 /**
@@ -59,9 +59,18 @@ export const useMailToolbarHandlers = (userId, selectedIds, setSelectedIds, allE
     }, [selectedIds, setSelectedIds]);
 
     // Mark selected mails as spam (using the blacklist)
-    const handleMarkSpam = useCallback(() => {
+    const handleMarkSpam = useCallback(async () => {
+        // nothing to delete
+        if (selectedIds.size === 0)
+            return;
         console.log(">> Marking Spam:", Array.from(selectedIds));
-        // TODO: call API to mark with blacklist
+        try {
+            await Promise.all(Array.from(selectedIds).map((mid) => reportSpam(userId, mid)));
+            setSelectedIds(new Set());
+            refreshMails();
+        } catch (error) {
+            console.error("Error marking spam:", error);
+        }
         setSelectedIds(new Set());
     }, [selectedIds, setSelectedIds]);
 

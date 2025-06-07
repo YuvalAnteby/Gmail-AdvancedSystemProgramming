@@ -17,6 +17,7 @@ const {inboxFilters} = require("../utils/mails");
  * isRead - boolean if user read the mail
  * isStarred - boolean if the user put it as starred
  * isTrashed - boolean if the user moved the mail to trash, deleting from trash will fully delete the mail
+ * isSpam - boolean if the user marked the mail as a spam.
  */
 const mails = [
     {
@@ -33,6 +34,7 @@ const mails = [
         isRead: true,
         isStarred: false,
         isTrashed: false,
+        isSpam: false,
     },
     {
         id: 2,
@@ -48,6 +50,7 @@ const mails = [
         isRead: false,
         isStarred: false,
         isTrashed: false,
+        isSpam: false,
     },
     {
         id: 3,
@@ -63,6 +66,7 @@ const mails = [
         isRead: true,
         isStarred: false,
         isTrashed: false,
+        isSpam: false,
     },
     {
         id: 4,
@@ -78,6 +82,7 @@ const mails = [
         isRead: false,
         isStarred: true,
         isTrashed: false,
+        isSpam: true,
     },
     {
         id: 5,
@@ -93,6 +98,7 @@ const mails = [
         is_read: false,
         isStarred: false,
         isTrashed: false,
+        isSpam: false,
     },
 ];
 let mailId = mails ? mails.length : 0;

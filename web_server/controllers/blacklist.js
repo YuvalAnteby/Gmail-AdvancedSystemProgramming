@@ -1,4 +1,5 @@
 const Blacklist = require('../models/blacklist');
+const Mails = require('../models/mails');
 const {extractUrls} = require("../utils/mails");
 
 /**
@@ -6,99 +7,59 @@ const {extractUrls} = require("../utils/mails");
  * Validates the provided URL, normalizes it by removing trailing slashes,
  * and attempts to insert it into the blacklist. If the URL is already blacklisted,
  * no content is returned. On success, sets the Location header to the new resource.
- * @param req HTTP request, expects JSON body with `url` field
+ * @param req HTTP request, expects JSON body with `url` field, if inserting a mail - mailId
  * @param res HTTP response
- * @returns 201 Created with Location header if newly added;
- * 204 No Content if URL was already in blacklist;
+ * @returns 201 Created if newly added;
+ * 204 No Content if no URL are given in mail
  * 400 Bad Request if URL is missing or invalid;
  * 502 on server error
  */
 exports.addToBlacklist = async (req, res) => {
     const rawUrl = req.body.url;
-    const {subject, body} = req.body;
-    if (rawUrl) {
-        // if we received only a URL - we should just add it
-        const {code, message} = await addUrlToBlacklist(rawUrl);
-        res.status(code);
-        if (message)
-            res.json({error: message});
-        res.end();
-
-    } else if (subject && body) {
-        // if we received a mail we should extract and report URLs in it as blacklisted
-        const {code, message} = await addMailToBlacklist(subject, body);
-        res.status(code);
-        if (message)
-            res.json({error: message});
-        res.end();
-    } else { // this one is just invalid input
+    const mailId = req.body.mailId;
+    // check for valid input
+    if (!rawUrl && !mailId)
         return res.status(400).json({error: 'URL or mail is required'})
+    // find the mail and fetch it's subject and body
+    const {subject, body} = Mails.getMail(Number(mailId));
+
+    try {
+        // gotten a single URL - add it and finish
+        if (rawUrl) {
+            // Remove trailing slashes
+            const validated = String(rawUrl).toString().replace(/\/+$/, '');
+            const created = await Blacklist.addToBlacklist(String(validated));
+            if (created) {
+                res.status(201).end();
+            } else {
+                res.status(400).end();
+            }
+        }
+        // we haven't gotten a single URL, meaning we got a mail - check it's content and add URLs to blacklist
+        const urls = [
+            ...extractUrls(subject),
+            ...extractUrls(body)
+        ]
+            .map(extractUrls)
+            .filter((u) => u !== null);
+        // Check if the mail got any URLs
+        if (urls.length === 0)
+            return res.status(204).json({ error: 'No valid URLs found in mail' });
+        // found URLs - add to blacklist
+        const added = await Blacklist.addToBlacklist(urls);
+        if (added) {
+            res.status(201).end();
+        } else {
+            res.status(204).end();
+        }
+
+    } catch (error) {
+        // in case a server error occurred
+        console.error('Error in addToBlacklist:', error);
+        res.status(502).json({ error: 'Server error' });
     }
 };
 
-/**
- * Adds a URL to the blacklist.
- * Validates the provided URL, normalizes it by removing trailing slashes,
- * and attempts to insert it into the blacklist. If the URL is already blacklisted,
- * no content is returned. On success, sets the Location header to the new resource.
- * @param rawUrl
- * @returns 201 Created with Location header if newly added;
- * 204 No Content if URL was already in blacklist;
- * 400 Bad Request if URL is missing or invalid;
- * 502 on server error
- */
-async function addUrlToBlacklist(rawUrl) {
-    let validated;
-    try {
-        // Remove trailing slashes
-        validated = String(rawUrl).toString().replace(/\/+$/, '');
-    } catch {
-        return {code: 400, message: 'error: Invalid URL'};
-    }
-    try {
-        const created = await Blacklist.addToBlacklist(String(validated));
-        if (created) {
-            return {code: 201};
-        }
-        return {code: 204};
-    } catch (err) {
-        console.error('error in addToBlacklist controller:', err);
-        return {code: 502};
-    }
-}
-
-/**
- * Adds URLs in a mail to the blacklist
- * @param {string} subject of the mail
- * @param {string} body of the mail
- * @returns 201 Created with Location header if newly added;
- * 204 No Content if URL was already in blacklist;
- * 400 Bad Request if URL is missing or invalid;
- * 502 on server error
- */
-async function addMailToBlacklist(subject, body) {
-    let urls = extractUrls(subject).concat(extractUrls(body));
-    let validated = [];
-    for (const u of urls) {
-        try {
-            // Remove trailing slashes and add to the validated URLs array
-            const valid = String(u).toString().replace(/\/+$/, '');
-            if (valid)
-                validated.push(valid);
-        } catch {
-        }
-    }
-    try {
-        const created = await Blacklist.addToBlacklist(validated);
-        if (created) {
-            return {code: 201};
-        }
-        return {code: 204};
-    } catch (err) {
-        console.error('error in addToBlacklist controller:', err);
-        return {code: 502};
-    }
-}
 
 /**
  * Checks if a given URL is in the blacklist.
