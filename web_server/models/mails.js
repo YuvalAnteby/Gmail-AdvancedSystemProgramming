@@ -82,7 +82,7 @@ const mails = [
         isRead: false,
         isStarred: true,
         isTrashed: false,
-        isSpam: true,
+        isSpam: false,
     },
     {
         id: 5,
@@ -119,7 +119,7 @@ const getUserMails = (userId, limit, inboxType) => {
     return mails
         .filter((mail) => predicate(mail, userId))
         .sort((a, b) => sortKey(b) - sortKey(a))
-        .slice(0, limit);
+        .slice(0, limit)
 }
 
 
@@ -181,7 +181,7 @@ const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deleted
     if (index === -1)
         return 404;
     // make sure the user has access to the mail
-    if (mails[index].from !== userId && !mails[index].sentTo.includes(userId))
+    if (mails[index].owner != userId)
         return 400;
     // check each input, if it's valid edit them in the mail
     if (subject !== undefined)
@@ -197,6 +197,28 @@ const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deleted
     if (deletedBy !== undefined && Array.isArray(deletedBy))
         mails[index].deletedBy = deletedBy;
     return mails[index];
+}
+
+/**
+ * Toggles the spam flag on/off for a specific mail
+ * @param userId owner of the mail
+ * @param mailId mail's id
+ * @returns {number}
+ * - code 200 if successfully toggled the flag
+ * - code 404 if mail wasn't found
+ * - code 400 if user don't own the mail
+ */
+const toggleSpamFlag = (userId, mailId) => {
+    // find the index of the wanted mail
+    const index = mails.findIndex(mail => mail.id === mailId);
+    // make sure the mail wa s found
+    if (index === -1)
+        return 404;
+    // make sure the user has access to the mail
+    if (mails[index].owner != userId)
+        return 400
+    mails[index].isSpam = !mails[index].isSpam;
+    return 200;
 }
 
 /**
@@ -250,4 +272,4 @@ const searchInInbox = (query, userId) => {
             ));
 }
 
-module.exports = {getUserMails, createNewMail, getMail, editMail, deleteMail, searchInInbox,};
+module.exports = {getUserMails, createNewMail, getMail, editMail, deleteMail, searchInInbox, toggleSpamFlag};

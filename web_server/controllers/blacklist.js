@@ -1,6 +1,7 @@
 const Blacklist = require('../models/blacklist');
 const Mails = require('../models/mails');
 const {extractUrls} = require("../utils/mails");
+const readline = require("node:readline");
 
 /**
  * Adds a URL to the blacklist.
@@ -15,11 +16,12 @@ const {extractUrls} = require("../utils/mails");
  * 502 on server error
  */
 exports.addToBlacklist = async (req, res) => {
+    const userId = req.headers['user-id'];
     const rawUrl = req.body.url;
     const mailId = req.body.mailId;
     // check for valid input
-    if (!rawUrl && !mailId)
-        return res.status(400).json({error: 'URL or mail is required'})
+    if (!userId || (!rawUrl && !mailId))
+        return res.status(400).json({error: 'error missing input'})
     // find the mail and fetch it's subject and body
     const {subject, body} = Mails.getMail(Number(mailId));
 
@@ -42,12 +44,14 @@ exports.addToBlacklist = async (req, res) => {
         ]
             .map(extractUrls)
             .filter((u) => u !== null);
+        // flag the mail as spam
+        const toggle = Mails.toggleSpamFlag(Number(userId), Number(mailId))
         // Check if the mail got any URLs
         if (urls.length === 0)
             return res.status(204).json({ error: 'No valid URLs found in mail' });
         // found URLs - add to blacklist
         const added = await Blacklist.addToBlacklist(urls);
-        if (added) {
+        if (added && toggle === 200) {
             res.status(201).end();
         } else {
             res.status(204).end();
