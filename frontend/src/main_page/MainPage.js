@@ -22,7 +22,7 @@ const SideMenuPlaceholder = ({theme}) => (
 const MainPage = ({theme}) => {
     const userId = DEFAULT_USER_ID;
 
-    const [inboxType, setInboxType] = useState('all');
+    const [inboxType, setInboxType] = useState('incoming');
     const {emails, refreshMails } = useMails(userId, inboxType);
 
     // selected mail ids logic

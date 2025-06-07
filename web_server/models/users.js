@@ -53,6 +53,22 @@ const getUserById = (id) => users.find(user => user.id === id);
 
 /**
  *
+ * @param id id of a user
+ * @returns {{id: number | *, fullName: string | *, mail: string | *, image: (string|*), dateOfBirth: (string|*)}}
+ */
+const getSafeUserById = (id) => {
+    const user = users.find(user => user.id === id);
+    return {
+        id: user.id,
+        fullName: user.fullName,
+        mail: user.mail,
+        image: user.image,
+        dateOfBirth: user.dateOfBirth,
+    }
+}
+
+/**
+ *
  * @param mail of the user
  * @returns {{id: number | *, fullName: string | *, mail: string | *}} user object with the same mail (without password)
  */
@@ -112,4 +128,4 @@ const createUser = (fullName, mail, password, dateOfBirth, image) => {
 };
 
 
-module.exports = {getAllUsers, getUserById, createUser, userExist, isAuthorizeUser, getUserByMail};
+module.exports = {getAllUsers, getUserById, getSafeUserById, createUser, userExist, isAuthorizeUser, getUserByMail};

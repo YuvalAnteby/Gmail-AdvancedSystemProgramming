@@ -12,4 +12,16 @@ function convertLabelsToIds(userId, labelsByNames) {
     })
 }
 
-module.exports = {convertLabelsToIds}
+/**
+ * Converts an array of label ids to include the entire object
+ * @param userId owner of the label
+ * @param labelsIds array of labels' ids
+ * @returns {*} array of labels elements
+ */
+function labelsToFullElement(userId, labelsIds) {
+    return labelsIds.map(label => {
+        return Labels.getLabelById(userId, label);
+    })
+}
+
+module.exports = {convertLabelsToIds, labelsToFullElement}

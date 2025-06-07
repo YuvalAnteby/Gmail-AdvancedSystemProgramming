@@ -1,6 +1,3 @@
-const Users = require('../models/users');
-const {getUserById} = require("../models/users");
-
 const inboxFilters = {
         // Fetch all mails belonging to the user
         all: {
@@ -50,45 +47,7 @@ const inboxFilters = {
             sortKey: (mail) => new Date(mail.sentAt).getTime(),
         }
 /// TODO get by labels
-    }
-;
-
-/**
- * Replaces users ids in a mail with safe user objects (including only id, name, mail)
- * @param rawMails mails with ids instead of user objects
- * @returns {*} mails with user objects instead of user ids in 'from' and 'sentTo'
- */
-const replaceToUsers = (rawMails) => {
-    return rawMails.map(mail => {
-        // replace the 'from' attribute
-        const sender = Users.getUserById(mail.from);
-        const fromObj = sender
-            ? {id: sender.id, fullName: sender.fullName, mail: sender.mail}
-            : {id: mail.from, fullName: "Unknown", mail: ""};
-        // replace the 'sentTo' attributes
-        const recipients = (mail.sentTo || []).map(rid => {
-            const ru = getUserById(rid);
-            return ru
-                ? {id: ru.id, fullName: ru.fullName, mail: ru.mail}
-                : {id: rid, fullName: "Unknown", mail: ""};
-        })
-
-        return {
-            id: mail.id,
-            owner: mail.owner,
-            from: fromObj,
-            sentTo: recipients,
-            subject: mail.subject,
-            body: mail.body,
-            createdAt: mail.createdAt,
-            sentAt: mail.sentAt || "",
-            labels: mail.labels || [],
-            isRead: mail.isRead,
-            isStarred: mail.isStarred,
-            isTrashed: mail.isTrashed,
-        }
-    });
-}
+    };
 
 /**
  * Finds and returns URLs from a given string
@@ -101,4 +60,4 @@ function extractUrls(text) {
     return text.match(urlRegex) || [];
 }
 
-module.exports = {inboxFilters, replaceToUsers, extractUrls};
+module.exports = {inboxFilters, extractUrls};

@@ -1,8 +1,8 @@
 const Mails = require('../models/mails');
 const Blacklist = require('../models/blacklist');
-const {replaceToUsers, extractUrls} = require("../utils/mails");
-const {convertMailsToIds} = require("../utils/users");
-const {convertLabelsToIds} = require("../utils/labels");
+const {extractUrls} = require("../utils/mails");
+const {convertMailsToIds, usersToFullElement} = require("../utils/users");
+const {convertLabelsToIds, labelsToFullElement} = require("../utils/labels");
 
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
@@ -20,9 +20,13 @@ const getLastMailsOrdered = (req, res) => {
     const inboxType = req.query.inboxType;
     // limit is 50 according to instructions
     const rawMails = Mails.getUserMails(userId, 50, inboxType || undefined);
-    // replace in the mails the user ids with user elements so we can show names and emails
-    const fullMails = replaceToUsers(rawMails);
+    // replace in the mails the user ids and labels ids with user and label elements so we can show names and emails
+    const fullMails = rawMails.map(m => {
+        m.from = usersToFullElement(m.from);
+        m.sentTo = usersToFullElement(rawMails.sentTo);
+        m.labels = labelsToFullElement(userId, rawMails.labels);
 
+    })
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
     return res.status(200).json(fullMails);
 }
