@@ -77,7 +77,7 @@ const MainPage = ({theme}) => {
                                 theme={theme}
                                 key={email.id}
                                 id={email.id}
-                                sender={email.from}
+                                sender={email.from.mail}
                                 subject={email.subject}
                                 body={email.body}
                                 date={email.sentAt || email.createdAt}
