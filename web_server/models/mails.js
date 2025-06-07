@@ -95,7 +95,7 @@ const mails = [
         sentAt: "",
         labels: [],
         isDraft: true,
-        is_read: false,
+        isRead: false,
         isStarred: false,
         isTrashed: false,
         isSpam: false,
@@ -122,34 +122,89 @@ const getUserMails = (userId, limit, inboxType) => {
         .slice(0, limit)
 }
 
+/**
+ * Creates a new mail as a draft.
+ * Lets the user to not include all attributes, marks it accordingly and avoid sending it.
+ * @param {number} userId
+ * @param {string} subject
+ * @param {string} body
+ * @param {number[]} sentToIds
+ * @returns {{id: number, owner: number, from: number, sentTo: (number[]|*[]), subject: (string|string), body: (string|string), createdAt: string, sentAt: string, labels: *[], isDraft: boolean, isRead: boolean, isStarred: boolean, isTrashed: boolean, isSpam: boolean}}
+ */
+const saveDraft = (userId, subject, body, sentToIds) => {
+    const draft = {
+        id: ++mailId,
+        owner: userId,
+        from: userId,
+        sentTo: sentToIds || [],
+        subject: subject || "",
+        body: body || "",
+        createdAt: new Date().toISOString(),
+        sentAt: "",
+        labels: [],
+        isDraft: true,
+        isRead: true,
+        isStarred: false,
+        isTrashed: false,
+        isSpam: false,
+    };
+    mails.push(draft);
+    return draft;
+}
 
 /**
- * Creates a new mail and add it to the total inbox
- * @param subject of the mail
- * @param body main text context of the mail
- * @param from user id of the sender
- * @param sentTo list of user ids of receivers
- * @param sentAt timestamp of when sent
- * @param labels list of labels used per user id
- * @returns {{id: number, subject, body, from, sentTo, sentAt, labels, readBy: *[], deletedBy: *[]}|null}
- * new mail object, null if invalid
+ * Sends a new mail to all the recipients
+ * @param {number} userId of the sender
+ * @param {string} subject
+ * @param {string} body
+ * @param {number[]} sentToIds
+ * @returns {{id: number, owner: number, from: number, sentTo, subject: string, body: string, createdAt: string, sentAt: string, labels: *[], isDraft: boolean, isRead: boolean, isStarred: boolean, isTrashed: boolean, isSpam: boolean}|boolean}
  */
-const createNewMail = (subject, body, from, sentTo, sentAt, labels) => {
-    if (!from)
-        return null;
-    const newMail = {
-        id: ++mailId,
-        subject: subject,
-        body: body,
-        from: from,
-        sentTo: sentTo,
-        sentAt: sentAt,
-        labels: labels,
-        readBy: [],
-        deletedBy: []
+const sendNewMail = (userId, subject, body, sentToIds) => {
+    try {
+        // create the mail for the sender and save it
+        const atOwner = {
+            id: ++mailId,
+            owner: Number(userId),
+            from: Number(userId),
+            sentTo: sentToIds,
+            subject: subject || "",
+            body: String(body),
+            createdAt: new Date().toISOString(),
+            sentAt: new Date().toISOString(),
+            labels: [],
+            isDraft: false,
+            isRead: true,
+            isStarred: false,
+            isTrashed: false,
+            isSpam: false,
+        };
+        mails.push(atOwner);
+        // create the mails for the recipients and save each one
+        for (const uid of sentToIds) {
+            const mail = {
+                id: ++mailId,
+                owner: Number(uid),
+                from: atOwner.from,
+                sentTo: atOwner.sentTo,
+                subject: atOwner.subject,
+                body: atOwner.body,
+                createdAt: atOwner.createdAt,
+                sentAt: atOwner.sentAt,
+                labels: [],
+                isDraft: false,
+                isRead: false,
+                isStarred: false,
+                isTrashed: false,
+                isSpam: false,
+            }
+            mails.push(mail);
+        }
+        return atOwner;
+    } catch (error) {
+        console.log(error.message);
+        return false;
     }
-    mails.push(newMail);
-    return newMail;
 }
 
 /**
@@ -160,90 +215,62 @@ const createNewMail = (subject, body, from, sentTo, sentAt, labels) => {
 const getMail = (mailId) => mails.find(mail => mail.id === mailId);
 
 /**
- * Edits an existing mail with allowed fields
- * @param userId the user doing the operation (authenticated)
- * @param mailId id of a mail to edit
- * @param subject new subject
- * @param body new body text
- * @param sentTo new receivers list
- * @param labels new labels for the mail
- * @param readBy new read status list
- * @param deletedBy new deleted status list
- * @returns
- * - the new mail object if successfully edited
- * - code 404 if no such email was found
- * - code 400 if user has no access to it
+ * Updates a draft by optional changing existing attributes with new values
+ * @param {number} mailId id of the draft
+ * @param {string} subject
+ * @param {string} body
+ * @param {number[]} sentToIds
+ * @returns {*|null} null if the mail isn't found or isn't a draft, otherwise returns the new draft mail object
  */
-const editMail = (userId, mailId, subject, body, sentTo, labels, readBy, deletedBy) => {
-    // find the index of the wanted mail
+const updateDraft = (mailId, subject, body, sentToIds) => {
     const index = mails.findIndex(mail => mail.id === mailId);
-    // make sure the mail wa s found
-    if (index === -1)
-        return 404;
-    // make sure the user has access to the mail
-    if (mails[index].owner != userId)
-        return 400;
-    // check each input, if it's valid edit them in the mail
+    if (mails[index] < 0 || !mails[index].isDraft)
+        return null;
+    // attempt to update the allowed attributes of a draft
     if (subject !== undefined)
         mails[index].subject = subject;
     if (body !== undefined)
         mails[index].body = body;
-    if (sentTo !== undefined && Array.isArray(sentTo))
-        mails[index].sentTo = sentTo;
-    if (readBy !== undefined && Array.isArray(readBy))
-        mails[index].readBy = readBy;
-    if (labels !== undefined && Array.isArray(labels))
-        mails[index].labels = labels;
-    if (deletedBy !== undefined && Array.isArray(deletedBy))
-        mails[index].deletedBy = deletedBy;
+    if (sentToIds !== undefined)
+        mails[index].sentTo = sentToIds;
     return mails[index];
 }
 
 /**
- * Toggles the spam flag on/off for a specific mail
- * @param userId owner of the mail
- * @param mailId mail's id
- * @returns {number}
- * - code 200 if successfully toggled the flag
- * - code 404 if mail wasn't found
- * - code 400 if user don't own the mail
+ * Edits an existing mail with allowed fields
+ * @param {number} mailId id of a mail to edit
+ * @param {boolean|null} isRead true if mail was read, otherwise false
+ * @param {boolean|null} isStarred true if the mail is marked with a star, otherwise false
+ * @param {boolean|null} isTrashed true if the mail is in the trash, otherwise false
+ * @param {boolean|null} isSpam true if marked as spam by a user, otherwise false
+ * @param {number[]|null} labels id array of new labels for the mail
+ * @returns
+ * - the new mail object if successfully edited
+ * - code 404 if no such email was found
  */
-const toggleSpamFlag = (userId, mailId) => {
+const editSentMail = (mailId, isRead, isStarred, isTrashed, isSpam, labels) => {
     // find the index of the wanted mail
     const index = mails.findIndex(mail => mail.id === mailId);
-    // make sure the mail wa s found
+    // make sure the mail was found
     if (index === -1)
         return 404;
-    // make sure the user has access to the mail
-    if (mails[index].owner != userId)
-        return 400
-    mails[index].isSpam = !mails[index].isSpam;
-    return 200;
+    // check each input, if it's valid edit them in the mail
+    console.log(`isRead: ${typeof isRead}, isStarred: ${typeof isStarred}, isTrashed: ${typeof isTrashed}, isSpam: ${typeof isSpam}, labels: ${typeof labels}`);
+    if (typeof isRead === 'boolean')
+        mails[index].isRead = isRead;
+    if (typeof isStarred === 'boolean')
+        mails[index].isStarred = isStarred;
+    if (typeof isTrashed === 'boolean')
+        mails[index].isTrashed = isTrashed;
+    console.log(`before: ${mails[index].isSpam}`);
+    if (typeof isSpam === 'boolean')
+        mails[index].isSpam = isSpam;
+    console.log(`after: ${mails[index].isSpam}`);
+    if (Array.isArray(labels))
+        mails[index].labels = labels;
+    // return updated mail
+    return mails[index];
 }
-
-/**
- * Toggles the read flag on/off for a specific mail
- * @param userId owner of the mail
- * @param mailId mail's id
- * @param isRead true if we want to mark mail as read, false if we want to mark as unread
- * @returns {number}
- * - code 200 if successfully changed the flag
- * - code 404 if mail wasn't found
- * - code 400 if user don't own the mail
- */
-const toggleReadFlag = (userId, mailId, isRead) => {
-    // find the index of the wanted mail
-    const index = mails.findIndex(mail => mail.id === mailId);
-    // make sure the mail wa s found
-    if (index === -1)
-        return 404;
-    // make sure the user has access to the mail
-    if (mails[index].owner != userId)
-        return 400
-    mails[index].isRead = isRead;
-    return 200;
-}
-
 
 /**
  * Deletes a mail
@@ -296,4 +323,13 @@ const searchInInbox = (query, userId) => {
             ));
 }
 
-module.exports = {getUserMails, createNewMail, getMail, editMail, deleteMail, searchInInbox, toggleSpamFlag, toggleReadFlag};
+module.exports = {
+    getUserMails,
+    saveDraft,
+    sendNewMail,
+    getMail,
+    editSentMail,
+    updateDraft,
+    deleteMail,
+    searchInInbox,
+};

@@ -38,6 +38,10 @@ const createNewLabel = (owner, name) => {
  */
 const getLabelById = (id) => labels.find(label => label.id === id);
 
+const getLabelByName = (userId, name) => {
+    return labels.find(label => label.owner == userId && label.name === name);
+}
+
 /**
  * Edits the label with new info
  * @param labelId id of a label to edit
@@ -68,4 +72,4 @@ const deleteLabel = (labelId) => {
     return true;
 }
 
-module.exports = {getAllLabels, createNewLabel, getLabelById, editLabel, deleteLabel}
+module.exports = {getAllLabels, createNewLabel, getLabelById, getLabelByName, editLabel, deleteLabel}

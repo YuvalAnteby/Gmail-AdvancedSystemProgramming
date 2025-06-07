@@ -1,7 +1,6 @@
 const Blacklist = require('../models/blacklist');
 const Mails = require('../models/mails');
 const {extractUrls} = require("../utils/mails");
-const readline = require("node:readline");
 
 /**
  * Adds a URL to the blacklist.
@@ -37,6 +36,7 @@ exports.addToBlacklist = async (req, res) => {
                 res.status(400).end();
             }
         }
+
         // we haven't gotten a single URL, meaning we got a mail - check it's content and add URLs to blacklist
         const urls = [
             ...extractUrls(subject),
@@ -45,7 +45,7 @@ exports.addToBlacklist = async (req, res) => {
             .map(extractUrls)
             .filter((u) => u !== null);
         // flag the mail as spam
-        const toggle = Mails.toggleSpamFlag(Number(userId), Number(mailId))
+        const toggle = Mails.editSentMail(mailId, null, null, null, true, null);
         // Check if the mail got any URLs
         if (urls.length === 0)
             return res.status(204).json({ error: 'No valid URLs found in mail' });

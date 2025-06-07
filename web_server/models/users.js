@@ -53,6 +53,20 @@ const getUserById = (id) => users.find(user => user.id === id);
 
 /**
  *
+ * @param mail of the user
+ * @returns {{id: number | *, fullName: string | *, mail: string | *}} user object with the same mail (without password)
+ */
+const getUserByMail = (mail) => {
+    const user = users.find(user => user.id === mail);
+    return {
+        id: user.id,
+        fullName: user.fullName,
+        mail: user.mail,
+    }
+}
+
+/**
+ *
  * @param  mail
  * @returns {boolean} true if user with the same email address already exists
  */
@@ -98,4 +112,4 @@ const createUser = (fullName, mail, password, dateOfBirth, image) => {
 };
 
 
-module.exports = {getAllUsers, getUserById, createUser, userExist, isAuthorizeUser};
+module.exports = {getAllUsers, getUserById, createUser, userExist, isAuthorizeUser, getUserByMail};
