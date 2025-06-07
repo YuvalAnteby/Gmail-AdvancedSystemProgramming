@@ -23,7 +23,7 @@ const MainPage = ({theme}) => {
     const userId = DEFAULT_USER_ID;
 
     const [inboxType, setInboxType] = useState('all');
-    const {emails, loading, error, refreshMails } = useMails(userId, inboxType);
+    const {emails, refreshMails } = useMails(userId, inboxType);
 
     // selected mail ids logic
     const [selectedIds, setSelectedIds] = useState(new Set());

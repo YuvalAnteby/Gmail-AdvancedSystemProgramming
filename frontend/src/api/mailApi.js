@@ -49,7 +49,12 @@ export async function deleteMail(userId, mailId) {
     console.log(`deletion: ${res.status}`);
 }
 
-
+/**
+ * POST api/blacklist
+ * @param {number|string} userId
+ * @param {number|string} mailId
+ * @returns {Promise<void>}
+ */
 export async function reportSpam(userId, mailId) {
     const url = `${API_BASE}/blacklist`;
     const res = await fetch(url, {
@@ -63,6 +68,30 @@ export async function reportSpam(userId, mailId) {
         })
     })
     if (!res.ok)
-        throw new Error(`getMails failed: ${res.status}`);
+        throw new Error(`reporting spam failed: ${res.status}`);
     console.log(`marking spam: ${res.status}`);
+}
+
+/**
+ * PATCH api/mails/:id
+ * @param {number|string} userId
+ * @param {number|string} mailId
+ * @returns {Promise<void>}
+ */
+export async function markAsRead(userId, mailId) {
+    const url = `${API_BASE}/mails/${mailId}`;
+    const res = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'user-id': userId,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            isRead: true,
+        })
+    })
+    if (!res.ok)
+        throw new Error(`marking read failed: ${res.status}`);
+    console.log(`marking read: ${res.status}`);
+
 }

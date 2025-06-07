@@ -1,6 +1,7 @@
 const Mails = require('../models/mails');
 const Blacklist = require('../models/blacklist');
 const {replaceToUsers, extractUrls} = require("../utils/mails");
+const {toggleSpamFlag, toggleReadFlag} = require("../models/mails");
 
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
@@ -85,7 +86,6 @@ const createNewMail = async (req, res) => {
 }
 
 
-
 /**
  * Finds and edits the mail with a given id.
  * @param req request
@@ -97,11 +97,11 @@ const createNewMail = async (req, res) => {
  */
 const editMailById = (req, res) => {
     // Make sure we got an id in the request
-    const mailId = parseInt(req.params.id);
+    const mailId = Number(req.params.id);
     if (isNaN(mailId))
         return res.status(400).json({error: 'No valid mail ID was given - failed editing a mail'});
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = req.headers['user-id'];
+    const userId = Number(req.headers['user-id']);
     if (isNaN(userId))
         return res.status(400).json({error: 'User not authenticated - failed editing a mail'});
     // Get the input params and edit the mail
@@ -111,25 +111,39 @@ const editMailById = (req, res) => {
     const labels = req.body?.labels;
     const readBy = req.body?.readBy;
     const deletedBy = req.body?.deletedBy;
-    // nothing to change was received - end it here
-    if (!subject && !body && !sentTo && !labels && !readBy && !deletedBy) {
-        return res.status(200).json({msg: "nothing to edit"})
+    const isRead = req.body?.isRead;
+    // for cases of
+    if (typeof isRead === 'boolean') {
+        const toggle = toggleReadFlag(userId, mailId, isRead);
+        switch (toggle) {
+            case 200:
+                return res.status(200).end();
+            case 404:
+                return res.status(404).json({error: 'mail was not found - failed editing a mail'});
+            default:
+                return res.status(400).json({error: 'error editing mail'});
+        }
     }
-    const mail = Mails.editMail(
-        userId, mailId,
-        subject || undefined,
-        body || undefined,
-        sentTo || undefined,
-        labels || undefined,
-        readBy || undefined,
-        deletedBy || undefined
-    );
+    // nothing to change was received - end it here
+    //if (!subject && !body && !sentTo && !labels && !readBy && !deletedBy) {
+    //    return res.status(200).json({msg: "nothing to edit"})
+    //}
+    //const mail = Mails.editMail(
+    //    userId, mailId,
+    //    subject || undefined,
+    //    body || undefined,
+    //    sentTo || undefined,
+    //    labels || undefined,
+    //    readBy || undefined,
+    //    deletedBy || undefined
+    //);
     // Check the outcome of the edit and return a matching result
-    if (mail === 404)
-        return res.status(404).json({error: 'mail was not found - failed editing a mail'});
-    if (mail === 400)
-        return res.status(400).json({error: 'mail doesn\'t belong to user - failed editing a mail'});
-    return res.status(200).json(mail);
+    //if (mail === 404)
+    //    return res.status(404).json({error: 'mail was not found - failed editing a mail'});
+    //if (mail === 400)
+    //    return res.status(400).json({error: 'mail doesn\'t belong to user - failed editing a mail'});
+    //return res.status(200).json(mail);
+    return res.status(500).end();
 }
 
 /**

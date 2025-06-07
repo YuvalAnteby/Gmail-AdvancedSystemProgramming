@@ -1,5 +1,5 @@
 import {useCallback} from "react";
-import {deleteMail, reportSpam} from "../../api/mailApi";
+import {deleteMail, markAsRead, reportSpam} from "../../api/mailApi";
 
 
 /**
@@ -40,7 +40,6 @@ export const useMailToolbarHandlers = (userId, selectedIds, setSelectedIds, allE
         // nothing to delete
         if (selectedIds.size === 0)
             return;
-        console.log(">> Deleting:", Array.from(selectedIds));
         try {
             await Promise.all(Array.from(selectedIds).map((mid) => deleteMail(userId, mid)));
             setSelectedIds(new Set());
@@ -52,10 +51,16 @@ export const useMailToolbarHandlers = (userId, selectedIds, setSelectedIds, allE
     }, [userId, selectedIds, setSelectedIds, refreshMails]);
 
     // Mark selected mails as read
-    const handleMarkAsRead = useCallback(() => {
-        console.log(">> Marking as Read:", Array.from(selectedIds));
-        // TODO: call API to mark read/unread
-        setSelectedIds(new Set()); // un‐select everything after marking as read
+    const handleMarkAsRead = useCallback(async () => {
+        if (selectedIds.size === 0)
+            return;
+        try {
+            await Promise.all(Array.from(selectedIds).map((mid) => markAsRead(userId, mid)));
+            setSelectedIds(new Set());
+            refreshMails();
+        } catch (error) {
+            console.error("Error marking read mails:", error);
+        }
     }, [selectedIds, setSelectedIds]);
 
     // Mark selected mails as spam (using the blacklist)
@@ -63,7 +68,6 @@ export const useMailToolbarHandlers = (userId, selectedIds, setSelectedIds, allE
         // nothing to delete
         if (selectedIds.size === 0)
             return;
-        console.log(">> Marking Spam:", Array.from(selectedIds));
         try {
             await Promise.all(Array.from(selectedIds).map((mid) => reportSpam(userId, mid)));
             setSelectedIds(new Set());
@@ -73,7 +77,6 @@ export const useMailToolbarHandlers = (userId, selectedIds, setSelectedIds, allE
         }
         setSelectedIds(new Set());
     }, [selectedIds, setSelectedIds]);
-
 
     // TODO add a return trashed mail to be regular
 

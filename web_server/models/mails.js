@@ -222,6 +222,30 @@ const toggleSpamFlag = (userId, mailId) => {
 }
 
 /**
+ * Toggles the read flag on/off for a specific mail
+ * @param userId owner of the mail
+ * @param mailId mail's id
+ * @param isRead true if we want to mark mail as read, false if we want to mark as unread
+ * @returns {number}
+ * - code 200 if successfully changed the flag
+ * - code 404 if mail wasn't found
+ * - code 400 if user don't own the mail
+ */
+const toggleReadFlag = (userId, mailId, isRead) => {
+    // find the index of the wanted mail
+    const index = mails.findIndex(mail => mail.id === mailId);
+    // make sure the mail wa s found
+    if (index === -1)
+        return 404;
+    // make sure the user has access to the mail
+    if (mails[index].owner != userId)
+        return 400
+    mails[index].isRead = isRead;
+    return 200;
+}
+
+
+/**
  * Deletes a mail
  * @param userId id of the user that wants to remove the mail
  * @param mailId id of a mail to delete
@@ -272,4 +296,4 @@ const searchInInbox = (query, userId) => {
             ));
 }
 
-module.exports = {getUserMails, createNewMail, getMail, editMail, deleteMail, searchInInbox, toggleSpamFlag};
+module.exports = {getUserMails, createNewMail, getMail, editMail, deleteMail, searchInInbox, toggleSpamFlag, toggleReadFlag};
