@@ -25,8 +25,8 @@ const getLastMailsOrdered = (req, res) => {
         return {
             ...m,
             from: usersToFullElement([m.from])[0],
-            sentTo: usersToFullElement(rawMails.sentTo || []),
-            labels: labelsToFullElement(userId, rawMails.labels || [])
+            sentTo: usersToFullElement(m.sentTo || []),
+            labels: labelsToFullElement(userId, m.labels || [])
         }
     })
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one

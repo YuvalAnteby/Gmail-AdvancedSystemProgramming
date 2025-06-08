@@ -79,7 +79,7 @@ const mails = [
         body: "Don’t forget the team meeting at 9AM tomorrow.",
         createdAt: new Date('2025-06-03T03:15:27.000Z'),
         sentAt: new Date('2025-06-03T11:42:53.000Z'),
-        labels: [],
+        labels: [1],
         isDraft: false,
         isRead: false,
         isStarred: true,

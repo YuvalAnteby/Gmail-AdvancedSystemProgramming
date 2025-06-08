@@ -4,8 +4,19 @@
  *  owner - user id of the label's owner
  *  name - label's name
  */
-const labels = [];
-let labelId = 0;
+const labels = [
+    {
+        id: 1,
+        name: 'work',
+        owner: 1,
+    },
+    {
+        id: 2,
+        name: 'friends',
+        owner: 2,
+    }
+];
+let labelId = labels ? labels.length : 0;
 
 /**
  * Returns all labels saved
@@ -36,7 +47,7 @@ const createNewLabel = (owner, name) => {
  * @param id id of a label
  * @returns {*} label object with the same id
  */
-const getLabelById = (id) => labels.find(label => label.id === id);
+const getLabelById = (id) => labels.find(label => label.id == id);
 
 const getLabelByName = (userId, name) => {
     return labels.find(label => label.owner == userId && label.name === name);
