@@ -53,11 +53,11 @@ const getUserById = (id) => users.find(user => user.id === id);
 
 /**
  *
- * @param id id of a user
+ * @param uid id of a user
  * @returns {{id: number | *, fullName: string | *, mail: string | *, image: (string|*), dateOfBirth: (string|*)}}
  */
-const getSafeUserById = (id) => {
-    const user = users.find(user => user.id === id);
+const getSafeUserById = (uid) => {
+    const user = users.find(u => u.id == uid);
     return {
         id: user.id,
         fullName: user.fullName,
@@ -73,7 +73,7 @@ const getSafeUserById = (id) => {
  * @returns {{id: number | *, fullName: string | *, mail: string | *}} user object with the same mail (without password)
  */
 const getUserByMail = (mail) => {
-    const user = users.find(user => user.id === mail);
+    const user = users.find(user => user.mail === mail);
     return {
         id: user.id,
         fullName: user.fullName,

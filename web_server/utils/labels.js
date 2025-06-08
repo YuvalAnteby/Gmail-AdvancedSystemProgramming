@@ -1,4 +1,4 @@
-const Labels = require("../models/Labels");
+const Labels = require("../models/labels");
 
 /**
  * Converts an array of label names to their ids
@@ -24,4 +24,16 @@ function labelsToFullElement(userId, labelsIds) {
     })
 }
 
-module.exports = {convertLabelsToIds, labelsToFullElement}
+/**
+ * @param {number} userId owner of the label
+ * @param {Object} mail mail object
+ * @returns {string[]} an array of lowercase label names for this mail.
+ */
+const mailLabelNames = (userId, mail) => {
+    return (mail.labels || [])
+        .map(labelId => Labels.getLabelById(userId, labelId).name)
+        .filter(Boolean)
+        .map(name => name.toLowerCase());
+};
+
+module.exports = {convertLabelsToIds, labelsToFullElement, mailLabelNames}
