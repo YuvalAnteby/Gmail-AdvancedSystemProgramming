@@ -22,10 +22,12 @@ const getLastMailsOrdered = (req, res) => {
     const rawMails = Mails.getUserMails(userId, 50, inboxType || undefined);
     // replace in the mails the user ids and labels ids with user and label elements so we can show names and emails
     const fullMails = rawMails.map(m => {
-        m.from = usersToFullElement(m.from);
-        m.sentTo = usersToFullElement(rawMails.sentTo);
-        m.labels = labelsToFullElement(userId, rawMails.labels);
-
+        return {
+            ...m,
+            from: usersToFullElement([m.from])[0],
+            sentTo: usersToFullElement(rawMails.sentTo || []),
+            labels: labelsToFullElement(userId, rawMails.labels || [])
+        }
     })
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
     return res.status(200).json(fullMails);
@@ -92,7 +94,7 @@ const createNewMail = async (req, res) => {
             return res.status(500).json({error: 'Failed to create new mail'});
         return res.status(201).location(`/mails/${newMail.id}`).json(newMail);
     } catch (err) {
-        return res.status(500).json({error: `error: ${err.message}`});
+        return res.status(500).json({error: `error creating mail: ${err.message}`});
     }
 }
 

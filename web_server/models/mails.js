@@ -1,4 +1,6 @@
 const {inboxFilters} = require("../utils/mails");
+const {mailLabelNames} = require("../utils/labels");
+const {mailUserFields} = require("../utils/users");
 
 /**
  * When sending an email we will create an element for each user that receives it and the sender.
@@ -27,8 +29,8 @@ const mails = [
         sentTo: [1],
         subject: "Project update",
         body: "Here’s what we changed in v2.0...",
-        createdAt: "2025/06/03",
-        sentAt: "2025/06/04",
+        createdAt: new Date('2025-06-03T20:27:11.000Z'),
+        sentAt: new Date('2025-06-04T14:08:36.000Z'),
         labels: [],
         isDraft: false,
         isRead: true,
@@ -43,8 +45,8 @@ const mails = [
         sentTo: [1],
         subject: "Project update",
         body: "Here’s what we changed in v2.0...",
-        createdAt: "2025/06/03",
-        sentAt: "2025/06/04",
+        createdAt: new Date('2025-06-03T20:27:11.000Z'),
+        sentAt: new Date('2025-06-04T14:08:36.000Z'),
         labels: [],
         isDraft: false,
         isRead: false,
@@ -59,8 +61,8 @@ const mails = [
         sentTo: [1],
         subject: "Meeting reminder",
         body: "Don’t forget the team meeting at 9AM tomorrow.",
-        createdAt: "2025/06/03",
-        sentAt: "2025/06/03",
+        createdAt: new Date('2025-06-03T03:15:27.000Z'),
+        sentAt: new Date('2025-06-03T11:42:53.000Z'),
         labels: [],
         isDraft: false,
         isRead: true,
@@ -75,8 +77,8 @@ const mails = [
         sentTo: [1],
         subject: "Meeting reminder",
         body: "Don’t forget the team meeting at 9AM tomorrow.",
-        createdAt: "2025/06/03",
-        sentAt: "2025/06/03",
+        createdAt: new Date('2025-06-03T03:15:27.000Z'),
+        sentAt: new Date('2025-06-03T11:42:53.000Z'),
         labels: [],
         isDraft: false,
         isRead: false,
@@ -91,7 +93,7 @@ const mails = [
         sentTo: [2],
         subject: "Your daily digest",
         body: "Top tech news today: React 21.0 is out...",
-        createdAt: "2025/06/02",
+        createdAt: new Date('2025-06-02T18:55:04.000Z'),
         sentAt: "",
         labels: [],
         isDraft: true,
@@ -134,8 +136,8 @@ const getUserMails = (userId, limit, inboxType) => {
 const saveDraft = (userId, subject, body, sentToIds) => {
     const draft = {
         id: ++mailId,
-        owner: userId,
-        from: userId,
+        owner: Number(userId),
+        from: Number(userId),
         sentTo: sentToIds || [],
         subject: subject || "",
         body: body || "",
@@ -255,17 +257,14 @@ const editSentMail = (mailId, isRead, isStarred, isTrashed, isSpam, labels) => {
     if (index === -1)
         return 404;
     // check each input, if it's valid edit them in the mail
-    console.log(`isRead: ${typeof isRead}, isStarred: ${typeof isStarred}, isTrashed: ${typeof isTrashed}, isSpam: ${typeof isSpam}, labels: ${typeof labels}`);
     if (typeof isRead === 'boolean')
         mails[index].isRead = isRead;
     if (typeof isStarred === 'boolean')
         mails[index].isStarred = isStarred;
     if (typeof isTrashed === 'boolean')
         mails[index].isTrashed = isTrashed;
-    console.log(`before: ${mails[index].isSpam}`);
     if (typeof isSpam === 'boolean')
         mails[index].isSpam = isSpam;
-    console.log(`after: ${mails[index].isSpam}`);
     if (Array.isArray(labels))
         mails[index].labels = labels;
     // return updated mail
@@ -310,17 +309,27 @@ const deleteMail = (userId, mailId) => {
 const searchInInbox = (query, userId) => {
     const lowerCased = query.toString().toLowerCase();
     const isNum = !isNaN(Number(query));
-    return mails.filter(
-        mail =>
-            (mail.from === userId // search 'from' user id
-                || (mail.sentTo && mail.sentTo.some(id => id === userId))) // search 'sent to' user ids
-            && (
-                (mail.subject && mail.subject.toLowerCase().includes(lowerCased)) // search subject string
-                || (mail.body && mail.body.toLowerCase().includes(lowerCased)) // search body string
-                || (mail.sentAt && new Date(mail.sentAt).toISOString().includes(query)) // search the time sent at
-                || (isNum && mail.labels && mail.labels.some(label => label.id === parseInt(query))) // search labels names
-                || (mail.readBy && mail.readBy.some(id => String(id).includes(lowerCased))) // check if it's a user that e
-            ));
+    return mails
+        .filter(mail => {
+            // ensure the user owns the mail
+            if (mail.owner != userId)
+                return false;
+            // check if query in the subject/ body texts
+            if (mail.subject.toLowerCase().includes(lowerCased) || mail.body.toLowerCase().includes(lowerCased))
+                return true;
+            // check if the query is a time (in the format YYYY-MM-DD only)
+            const time = (mail.sentAt && mail.sentAt !== "") ? mail.sentAt : mail.createdAt;
+            if (time && time.toISOString().includes(lowerCased))
+                return true;
+            // check if the query is a user's name or mail address
+            if (mailUserFields(mail).some(field => field.includes(lowerCased)))
+                return true;
+            // check if the query is a label's name
+            if (isNum && mail.labels && mailLabelNames(userId, mail).some(name => name.includes(lowerCased)))
+                return true;
+            // not found
+            return false;
+        });
 }
 
 module.exports = {
