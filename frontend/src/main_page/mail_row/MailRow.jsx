@@ -1,4 +1,5 @@
 import "./MailRow.css"
+import {formatDate} from "../../utils/formatDate";
 
 
 /**
@@ -43,7 +44,9 @@ const MailRow = ({theme, id, sender, subject, body, date, isRead, isSelected, on
 
             <div className="col" style={{color: `var(--${theme}-text-color)`}}>{body}</div>
 
-            <div className="col text-end" style={{color: `var(--${theme}-text-color)`}}>{date}</div>
+            <div className="col text-end"
+                 style={{color: `var(--${theme}-text-color)`}}>{formatDate(date)}</div>
+
         </div>
     );
 }

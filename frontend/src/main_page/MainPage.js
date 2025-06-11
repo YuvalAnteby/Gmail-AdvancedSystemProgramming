@@ -22,7 +22,7 @@ const MainPage = ({theme, setTheme}) => {
 
     const location = useLocation();
     const [inboxType, setInboxType] = useState(location.state?.inboxType || 'all');
-    const {emails, refreshMails } = useMails(userId, inboxType);
+    const {emails, refreshMails} = useMails(userId, inboxType);
 
     // selected mail ids logic
     const [selectedIds, setSelectedIds] = useState(new Set());
@@ -56,8 +56,12 @@ const MainPage = ({theme, setTheme}) => {
 
     return (
         <div className={`container-fluid p-3 ${theme}-main-page`}>
-            {/* ---- TODO TOP MENU ---- */}
-            <div className="row mb-3"><div className="col-12"><TopMenu theme={theme} setTheme={setTheme}/></div></div>
+            {/* ---- TOP MENU ---- */}
+            <div className="row mb-3">
+                <div className="col-12">
+                    <TopMenu theme={theme} setTheme={setTheme} userId={userId}/>
+                </div>
+            </div>
             {/* ---- MAIN LAYOUT ---- */}
             <div className="row">
                 {/* ---- TODO SIDE MENU ---- */}
