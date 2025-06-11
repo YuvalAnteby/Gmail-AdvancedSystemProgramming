@@ -95,3 +95,22 @@ export async function markAsRead(userId, mailId) {
     console.log(`marking read: ${res.status}`);
 
 }
+
+/**
+ * GET api/mails/:query
+ * @param userId {number|string} user id that makes the search
+ * @param {string} query to search in mails
+ * @returns {Promise<any>}
+ */
+export const searchMails = async (userId, query) => {
+    const url = `${API_BASE}/mails/search/${encodeURIComponent(query)}`;
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'user-id': userId,
+        }
+    });
+    if (!res.ok)
+        throw new Error(`Search failed ${res.status}`);
+    return res.json();
+};
