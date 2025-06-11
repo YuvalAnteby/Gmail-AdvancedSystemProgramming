@@ -17,12 +17,11 @@ const SideMenuPlaceholder = ({theme}) => (
     <div className={`${theme}-custom-sidenav`}>Side menu</div>
 );
 
-const MainPage = ({theme}) => {
+const MainPage = ({theme, setTheme}) => {
     const userId = DEFAULT_USER_ID;
 
     const location = useLocation();
     const [inboxType, setInboxType] = useState(location.state?.inboxType || 'all');
-    console.log(inboxType)
     const {emails, refreshMails } = useMails(userId, inboxType);
 
     // selected mail ids logic
@@ -58,7 +57,7 @@ const MainPage = ({theme}) => {
     return (
         <div className={`container-fluid p-3 ${theme}-main-page`}>
             {/* ---- TODO TOP MENU ---- */}
-            <div className="row mb-3"><div className="col-12"><TopMenu theme={theme}/></div></div>
+            <div className="row mb-3"><div className="col-12"><TopMenu theme={theme} setTheme={setTheme}/></div></div>
             {/* ---- MAIN LAYOUT ---- */}
             <div className="row">
                 {/* ---- TODO SIDE MENU ---- */}

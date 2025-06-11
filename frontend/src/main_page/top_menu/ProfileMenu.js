@@ -1,11 +1,12 @@
 import {useRef} from "react";
+import './ProfileImage.css'
 
-const ProfileMenu = ({ theme, imageUrl, fullName, onImageUpload, onLogout }) => {
+const ProfileMenu = ({ theme, setTheme, imageUrl, fullName, onImageUpload }) => {
 
     const fileInputRef = useRef(null);
     const changePictureClick = () => fileInputRef.current.click();
 
-    const handleLogout = () => {
+    const onLogoutClick = () => {
         console.log("Logging out...");
     };
 
@@ -21,14 +22,19 @@ const ProfileMenu = ({ theme, imageUrl, fullName, onImageUpload, onLogout }) => 
                     type="file"
                     accept="image/*"
                     ref={fileInputRef}
-                    style={{ display: 'none' }}
+                    style={{display: 'none'}}
                     onChange={onImageUpload}
                 />
                 <div className="hello-text">Hello, <strong>{fullName}</strong>!</div>
-                <button className="btn btn-outline-success btn-sm mt-3" onClick={changePictureClick}>Change picture</button>
-                <button className="btn btn-outline-danger btn-sm mt-3" onClick={onLogout}>
-                    Logout
+                <button className="btn btn-outline-success btn-sm mt-3" onClick={changePictureClick}>Change picture
                 </button>
+                <button
+                    className={`btn btn-outline-${theme === 'light' ? 'dark' : 'light'} btn-sm mt-3`}
+                    onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                >
+                    Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
+                </button>
+                <button className="btn btn-outline-danger btn-sm mt-3" onClick={onLogoutClick}>Logout</button>
             </div>
         </div>
     );

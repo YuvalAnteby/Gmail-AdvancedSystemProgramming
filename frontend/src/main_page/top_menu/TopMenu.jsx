@@ -1,10 +1,12 @@
 import { useRef, useState } from "react";
 import "./TopMenu.css";
+import "./ProfileImage.css";
+import "./SearchBar.css";
 import { useNavigate } from "react-router-dom";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import ProfileMenu from "../top_menu/ProfileMenu";
 
-const TopMenu = ({ theme }) => {
+const TopMenu = ({ theme, setTheme }) => {
     const navigate = useNavigate();
 
     const [query, setQuery] = useState('');
@@ -39,8 +41,9 @@ const TopMenu = ({ theme }) => {
     return (
         <div className={`top-menu-wrapper ${theme}-top-menu d-flex align-items-center justify-content-between px-3`}>
             {/* Logo button */}
-            <button className="btn logo-btn" onClick={onLogoClick}>
-                <img src="/logo192.png" alt="icon" className="logo-img" />
+            <button className="btn logo-btn d-flex align-items-center gap-2" onClick={onLogoClick}>
+                <img src="/logo192.png" alt="icon" className="logo-img"/>
+                <span className="logo-text">Mail ASP</span>
             </button>
             {/* Search bar */}
             <form onSubmit={(e) => e.preventDefault()} className="search-bar d-flex align-items-center">
@@ -63,6 +66,7 @@ const TopMenu = ({ theme }) => {
                 {showMenu && (
                     <ProfileMenu
                         theme={theme}
+                        setTheme={setTheme}
                         imageUrl={imageUrl}
                         fullName={fullName}
                         onImageUpload={onImageUpload}
