@@ -34,4 +34,6 @@
     /* Hover/background effects for dark rows */
     --dark-hover-bg-mail-row: rgba(255, 255, 255, 0.1);     /* subtle light tint on hover */
     --dark-shadow-bg-mail-row: rgba(0, 0, 0, 0.3);
+
+    --profile-placeholder-bg: #e0e0e0;
 }

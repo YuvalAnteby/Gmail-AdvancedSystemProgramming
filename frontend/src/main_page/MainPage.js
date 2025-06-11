@@ -1,19 +1,17 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './MainPage.css'
 import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
 import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
+import TopMenu from "./top_menu/TopMenu";
+import {useLocation} from "react-router-dom";
 
 const DEFAULT_USER_ID = 1; /// TODO replace with JWT
 
 
 /// TODO replace the placeholders with the real menus and real data
-// Placeholder for top menu
-const TopMenuPlaceholder = ({theme}) => (
-    <div className={`${theme}-custom-navbar`}>Top menu</div>
-);
 // Placeholder for side menu
 const SideMenuPlaceholder = ({theme}) => (
     <div className={`${theme}-custom-sidenav`}>Side menu</div>
@@ -22,7 +20,9 @@ const SideMenuPlaceholder = ({theme}) => (
 const MainPage = ({theme}) => {
     const userId = DEFAULT_USER_ID;
 
-    const [inboxType, setInboxType] = useState('incoming');
+    const location = useLocation();
+    const [inboxType, setInboxType] = useState(location.state?.inboxType || 'incoming');
+    console.log(inboxType)
     const {emails, refreshMails } = useMails(userId, inboxType);
 
     // selected mail ids logic
@@ -48,11 +48,18 @@ const MainPage = ({theme}) => {
         });
     };
 
+    // Update state when location.state.inboxType changes
+    useEffect(() => {
+        if (location.state?.inboxType) {
+            setInboxType(location.state.inboxType);
+        }
+    }, [location.state?.inboxType]);
+
 
     return (
         <div className={`container-fluid p-3 ${theme}-main-page`}>
             {/* ---- TODO TOP MENU ---- */}
-            <div className="row mb-3"><div className="col-12"><TopMenuPlaceholder theme={theme}/></div></div>
+            <div className="row mb-3"><div className="col-12"><TopMenu theme={theme}/></div></div>
             {/* ---- MAIN LAYOUT ---- */}
             <div className="row">
                 {/* ---- TODO SIDE MENU ---- */}
