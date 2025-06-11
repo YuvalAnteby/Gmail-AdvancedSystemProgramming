@@ -71,4 +71,31 @@ const loginUser = (req, res) => {
     return res.status(200).json({id: user.id});
 };
 
-module.exports = { signupUser, getUser, loginUser };
+/**
+ * Updates user's attributes (password and/or image)
+ * @param req request
+ * @param res response
+ * @returns
+ * - code 200 with the updated user object if updated successfully
+ * - code 400 if received invalid input
+ * - code 404 if the user doesn't exist
+ */
+const editUser = (req, res) => {
+    // make sure the user is authenticated
+    const id = Number(req.params.id);
+    if (!id || isNaN(id))
+        return res.status(400).json({ error: 'Invalid user ID' });
+    // check for image input
+    const image = req.body.image;
+    if (image === undefined || image === null)
+        return res.status(400).json({ error: 'Invalid image input' });
+    // update the attributes
+    const user = Users.updateUser(id, undefined, image);
+    if (user === 400)
+        return res.status(400).json({ error: 'error invalid input' });
+    if (user === 404)
+        return res.status(404).json({ error: 'user not found' });
+    return res.status(200).json(user);
+}
+
+module.exports = { signupUser, getUser, loginUser, editUser };

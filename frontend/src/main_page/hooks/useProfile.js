@@ -8,15 +8,15 @@ export const useProfile = (userId) => {
     useEffect(() => {
         const fetch = async () => {
             const {imageUrl, fullName} = await fetchUserInfo(userId);
-            setImageUrl(imageUrl);
+            setImageUrl(imageUrl || '/profile_default.png');
             setFullName(fullName);
         };
         if (userId) fetch();
     }, [userId]);
 
     const updateImage = async (file) => {
-        const newUrl = await changeProfileImage(file);
-        setImageUrl(newUrl);
+        const updatedUser = await changeProfileImage(userId, file);
+        setImageUrl(updatedUser.image);
     };
 
     return {imageUrl, fullName, updateImage};

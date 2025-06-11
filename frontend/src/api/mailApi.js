@@ -93,7 +93,7 @@ export async function markAsRead(userId, mailId) {
     if (!res.ok)
         throw new Error(`marking read failed: ${res.status}`);
     console.log(`marking read: ${res.status}`);
-
+    return res.json();
 }
 
 /**
