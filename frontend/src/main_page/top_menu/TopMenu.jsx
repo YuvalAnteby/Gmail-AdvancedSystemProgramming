@@ -1,29 +1,49 @@
-import {useState} from "react";
+import { useRef, useState } from "react";
 import "./TopMenu.css";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useOutsideClick } from "../hooks/useOutsideClick";
+import ProfileMenu from "../top_menu/ProfileMenu";
 
-const TopMenu = ({theme}) => {
-    const imageUrl = ''; // TODO replace with dynamic logic
+const TopMenu = ({ theme }) => {
+    const navigate = useNavigate();
+
     const [query, setQuery] = useState('');
+    // user picture related vars
+    const [showMenu, setShowMenu] = useState(false);
+    const menuRef = useRef(null);
+    const [imageUrl, setImageUrl] = useState("/profile_default.png");
+    const fullName = "Yuval";
 
-    const navigate = useNavigate(); //Hook to navigate to another page
-    const handleLogoClick = () => {
-        navigate('/inbox', {state: {inboxType: 'all'}});
+    // When user clicks the logo at the top corner
+    const onLogoClick = () => {
+        setShowMenu(false);
+        navigate('/inbox', { state: { inboxType: 'incoming' } });
     };
-    const handleSubmit = (e) => {
-        e.preventDefault();
+
+    // When user clicks their profile picture
+    const onProfileClick = () => setShowMenu((prev) => !prev);
+    // In the event the user picked a new profile picture
+    const onImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const objectURL = URL.createObjectURL(file);
+            setImageUrl(objectURL);
+            // TODO update image attribute in the server
+            console.log("Temporary object URL:", objectURL);
+        }
     };
-    const handleProfileClick = () => {};
+
+
+    useOutsideClick(menuRef, () => setShowMenu(false), showMenu);
 
     return (
         <div className={`top-menu-wrapper ${theme}-top-menu d-flex align-items-center justify-content-between px-3`}>
-            {/* Logo */}
-            <button className="btn logo-btn" onClick={handleLogoClick}>
-                <img src="/logo192.png" alt="icon" className="logo-img"/>
+            {/* Logo button */}
+            <button className="btn logo-btn" onClick={onLogoClick}>
+                <img src="/logo192.png" alt="icon" className="logo-img" />
             </button>
-
             {/* Search bar */}
-            <form onSubmit={handleSubmit} className="search-bar d-flex align-items-center">
+            <form onSubmit={(e) => e.preventDefault()} className="search-bar d-flex align-items-center">
                 <input
                     type="text"
                     className="form-control search-input me-2"
@@ -35,15 +55,20 @@ const TopMenu = ({theme}) => {
                     <i className="bi bi-search"></i>
                 </button>
             </form>
-
             {/* Profile image */}
-            <button onClick={handleProfileClick} className="profile-btn">
-                <img
-                    src={imageUrl || "/profile_default.png"}
-                    alt="Profile"
-                    className="profile-img"
-                />
-            </button>
+            <div className="position-relative" ref={menuRef}>
+                <button onClick={onProfileClick} className="profile-btn">
+                    <img src={imageUrl} alt="Profile" className="profile-img" />
+                </button>
+                {showMenu && (
+                    <ProfileMenu
+                        theme={theme}
+                        imageUrl={imageUrl}
+                        fullName={fullName}
+                        onImageUpload={onImageUpload}
+                    />
+                )}
+            </div>
         </div>
     );
 };

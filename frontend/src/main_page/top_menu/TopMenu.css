@@ -102,3 +102,36 @@
     border-radius: 50%;
     background-color: var(--profile-placeholder-bg, #3a3a3a);
 }
+
+
+.profile-popup {
+    position: absolute;
+    right: 0;
+    top: 52px;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    min-width: 240px;
+    z-index: 1000;
+    text-align: center;
+}
+
+.dark-popup {
+    background-color: #2c2c2c;
+    color: white;
+}
+
+.popup-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.hello-text {
+    font-size: 1rem;
+    margin-top: 4px;
+}
+
+/* You can adjust spacing and button margins here too */

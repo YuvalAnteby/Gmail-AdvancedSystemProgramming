@@ -21,7 +21,7 @@ const MainPage = ({theme}) => {
     const userId = DEFAULT_USER_ID;
 
     const location = useLocation();
-    const [inboxType, setInboxType] = useState(location.state?.inboxType || 'incoming');
+    const [inboxType, setInboxType] = useState(location.state?.inboxType || 'all');
     console.log(inboxType)
     const {emails, refreshMails } = useMails(userId, inboxType);
 
@@ -55,7 +55,6 @@ const MainPage = ({theme}) => {
         }
     }, [location.state?.inboxType]);
 
-
     return (
         <div className={`container-fluid p-3 ${theme}-main-page`}>
             {/* ---- TODO TOP MENU ---- */}
@@ -84,7 +83,7 @@ const MainPage = ({theme}) => {
                                 theme={theme}
                                 key={email.id}
                                 id={email.id}
-                                sender={email.from.mail}
+                                sender={email.from}
                                 subject={email.subject}
                                 body={email.body}
                                 date={email.sentAt || email.createdAt}
