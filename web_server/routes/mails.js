@@ -7,7 +7,7 @@ router
     .post('', controller.createNewMail);
 router.route('/:id')
     .get(controller.getMailById)
-    .patch(controller.editMailById)
+    .patch(controller.updateMail)
     .delete(controller.deleteMailById);
 router.get('/search/:query/', controller.getMailsByQuery);
 
