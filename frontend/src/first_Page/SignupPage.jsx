@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import './SignupPage.css';
 import { registerUserWithJwt } from '../api/userApi';
 
@@ -14,7 +15,11 @@ export default function SignupPage() {
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) setTheme(savedTheme);
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            localStorage.setItem('theme', 'dark');
+        }
     }, []);
 
     const toggleTheme = () => {
@@ -51,7 +56,7 @@ export default function SignupPage() {
             const reader = new FileReader();
             reader.onload = () => {
                 user.image = reader.result;
-                registerUserWithJwt(user); // שימוש בפונקציה מתוך api
+                registerUserWithJwt(user);
             };
             reader.onerror = () => {
                 console.error("Image reading failed");
@@ -64,7 +69,7 @@ export default function SignupPage() {
     };
 
     return (
-        <div className={'signup-container ${theme}-mode'}>
+        <div className={`signup-container ${theme}-mode`}>
             <div className="theme-toggle">
                 <button onClick={toggleTheme}>
                     {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
@@ -73,12 +78,13 @@ export default function SignupPage() {
 
             <div className="signup-box">
                 <img
-                    src=""
+                    src="/logo192.png" // ✅ uses logo from public folder
                     alt="Logo"
                     className="logo"
                 />
-                <h2>Create a Google Account</h2>
+                <h2>Create a mail Account</h2>
                 <p className="subtitle">Enter your details</p>
+
                 <form onSubmit={handleSubmit}>
                     <input
                         type="text"
@@ -119,6 +125,7 @@ export default function SignupPage() {
                         accept="image/*"
                         onChange={handleFileChange}
                     />
+
                     {previewUrl && (
                         <div className="image-preview">
                             <img src={previewUrl} alt="Preview" />

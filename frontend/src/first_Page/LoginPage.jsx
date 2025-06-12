@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ Needed for routing
+import { useNavigate } from 'react-router-dom'; //  Needed for routing
 import './LoginPage.css';
 import { loginWithJwt } from '../api/userApi'; // Your API call
 
@@ -53,15 +53,11 @@ export default function LoginPage() {
             {/* Login Box */}
             <div className="signup-box">
                 <img
-                    src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png"
-                    alt="Google Logo"
+                    src="/logo192.png"
+                    alt=" Logo"
                     className="logo"
                 />
-                <h2>Sign in</h2>
-                <p className="subtitle">
-                    with your Google Account to continue to Gmail.
-                    This account will be available to other Google apps in the browser.
-                </p>
+                <h2>LOGIN IN</h2>
 
                 <form onSubmit={handleSubmit}>
                     <input
