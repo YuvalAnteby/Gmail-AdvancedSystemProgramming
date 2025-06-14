@@ -169,7 +169,7 @@
     cursor: pointer;
     width: 16px;
     height: 16px;
-    color: #666666;
+    color: #888888;
     transition: all 0.2s;
 }
 
@@ -180,4 +180,11 @@
 .star-icon.starred {
     color: #ffc107;
     fill: #ffc107;
+}
+
+.bi-clock.light {
+    color: #666666;
+}
+.bi-clock.dark {
+    color: white;
 }

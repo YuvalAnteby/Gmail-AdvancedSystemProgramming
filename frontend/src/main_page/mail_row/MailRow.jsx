@@ -45,21 +45,22 @@ const MailRow = ({theme, userId, email, isSelected, onSelect}) => {
             <i
                 className={`bi bi-star${isStarred ? "-fill" : ""} star-icon ${isStarred ? "starred" : ""}`}
                 onClick={(e) => toggleStar(email, e)}
-                />
+            />
 
-                <div className="email-content" onClick={handleMailOpen}>
-                    <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
-                    <div className="email-main-line">
-                        <div className="email-title-body">
-                            <div className={`email-subject ${theme}`}>{email.subject}</div>
-                            <div className={`email-preview ${theme}`}>{email.body}</div>
-                        </div>
+            <div className="email-content" onClick={handleMailOpen}>
+                <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
+                <div className="email-main-line">
+                    <div className="email-title-body">
+                        <div className={`email-subject ${theme}`}>{email.subject}</div>
+                        <div className={`email-preview ${theme}`}>{email.body}</div>
                     </div>
                 </div>
-                <div className={`email-time ${theme}`}>{formatDate(email.sentAt || email.createdAt)}</div>
+            </div>
+            <i className={`bi bi-clock ${theme}`}/>
+            <div className={`email-time ${theme}`}>{formatDate(email.sentAt || email.createdAt)}</div>
 
         </div>
-);
+    );
 }
 
 export default MailRow;
