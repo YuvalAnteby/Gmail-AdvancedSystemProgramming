@@ -93,5 +93,21 @@ export async function markAsRead(userId, mailId) {
     if (!res.ok)
         throw new Error(`marking read failed: ${res.status}`);
     console.log(`marking read: ${res.status}`);
+}
 
+export async function toggleMailStar(userId, mail) {
+    const url = `${API_BASE}/mails/${mail.id}`;
+    const res = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'user-id': userId,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            isStarred: !mail.isStarred,
+        })
+    })
+    if (!res.ok)
+        throw new Error(`toggleStarred failed ${res.status}`);
+    console.log(`toggleStar: ${res.status}`);
 }

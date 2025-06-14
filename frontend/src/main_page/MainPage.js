@@ -99,6 +99,7 @@ const MainPage = ({theme}) => {
                             <MailRow
                                 theme={theme}
                                 key={email.id}
+                                userId={userId}
                                 email={email}
                                 isSelected={selectedIds.has(email.id)}
                                 onSelect={handleSelect}

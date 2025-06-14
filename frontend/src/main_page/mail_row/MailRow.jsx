@@ -1,25 +1,40 @@
 import "./MailRow.css"
 import {formatDate} from "../../utils/formatDate";
+import {useState} from "react";
+import {toggleMailStar} from "../../api/mailApi";
 
 
 /**
  * props:
  *   - theme: {String} dark or light according to user preference
+ *   - userId: {number|string} user's id
  *   - email: {Object} email object
  *   - isSelected: {boolean} (whether this row is currently checked)
  *   - onSelect: function when marking a mail as selected for mass actions on them
  */
-const MailRow = ({theme, email, isSelected, onSelect}) => {
+const MailRow = ({theme, userId, email, isSelected, onSelect}) => {
 
     const handleMailOpen = () => {
         console.log(">> Open Mail Row:", email);
         /// TODO open the mail to read
     }
 
-    const rowClass = email.isRead ? "read" : "unread";
+    const [isStarred, setIsStarred] = useState(email.isStarred);
+    const toggleStar = async (mail, e) => {
+        e.stopPropagation()
+        try {
+            console.log(">> Toggle Mail Row:", email);
+            setIsStarred((prev) => !prev);
+            email.isStarred = isStarred;
+            await toggleMailStar(userId, email);
+        } catch (e) {
+            console.error(e);
+        }
+
+    }
 
     return (
-        <div className={`mail-row-item ${theme} ${rowClass}`} onClick={handleMailOpen}>
+        <div className={`mail-row-item ${theme} ${email.isRead ? "read" : "unread"}`}>
             <input
                 type="checkbox"
                 checked={isSelected}
@@ -27,19 +42,24 @@ const MailRow = ({theme, email, isSelected, onSelect}) => {
                 onClick={(e) => e.stopPropagation()}
             />
 
-            <div className="email-content">
-                <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
-                <div className="email-main-line">
-                    <div className="email-title-body">
-                        <div className={`email-subject ${theme}`}>{email.subject}</div>
-                        <div className={`email-preview ${theme}`}>{email.body}</div>
+            <i
+                className={`bi bi-star${isStarred ? "-fill" : ""} star-icon ${isStarred ? "starred" : ""}`}
+                onClick={(e) => toggleStar(email, e)}
+                />
+
+                <div className="email-content" onClick={handleMailOpen}>
+                    <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
+                    <div className="email-main-line">
+                        <div className="email-title-body">
+                            <div className={`email-subject ${theme}`}>{email.subject}</div>
+                            <div className={`email-preview ${theme}`}>{email.body}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className={`email-time ${theme}`}>{formatDate(email.sentAt || email.createdAt)}</div>
+                <div className={`email-time ${theme}`}>{formatDate(email.sentAt || email.createdAt)}</div>
 
         </div>
-    );
+);
 }
 
 export default MailRow;

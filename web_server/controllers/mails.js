@@ -134,7 +134,7 @@ const updateMail = (req, res) => {
     if (updated === 404)
         return res.status(404).json({error: 'Email not found'});
     // some other error
-    return res.status(500).end();
+    return res.status(500).json(updated);
 }
 
 /**
