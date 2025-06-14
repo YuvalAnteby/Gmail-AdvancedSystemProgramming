@@ -49,24 +49,25 @@ const MainPage = ({theme}) => {
     const {emails, refreshMails} = useMails(userId, inboxType);
 
     // selected mail ids logic
-    const [selectedIds, setSelectedIds] = useState(new Set());
-    const allEmailIds = emails.map((mail) => mail.id);
-    const allSelected = selectedIds.size === emails.length;
-    const anySelected = selectedIds.size > 0;
+    const [selectedMails, setSelectedMails] = useState(new Set());
+    const allEmails = emails.map((mail) => mail);
+    const allSelected = selectedMails.size === emails.length;
+    const anySelected = selectedMails.size > 0;
 
     const handlers = useMailToolbarHandlers(
         userId,
-        selectedIds,
-        setSelectedIds,
-        allEmailIds,
+        selectedMails,
+        setSelectedMails,
+        allEmails,
         refreshMails
     );
 
-    const handleSelect = (id, isChecked) => {
-        setSelectedIds((prev) => {
+    const handleSelect = (mail, isChecked) => {
+        setSelectedMails((prev) => {
             const copy = new Set(prev);
-            if (isChecked) copy.add(id);
-            else copy.delete(id);
+            if (isChecked) copy.add(mail);
+            else copy.delete(mail);
+            console.log(copy);
             return copy;
         });
     };
@@ -86,13 +87,10 @@ const MainPage = ({theme}) => {
                         {/* ---- TOOLBAR ---- */}
                         <ToolBar
                             theme={theme}
+                            inboxType={inboxType}
                             allSelected={allSelected}
                             anySelected={anySelected}
-                            handleSelectAll={handlers.handleSelectAll}
-                            handleRefresh={handlers.handleRefresh}
-                            handleDelete={handlers.handleDelete}
-                            handleMarkAsRead={handlers.handleMarkAsRead}
-                            handleMarkSpam={handlers.handleMarkSpam}
+                            btnHandlers={handlers}
                         />
                         {/* ---- ACTUAL MAIL ROWS ---- */}
                         {emails.map((email) => (
@@ -101,7 +99,7 @@ const MainPage = ({theme}) => {
                                 key={email.id}
                                 userId={userId}
                                 email={email}
-                                isSelected={selectedIds.has(email.id)}
+                                isSelected={[...selectedMails].some(mail => mail.id === email.id)}
                                 onSelect={handleSelect}
                             />
                         ))}

@@ -5,6 +5,7 @@ const controller = require('../controllers/blacklist');
 router
     .post('/', controller.addToBlacklist)
     .get('/:url', controller.isInBlacklist)
+    .delete('/', controller.removeMailFromBlacklist)
     .delete('/:url', controller.deleteFromBlacklist);
 
 module.exports = router;

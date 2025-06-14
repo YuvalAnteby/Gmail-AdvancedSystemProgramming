@@ -32,11 +32,11 @@ export async function getMailsByType(userId, inboxType = "all") {
 /**
  * DELETE api/mails/:id
  * @param {number|string} userId
- * @param {number|string} mailId
+ * @param {Object} mail
  * @returns {Promise<void>}
  */
-export async function deleteMail(userId, mailId) {
-    const url = `${API_BASE}/mails/${mailId}`;
+export async function deleteMail(userId, mail) {
+    const url = `${API_BASE}/mails/${mail.id}`;
     const res = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -52,19 +52,19 @@ export async function deleteMail(userId, mailId) {
 /**
  * POST api/blacklist
  * @param {number|string} userId
- * @param {number|string} mailId
+ * @param {Object} mail
  * @returns {Promise<void>}
  */
-export async function reportSpam(userId, mailId) {
+export async function toggleSpamReport(userId, mail) {
     const url = `${API_BASE}/blacklist`;
     const res = await fetch(url, {
-        method: 'POST',
+        method: mail.isSpam ? 'DELETE' : 'POST',
         headers: {
             'user-id': userId,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            mailId: mailId
+            mailId: mail.id
         })
     })
     if (!res.ok)

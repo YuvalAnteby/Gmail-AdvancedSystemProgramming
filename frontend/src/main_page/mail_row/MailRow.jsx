@@ -38,7 +38,7 @@ const MailRow = ({theme, userId, email, isSelected, onSelect}) => {
             <input
                 type="checkbox"
                 checked={isSelected}
-                onChange={(e) => onSelect(email.id, e.target.checked)}
+                onChange={(e) => onSelect(email, e.target.checked)}
                 onClick={(e) => e.stopPropagation()}
             />
 
