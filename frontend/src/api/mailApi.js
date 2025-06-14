@@ -95,6 +95,12 @@ export async function markAsRead(userId, mailId) {
     console.log(`marking read: ${res.status}`);
 }
 
+/**
+ * PATCH api/mails/:id
+ * @param {number|string} userId
+ * @param {Object} mail mail object to toggle it's star
+ * @returns {Promise<void>}
+ */
 export async function toggleMailStar(userId, mail) {
     const url = `${API_BASE}/mails/${mail.id}`;
     const res = await fetch(url, {
@@ -110,4 +116,22 @@ export async function toggleMailStar(userId, mail) {
     if (!res.ok)
         throw new Error(`toggleStarred failed ${res.status}`);
     console.log(`toggleStar: ${res.status}`);
+}
+
+
+export async function restoreMail(userId, mail) {
+    const url = `${API_BASE}/mails/${mail.id}`;
+    const res = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'user-id': userId,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            isTrashed: false,
+        })
+    })
+    if (!res.ok)
+        throw new Error(`restore mail: ${res.status}`);
+    console.log(`restore mail: ${res.status}`);
 }

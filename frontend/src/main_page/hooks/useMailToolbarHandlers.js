@@ -1,5 +1,5 @@
 import {useCallback} from "react";
-import {deleteMail, markAsRead, toggleSpamReport} from "../../api/mailApi";
+import {deleteMail, markAsRead, restoreMail, toggleSpamReport} from "../../api/mailApi";
 
 
 /**
@@ -79,13 +79,26 @@ export const useMailToolbarHandlers = (userId, selectedMails, setSelectedMails, 
         setSelectedMails(new Set());
     }, [selectedMails, setSelectedMails]);
 
-    // TODO add a return trashed mail to be regular
+    // Restore selected mails from the trash inbox to their previous inbox
+    const handleRestore = useCallback(async () => {
+        if (selectedMails.size === 0)
+            return;
+        try {
+            await Promise.all(Array.from(selectedMails).map((mail) => restoreMail(userId, mail)));
+            setSelectedMails(new Set());
+            refreshMails();
+        } catch (error) {
+            console.error("Error restoring mail:", error);
+        }
+        setSelectedMails(new Set());
+    }, [selectedMails, setSelectedMails]);
 
     return {
         handleSelectAll,
         handleRefresh,
         handleDelete,
         handleMarkAsRead,
-        handleMarkSpam
+        handleMarkSpam,
+        handleRestore,
     };
 }
