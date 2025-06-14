@@ -28,15 +28,15 @@ const MailRow = ({theme, email, isSelected, onSelect}) => {
             />
 
             <div className="email-content">
-                <div className="email-sender">{email.from.fullName}</div>
+                <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
                 <div className="email-main-line">
                     <div className="email-title-body">
-                        <div className="email-subject">{email.subject}</div>
-                        <div className="email-preview">{email.body}</div>
+                        <div className={`email-subject ${theme}`}>{email.subject}</div>
+                        <div className={`email-preview ${theme}`}>{email.body}</div>
                     </div>
                 </div>
             </div>
-            <div className="email-time">{formatDate(email.sentAt || email.createdAt)}</div>
+            <div className={`email-time ${theme}`}>{formatDate(email.sentAt || email.createdAt)}</div>
 
         </div>
     );

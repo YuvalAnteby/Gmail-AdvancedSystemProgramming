@@ -34,6 +34,7 @@
 /* Give unread a light-gray background */
 .mail-row-item.unread {
     font-weight: 600;
+    border-left: 4px solid #0d6efd;     /* Bootstrap’s primary blue */
 }
 .mail-row-item.light.unread {
     background-color: var(--light-bg-unread-mail-row);
@@ -57,19 +58,17 @@
 
 /* ─── HOVER EFFECT ───────────────────────────────── */
 /* On hover, lift the row and slide it in from the left */
-.mail-row-item.light:hover {
+.mail-row-item:hover {
     transform: translateX(4px);         /* shift 4px to the right */
     padding-left: 1.25rem;              /* account for the new left border */
 }
 .mail-row-item.light:hover {
     background-color: var(--light-hover-bg-mail-row);
     box-shadow: 0 2px 8px var(--light-shadow-bg-mail-row);
-    border-left: 4px solid #0d6efd;     /* Bootstrap’s primary blue */
 }
 .mail-row-item.dark:hover {
     background-color: var(--dark-hover-bg-mail-row);
     box-shadow: 0 2px 8px var(--dark-shadow-bg-mail-row);
-    border-left: 4px solid #0d6efd;     /* Bootstrap’s primary blue */
 }
 
 
@@ -102,29 +101,44 @@
 
 .email-sender {
     font-size: 14px;
-    color: #333333;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 200px;
     font-weight: 700;
 }
+.email-sender.light {
+    color: #000000;
+}
+.email-sender.dark {
+    color: #ffffff;
+}
 
 .email-subject {
     font-size: 14px;
     font-weight: 600;
-    color: #333;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.email-subject.light {
+    color: #333;
+}
+.email-subject.dark {
+    color: #ffffff;
+}
 
 .email-preview {
     font-size: 13px;
-    color: #666;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.email-preview.light {
+    color: #666;
+}
+.email-preview.dark {
+    color: #ffffff;
 }
 
 .email-time {
@@ -132,8 +146,13 @@
     align-items: end;
     gap: 4px;
     font-size: 14px;
-    color: #666666;
     white-space: nowrap;
     flex-shrink: 0;
     font-weight: 400;
+}
+.email-time.light {
+    color: #666666;
+}
+.email-time.dark {
+    color: #ffffff;
 }
