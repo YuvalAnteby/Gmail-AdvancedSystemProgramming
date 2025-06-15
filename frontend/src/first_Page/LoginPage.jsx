@@ -1,22 +1,13 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import './LoginPage.css';
+import {loginWithJwt} from "../api/userApi";
+import {useTheme} from "./hooks/useTheme";
 
 export default function LoginPage() {
-    const [theme, setTheme] = useState('dark');
+    const {theme, toggleTheme} = useTheme();
     const [formData, setFormData] = useState({mail: '', password: ''});
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) setTheme(savedTheme);
-    }, []);
-
-    const toggleTheme = () => {
-        const newTheme = theme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-    };
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -27,31 +18,19 @@ export default function LoginPage() {
         e.preventDefault();
 
         const {mail, password} = formData;
-
-        try {
-            const result = await fetch("http://localhost:3001/api/tokens", {
-                method: "POST",
-                body: JSON.stringify({mail, password}),
-                headers: {"Content-Type": "application/json"},
-            });
-
-            if (result.ok) {
-                const data = await result.json();
-                const token = data.token;
-                localStorage.setItem("token", token);
-
-                setFormData({mail: "", password: ""});
-                navigate("/inbox", {replace: true});
-            } else {
-                alert("Login failed. Please check your username and password.");
-                console.error("Login error:", result.statusText);
-                setFormData({mail: "", password: ""});
-            }
-        } catch (error) {
-            console.error("Network error:", error.message);
-            alert("Network error occurred. Please try again.");
-            setFormData({mail: "", password: ""});
+        const token = await loginWithJwt(mail, password);
+        setFormData({mail: "", password: ""});
+        // show the correct error message or move to the inbox
+        if (token === 400) {
+            alert('Wrong email or password');
+            return;
         }
+        if (token === 500) {
+            alert('Unexpected error, try again');
+            return;
+        }
+        // upon login success take the user to the inbox
+        navigate("/inbox", {replace: true});
     };
 
 

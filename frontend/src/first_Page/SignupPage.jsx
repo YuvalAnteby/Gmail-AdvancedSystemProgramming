@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './SignupPage.css';
 import { registerUserWithJwt } from '../api/userApi';
+import {useTheme} from "./hooks/useTheme";
 
 export default function SignupPage() {
-    const [theme, setTheme] = useState('dark');
+    const {theme, toggleTheme} = useTheme();
+
     const [formData, setFormData] = useState({
         fullName: '',
         mail: '',
@@ -13,16 +15,6 @@ export default function SignupPage() {
     });
     const [previewUrl, setPreviewUrl] = useState(null);
 
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) setTheme(savedTheme);
-    }, []);
-
-    const toggleTheme = () => {
-        const newTheme = theme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
