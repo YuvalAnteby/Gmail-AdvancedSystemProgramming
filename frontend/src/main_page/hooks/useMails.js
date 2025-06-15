@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getMailsByType } from "../../api/mailApi";
+import {getMailsByType} from "../../api/mailApi";
+import {MAILS_PER_PAGE} from "../../utils/constants";
 
 /**
  * Custom hook to fetch and refresh "mails" for a given userId and inboxType.
@@ -15,6 +16,9 @@ import { getMailsByType } from "../../api/mailApi";
  */
 export function useMails(userId, inboxType) {
     const [emails, setEmails] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -24,21 +28,53 @@ export function useMails(userId, inboxType) {
         setError(null);
 
         try {
-            const data = await getMailsByType(userId, inboxType);
-            setEmails(data);
+            const {mails, total} = await getMailsByType(userId, inboxType, page);
+            setEmails(mails);
+            setTotal(total);
         } catch (err) {
             setError(err);
         } finally {
             setLoading(false);
         }
-    }, [userId, inboxType]);
+    }, [userId, inboxType, page]);
 
     // Fetch initially, and whenever userId or inboxType changes
     useEffect(() => {
         if (userId) {
             refreshMails();
         }
-    }, [userId, inboxType, refreshMails]);
+    }, [userId, refreshMails]);
 
-    return { emails, loading, error, refreshMails };
+    const hasNextPage = page * MAILS_PER_PAGE < total;
+    const hasPrevPage = page > 1;
+    // update the page to be the next one
+    const goToNextPage = () => {
+        if (hasNextPage)
+            setPage(p => p + 1);
+    }
+    //update the page to be the previous one
+    const goToPrevPage = () => {
+        if (hasPrevPage)
+            setPage(p => p - 1);
+    }
+    const resetPage = () => {
+        setPage(1);
+    }
+    // Reset page to 1 when inboxType changes
+    useEffect(() => {
+        resetPage();
+    }, [inboxType]);
+
+    return {
+        emails,
+        total,
+        page,
+        hasNextPage,
+        hasPrevPage,
+        goToNextPage,
+        goToPrevPage,
+        loading,
+        error,
+        refreshMails
+    };
 }

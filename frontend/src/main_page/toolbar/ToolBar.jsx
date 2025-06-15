@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from "react";
 import './ToolBar.css'
+import {MAILS_PER_PAGE} from "../../utils/constants";
 
 const ToolBar = ({
                      theme,
@@ -7,6 +8,12 @@ const ToolBar = ({
                      allSelected,
                      anySelected,
                      btnHandlers,
+                     total,
+                     page,
+                     hasNextPage,
+                     hasPrevPage,
+                     goToNextPage,
+                     goToPrevPage,
                  }) => {
 
     // for cases where not all mails were selected but some do
@@ -19,7 +26,7 @@ const ToolBar = ({
 
     return (
         <div className="toolbar-container">
-            {/* SELECT ALL */}
+            {/* SELECT ALL - always shown */}
             <div className={`select-all ${theme}`} style={{marginRight: '12px'}}>
                 <input
                     ref={selectAllRef}
@@ -29,12 +36,13 @@ const ToolBar = ({
                 />
                 select all
             </div>
-            {/* refresh button */}
+            {/* refresh button - always shown */}
             <i
                 className={`btn bi bi-arrow-clockwise icon ${theme}`}
                 title="Refresh"
                 onClick={btnHandlers.handleRefresh}
             />
+            {/* additional buttons - shown when mails selected */}
             {anySelected && (
                 <div className="d-flex flex-row">
                     {/* mark read button */}
@@ -86,6 +94,26 @@ const ToolBar = ({
                     )}
                 </div>
             )}
+            {/* paging info and buttons - always shown */}
+            <div
+                className={`paging-container`}
+            >
+                <p
+                    className={`paging-text ${theme}`}
+                >
+                    Showing {(page-1) * MAILS_PER_PAGE + MAILS_PER_PAGE}–{Math.min(page * MAILS_PER_PAGE, total)} of {total}
+                </p>
+                <i
+                    className={`btn bi bi-arrow-left icon ${theme} ${!hasPrevPage ? 'disabled-icon' : ''}`}
+                    title="previous page"
+                    onClick={hasPrevPage ? goToPrevPage : undefined}
+                   />
+                <i
+                    className={`btn bi bi-arrow-right icon ${theme} ${!hasNextPage ? 'disabled-icon' : ''} me-2`}
+                    title="next page"
+                    onClick={hasNextPage ? goToNextPage : undefined}
+                />
+            </div>
         </div>
     )
 }

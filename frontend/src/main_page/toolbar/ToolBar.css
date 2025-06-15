@@ -35,3 +35,29 @@
 .icon.dark:hover {
     box-shadow: 0 4px 12px rgba(240, 240, 240, 0.15);
 }
+.disabled-icon {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+}
+
+/* paging info */
+.paging-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    margin-left: auto;
+}
+.paging-text {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 4px;
+}
+.paging-text.light {
+    color: #666;
+}
+.paging-text.dark {
+    color: #ffffff;
+}

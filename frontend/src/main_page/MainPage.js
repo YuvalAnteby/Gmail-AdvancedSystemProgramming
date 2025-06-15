@@ -45,9 +45,17 @@ const SideMenuPlaceholder = () => (
 const MainPage = ({theme}) => {
     const userId = DEFAULT_USER_ID;
 
-    const [inboxType, setInboxType] = useState('incoming');
-    const {emails, refreshMails} = useMails(userId, inboxType);
-
+    const [inboxType, setInboxType] = useState('all');
+    const {
+        emails,
+        total,
+        page,
+        hasNextPage,
+        hasPrevPage,
+        goToNextPage,
+        goToPrevPage,
+        refreshMails
+    } = useMails(userId, inboxType);
     // selected mail ids logic
     const [selectedMails, setSelectedMails] = useState(new Set());
     const allEmails = emails.map((mail) => mail);
@@ -62,6 +70,7 @@ const MainPage = ({theme}) => {
         refreshMails
     );
 
+    // handle selection of mail using the checkbox
     const handleSelect = (mail, isChecked) => {
         setSelectedMails((prev) => {
             const copy = new Set(prev);
@@ -91,6 +100,12 @@ const MainPage = ({theme}) => {
                             allSelected={allSelected}
                             anySelected={anySelected}
                             btnHandlers={handlers}
+                            total={total}
+                            page={page}
+                            hasNextPage={hasNextPage}
+                            hasPrevPage={hasPrevPage}
+                            goToNextPage={goToNextPage}
+                            goToPrevPage={goToPrevPage}
                         />
                         {/* ---- ACTUAL MAIL ROWS ---- */}
                         {emails.map((email) => (

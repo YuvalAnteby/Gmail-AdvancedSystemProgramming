@@ -1,21 +1,21 @@
 // Base URL — adjust port if needed
+import {MAILS_PER_PAGE} from "../utils/constants";
+
 const API_BASE = "http://localhost:3001/api";
 
 /**
  * GET /api/mails
- * Body: { inboxType: string (e.g. "all", "incoming", "sent", "draft", "star", "trash") }
+ * params: { inboxType: string (e.g. "all", "incoming", "sent", "draft", "star", "trash") }
  * Must include the 'user-id' header for auth.
  *
  * @param {number|string} userId
  * @param {'all'|'incoming'|'sent'|'draft'|'star'|'trash'} [inboxType]
+ * @param {number} page
  * @returns Promise<array of mail objects> (up to 50).
  */
-export async function getMailsByType(userId, inboxType = "all") {
+export async function getMailsByType(userId, inboxType = "all", page = 1) {
     // change the URL to include the optional query param
-    let url = `${API_BASE}/mails`;
-    // encode just in case but these are simple words
-    if (inboxType)
-        url += `?inboxType=${encodeURIComponent(inboxType)}`;
+    let url = `${API_BASE}/mails?inboxType=${encodeURIComponent(inboxType)}&page=${page}&limit=${MAILS_PER_PAGE}`;
     // Perform GET with user-id header
     const res = await fetch(url, {
         method: 'GET',
@@ -46,7 +46,6 @@ export async function deleteMail(userId, mail) {
     })
     if (!res.ok)
         throw new Error(`getMails failed: ${res.status}`);
-    console.log(`deletion: ${res.status}`);
 }
 
 /**
@@ -92,7 +91,6 @@ export async function markAsRead(userId, mailId) {
     })
     if (!res.ok)
         throw new Error(`marking read failed: ${res.status}`);
-    console.log(`marking read: ${res.status}`);
 }
 
 /**
@@ -115,7 +113,6 @@ export async function toggleMailStar(userId, mail) {
     })
     if (!res.ok)
         throw new Error(`toggleStarred failed ${res.status}`);
-    console.log(`toggleStar: ${res.status}`);
 }
 
 
@@ -133,5 +130,4 @@ export async function restoreMail(userId, mail) {
     })
     if (!res.ok)
         throw new Error(`restore mail: ${res.status}`);
-    console.log(`restore mail: ${res.status}`);
 }

@@ -17,11 +17,13 @@ const getLastMailsOrdered = (req, res) => {
     const userId = req.headers['user-id'];
     if (!userId)
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
-    const inboxType = req.query.inboxType;
+    const inboxType = req.query.inboxType || 'all';
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 50;
     // limit is 50 according to instructions
-    const rawMails = Mails.getUserMails(userId, 50, inboxType || undefined);
+    const {paged, total} = Mails.getUserMails(userId, limit, inboxType, page);
     // replace in the mails the user ids and labels ids with user and label elements so we can show names and emails
-    const fullMails = rawMails.map(m => {
+    const fullMails = paged.map(m => {
         return {
             ...m,
             from: usersToFullElement([m.from])[0],
@@ -30,7 +32,12 @@ const getLastMailsOrdered = (req, res) => {
         }
     })
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
-    return res.status(200).json(fullMails);
+    return res.status(200).json(
+        {
+            mails: fullMails,
+            total: total
+        }
+    );
 }
 
 /**
