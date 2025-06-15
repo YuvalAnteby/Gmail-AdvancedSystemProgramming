@@ -1,19 +1,22 @@
 .top-menu-wrapper {
-    height: 64px;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    padding-left: 16px;
-    padding-right: 16px;
     display: flex;
+    height: 64px;
+    padding: 6px 16px;
+
     align-items: center;
     justify-content: space-between;
 }
 /* LIGHT: subtle border, no shadow */
-.light-top-menu {
+.top-menu-wrapper.light {
     background-color: #f1f3f4;
     color: #000;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
+.top-menu-wrapper.dark {
+    color: #ffffff;
+    border-bottom: 1px solid rgb(202, 202, 202, 0.08);
+}
+
 /* logo button in top corner */
 .logo-btn {
     background: transparent;
@@ -48,6 +51,14 @@
     color: inherit;
     user-select: none;
 }
+.logo-text.light {
+    color: #000;
+
+}
+.logo-text.dark {
+    color: #ffffff;
+}
+
 .light-top-menu .logo-text {
     color: #202124;
 }

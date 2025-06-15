@@ -44,7 +44,7 @@ const SearchBar = ({userId, theme}) => {
         <div className="search-input-wrapper position-relative" style={{flexGrow: 1}}>
             <input
                 type="text"
-                className="form-control search-input"
+                className={`form-control search-input ${theme}`}
                 placeholder="Search mails..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

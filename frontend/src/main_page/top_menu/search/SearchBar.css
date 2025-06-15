@@ -12,21 +12,22 @@
     border-radius: 8px;
 }
 /* Dark theme search bar */
-.dark-top-menu .search-input {
+.search-input.dark {
     background-color: #303134;
     color: white;
 }
-.dark-top-menu .search-input::placeholder {
+.search-input.dark::placeholder {
     color: #ccc;
 }
 /* Light theme search bar */
-.light-top-menu .search-input {
+.search-input.light {
     background-color: #e7e7e7;
     color: #000;
 }
-.light-top-menu .search-input::placeholder {
+.search-input.light::placeholder {
     color: #666;
 }
+
 /* Search icon button */
 .search-btn {
     background-color: transparent;

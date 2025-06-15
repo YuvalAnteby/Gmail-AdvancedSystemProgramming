@@ -22,10 +22,10 @@ const TopMenu = ({theme, setTheme, userId}) => {
     useOutsideClick(menuRef, () => setShowMenu(false), showMenu);
 
     return (
-        <div className={`top-menu-wrapper ${theme}-top-menu d-flex align-items-center justify-content-between px-3`}>
-            <button className="btn logo-btn d-flex align-items-center gap-2" onClick={onLogoClick}>
+        <div className={`top-menu-wrapper ${theme} px-3`}>
+            <button className="btn logo-btn" onClick={onLogoClick}>
                 <img src="/logo192.png" alt="icon" className="logo-img"/>
-                <span className="logo-text">Mail ASP</span>
+                <span className={`logo-text ${theme}`}>Mail ASP</span>
             </button>
 
             <div className="search-container d-flex align-items-center" style={{position: 'relative'}}>
