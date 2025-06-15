@@ -2,7 +2,7 @@
 
 const users = require('../models/users')
 const jwt = require('jsonwebtoken')
-// need to replace with a secure key
+// need to replace with a key
 const key = "my-secret-key"
 
 exports.createToken = (req, res) =>{
