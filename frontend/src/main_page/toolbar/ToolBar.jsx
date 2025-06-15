@@ -1,14 +1,19 @@
 import React, {useEffect, useRef} from "react";
 import './ToolBar.css'
+import {MAILS_PER_PAGE} from "../../utils/constants";
 
 const ToolBar = ({
+                     theme,
+                     inboxType,
                      allSelected,
                      anySelected,
-                     handleSelectAll,
-                     handleRefresh,
-                     handleDelete,
-                     handleMarkAsRead,
-                     handleMarkSpam
+                     btnHandlers,
+                     total,
+                     page,
+                     hasNextPage,
+                     hasPrevPage,
+                     goToNextPage,
+                     goToPrevPage,
                  }) => {
 
     // for cases where not all mails were selected but some do
@@ -20,52 +25,95 @@ const ToolBar = ({
     }, [allSelected, anySelected]);
 
     return (
-        // The d-flex container is what we want to directly style.
-        // We removed the outer col-md-9 mb-3 because it was the wrong level of abstraction here.
-        <div className="d-flex align-items-center mb-2 mail-toolbar-alignment"> {/* Add a new class for styling */}
-            {/* SELECT ALL */}
-            <div className="col-auto" style={{marginRight: '12px'}}>
+        <div className="toolbar-container">
+            {/* SELECT ALL - always shown */}
+            <div className={`select-all ${theme}`} style={{marginRight: '12px'}}>
                 <input
                     ref={selectAllRef}
                     type="checkbox"
                     checked={allSelected}
-                    onChange={handleSelectAll}
+                    onChange={btnHandlers.handleSelectAll}
+                />
+                select all
+            </div>
+            {/* refresh button - always shown */}
+            <i
+                className={`btn bi bi-arrow-clockwise icon ${theme}`}
+                title="Refresh"
+                onClick={btnHandlers.handleRefresh}
+            />
+            {/* additional buttons - shown when mails selected */}
+            {anySelected && (
+                <div className="d-flex flex-row">
+                    {/* mark read button */}
+                    <i
+                        className={`btn bi bi-envelope-open icon ${theme}`}
+                        title="Mark as Read"
+                        onClick={btnHandlers.handleMarkAsRead}/>
+                    {/* delete button, when in trash inbox shows delete forever and restore buttons */}
+                    {inboxType !== 'trash' && (
+                        <i
+                            className={`btn bi bi-trash icon ${theme}`}
+                            title="Delete"
+                            onClick={btnHandlers.handleDelete}/>
+                    )}
+                    {/* report spam, when in spam inbox shows unspam button */}
+                    {inboxType !== 'spam' && (
+                        <i
+                            className={`btn bi bi-exclamation-octagon icon ${theme}`}
+                            title="Report Spam"
+                            onClick={btnHandlers.handleMarkSpam}/>
+                    )}
+                    {/* instead of report spam have 'unspam' button */}
+                    {inboxType === 'spam' && (
+                        <button
+                            className="btn btn-sm"
+                            onClick={btnHandlers.handleMarkSpam}
+                        >
+                            Not spam
+                        </button>
+                    )}
+                    {/* instead of trash button have 'delete forever' and 'restore' buttons */}
+                    {inboxType === 'trash' && (
+                        <div className="d-flex flex-row">
+                            <button
+                                className="btn btn-sm"
+                                title="delete forever"
+                                onClick={btnHandlers.handleDelete}
+                            >
+                                Delete forever
+                            </button>
+                            <button
+                                className="btn btn-sm"
+                                title="restore mail"
+                                onClick={btnHandlers.handleRestore}
+                            >
+                                Restore mail
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
+            {/* paging info and buttons - always shown */}
+            <div
+                className={`paging-container`}
+            >
+                <p
+                    className={`paging-text ${theme}`}
+                >
+                    Showing {(page-1) * MAILS_PER_PAGE + MAILS_PER_PAGE}–{Math.min(page * MAILS_PER_PAGE, total)} of {total}
+                </p>
+                <i
+                    className={`btn bi bi-arrow-left icon ${theme} ${!hasPrevPage ? 'disabled-icon' : ''}`}
+                    title="previous page"
+                    onClick={hasPrevPage ? goToPrevPage : undefined}
+                   />
+                <i
+                    className={`btn bi bi-arrow-right icon ${theme} ${!hasNextPage ? 'disabled-icon' : ''} me-2`}
+                    title="next page"
+                    onClick={hasNextPage ? goToNextPage : undefined}
                 />
             </div>
-            {/* --- REFRESH --- */}
-            <button className="btn btn-info btn-sm me-2"
-                    onClick={handleRefresh}
-                    title="Refresh"
-            >
-                <i className="bi bi-arrow-clockwise"></i>
-            </button>
-            {/* MARK READ */}
-            <button
-                className="btn btn-success btn-sm me-2"
-                onClick={handleMarkAsRead}
-                disabled={!anySelected}
-                title="Mark as Read"
-            >
-                <i className="bi bi-envelope-open"></i>
-            </button>
-            {/* --- DELETE --- */}
-            <button
-                className="btn btn-danger btn-sm me-2"
-                onClick={handleDelete}
-                disabled={!anySelected}
-                title="Delete"
-            >
-                <i className="bi bi-trash"></i>
-            </button>
-            {/* REPORT SPAM */}
-            <button
-                className="btn btn-warning btn-sm"
-                onClick={handleMarkSpam}
-                disabled={!anySelected}
-                title="Report Spam"
-            >
-                <i className="bi bi-exclamation-octagon"></i>
-            </button>
         </div>
     )
 }

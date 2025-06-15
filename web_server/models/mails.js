@@ -107,21 +107,25 @@ let mailId = mails ? mails.length : 0;
 
 /**
  * Gets the last X mails belonging to a user according to different types of inboxes.
- * @param userId user id we want to search for
- * @param limit max amount of mails to receive
- * @param inboxType type of inbox to get. e.g. starred or drafts
- * @returns {any[]} list of ordered mails objects from the most recent to less recent
+ * @param {number} userId user id we want to search for
+ * @param {number} limit max amount of mails to receive, by default 50 mails
+ * @param {string} inboxType type of inbox to get. e.g. starred or drafts
+ * @param {number} page what page of mails to receive, by default gets the first 50 mails
+ * @returns {Object} list of ordered mails objects from the most recent to less recent and total mails amount
  */
-const getUserMails = (userId, limit, inboxType) => {
+const getUserMails = (userId, limit = 50, inboxType, page = 1) => {
     // Default to 'all' if inboxType is invalid or missing
     const lowerCasedKey = (typeof inboxType === 'string' && inboxType.toLowerCase()) || 'all';
     const key = inboxFilters.hasOwnProperty(lowerCasedKey) ? lowerCasedKey : 'all';
     const {predicate, sortKey} = inboxFilters[key];
     // Fetch the mails with the chosen predicate and sort key
-    return mails
-        .filter((mail) => predicate(mail, userId))
-        .sort((a, b) => sortKey(b) - sortKey(a))
-        .slice(0, limit)
+    const filtered = mails.filter((mail) => predicate(mail, userId));
+    const sorted = filtered.sort((a, b) => sortKey(b) - sortKey(a));
+    // calculate what mails to get according to the page
+    const total = sorted.length;
+    const startIdx = (page - 1) * limit;
+    const paged = sorted.slice(startIdx, startIdx + limit);
+    return {paged, total};
 }
 
 /**

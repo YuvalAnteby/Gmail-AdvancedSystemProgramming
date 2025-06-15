@@ -7,6 +7,8 @@ const Labels = require("../models/labels");
  * @returns {number[]} array of labels ids
  */
 function convertLabelsToIds(userId, labelsByNames) {
+    if (!labelsByNames)
+        return [];
     return labelsByNames.map(label => {
         return Labels.getLabelByName(userId, label).id;
     })

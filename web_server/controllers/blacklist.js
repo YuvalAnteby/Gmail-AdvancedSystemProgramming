@@ -111,7 +111,6 @@ exports.deleteFromBlacklist = async (req, res) => {
     } catch {
         return res.status(400).json({error: 'Invalid URL encoding'});
     }
-
     try {
         const removed = await Blacklist.deleteFromBlacklist(decoded);
         if (removed) {
@@ -122,4 +121,34 @@ exports.deleteFromBlacklist = async (req, res) => {
         console.error('Error in deleteFromBlacklist controller:', err);
         return res.status(502).end();
     }
+};
+
+/**
+ * Removes a mail from the spam, including all URLs in it that were previously blacklisted in the bloom filter.
+ * @param req request
+ * @param res response
+ * @returns {Promise<*>}
+ */
+exports.removeMailFromBlacklist = async (req, res) => {
+    const userId = req.headers['user-id'];
+    if (!userId)
+        return res.status(400).json({error: 'No user id'});
+    // fetch the mail
+    const mailId = req.body.mailId;
+    if (!mailId)
+        return res.status(400).json({error: 'No mail id'});
+    const mail = Mails.getMail(mailId);
+    // make sure it was found and belongs to the user
+    if (!mail || mail.owner !== Number(userId))
+        return res.status(404).json({error: 'mail not found for user'});
+    // update the mail's spam flag
+    const updated = Mails.editSentMail(mail.id, null, null, null, false, null);
+    // extract URLs, if we found URLs - remove them from the blacklist
+    const urls = extractUrls(mail.subject + ' ' + mail.body);
+    let removedUrls;
+    if (urls.length !== 0)
+        removedUrls = await Blacklist.deleteFromBlacklist(urls);
+    if ((urls.length === 0 || removedUrls) && updated)
+        return res.status(204).end();
+    return res.status(500).json({error: 'unexpected error while unspamming mail'});
 };

@@ -1,21 +1,21 @@
 // Base URL — adjust port if needed
+import {MAILS_PER_PAGE} from "../utils/constants";
+
 const API_BASE = "http://localhost:3001/api";
 
 /**
  * GET /api/mails
- * Body: { inboxType: string (e.g. "all", "incoming", "sent", "draft", "star", "trash") }
+ * params: { inboxType: string (e.g. "all", "incoming", "sent", "draft", "star", "trash") }
  * Must include the 'user-id' header for auth.
  *
  * @param {number|string} userId
  * @param {'all'|'incoming'|'sent'|'draft'|'star'|'trash'} [inboxType]
+ * @param {number} page
  * @returns Promise<array of mail objects> (up to 50).
  */
-export async function getMailsByType(userId, inboxType = "all") {
+export async function getMailsByType(userId, inboxType = "all", page = 1) {
     // change the URL to include the optional query param
-    let url = `${API_BASE}/mails`;
-    // encode just in case but these are simple words
-    if (inboxType)
-        url += `?inboxType=${encodeURIComponent(inboxType)}`;
+    let url = `${API_BASE}/mails?inboxType=${encodeURIComponent(inboxType)}&page=${page}&limit=${MAILS_PER_PAGE}`;
     // Perform GET with user-id header
     const res = await fetch(url, {
         method: 'GET',
@@ -32,11 +32,11 @@ export async function getMailsByType(userId, inboxType = "all") {
 /**
  * DELETE api/mails/:id
  * @param {number|string} userId
- * @param {number|string} mailId
+ * @param {Object} mail
  * @returns {Promise<void>}
  */
-export async function deleteMail(userId, mailId) {
-    const url = `${API_BASE}/mails/${mailId}`;
+export async function deleteMail(userId, mail) {
+    const url = `${API_BASE}/mails/${mail.id}`;
     const res = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -46,25 +46,24 @@ export async function deleteMail(userId, mailId) {
     })
     if (!res.ok)
         throw new Error(`getMails failed: ${res.status}`);
-    console.log(`deletion: ${res.status}`);
 }
 
 /**
  * POST api/blacklist
  * @param {number|string} userId
- * @param {number|string} mailId
+ * @param {Object} mail
  * @returns {Promise<void>}
  */
-export async function reportSpam(userId, mailId) {
+export async function toggleSpamReport(userId, mail) {
     const url = `${API_BASE}/blacklist`;
     const res = await fetch(url, {
-        method: 'POST',
+        method: mail.isSpam ? 'DELETE' : 'POST',
         headers: {
             'user-id': userId,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            mailId: mailId
+            mailId: mail.id
         })
     })
     if (!res.ok)
@@ -92,6 +91,43 @@ export async function markAsRead(userId, mailId) {
     })
     if (!res.ok)
         throw new Error(`marking read failed: ${res.status}`);
-    console.log(`marking read: ${res.status}`);
+}
 
+/**
+ * PATCH api/mails/:id
+ * @param {number|string} userId
+ * @param {Object} mail mail object to toggle it's star
+ * @returns {Promise<void>}
+ */
+export async function toggleMailStar(userId, mail) {
+    const url = `${API_BASE}/mails/${mail.id}`;
+    const res = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'user-id': userId,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            isStarred: !mail.isStarred,
+        })
+    })
+    if (!res.ok)
+        throw new Error(`toggleStarred failed ${res.status}`);
+}
+
+
+export async function restoreMail(userId, mail) {
+    const url = `${API_BASE}/mails/${mail.id}`;
+    const res = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'user-id': userId,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            isTrashed: false,
+        })
+    })
+    if (!res.ok)
+        throw new Error(`restore mail: ${res.status}`);
 }
