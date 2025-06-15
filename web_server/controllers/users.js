@@ -11,27 +11,36 @@ const jwt =require('jsonwebtoken');
  */
 const signupUser = async (req, res) => {
     const { fullName, mail, password, dateOfBirth, image } = req.body;
-    // Check if we have a missing attribute
+
     for (const field of ['fullName', 'mail', 'password', 'dateOfBirth']) {
         if (!req.body[field]) {
             return res.status(400).json({ error: `${field} is required` });
         }
     }
-    // Don't create a new user if the mail address is taken already
+
     if (Users.userExist(mail)) {
         return res.status(400).json({ error: 'mail already exists' });
     }
-    const newUser =await Users.createUser(fullName, mail, password, dateOfBirth, image);
-    const token=jwt.sign({
+
+    const newUser = await Users.createUser(fullName, mail, password, dateOfBirth, image);
+
+    const token = jwt.sign({
         id: newUser.id,
         fullName: newUser.fullName,
         mail: newUser.mail,
         dateOfBirth: newUser.dateOfBirth
-    },
-        'mySecretKey',
-    {expiresIn: '24h'}
-        );
-    return res.status(201).json({token});
+    }, 'mySecretKey', { expiresIn: '24h' });
+
+    return res.status(201).json({
+        token,
+        user: {
+            id: newUser.id,
+            fullName: newUser.fullName,
+            mail: newUser.mail,
+            dateOfBirth: newUser.dateOfBirth,
+            image: newUser.image
+        }
+    });
 };
 
 /**
@@ -80,7 +89,8 @@ const loginUser = async (req, res) => {
         id: user.id,
         fullName: user.fullName,
         mail: user.mail,
-        dateOfBirth: user.dateOfBirth
+        dateOfBirth: user.dateOfBirth,
+        image: user.image
         },
         'mySecretKey',
         {expiresIn: '24h'}

@@ -5,22 +5,22 @@ const jwt = require('jsonwebtoken')
 // need to replace with a key
 const key = "my-secret-key"
 
-exports.createToken = (req, res) =>{
+exports.createToken = (req, res) => {
     // Extract and check for missing fields in request's body
-    const { username, password } = req.body
+    const { username, password } = req.body;
     if (!username || !password)
-        return res.status (400).json({ error : 'Username, Password are required' })
+        return res.status(400).json({ error: 'Username and password are required' });
 
-    // Get token (= user ID) by the given username + password
-    const userId = users.getUserID(username, password)
+    const user = users.isAuthorizeUser(username, password);
+    if (!user)
+        return res.status(404).json({ error: 'User does not exist' });
 
-    if (!userId)
-        return res.status (404).json({ error: 'User does not exist' })
-    jwt.sign({ userId }, key, (err, token) => {
-        if (err) {
-            console.error("Error signing token:", err)
-            return res.status(500).json({error: 'Internal server error'})
-        }
-        res.status(201).json({ token })
-    })
-}
+    const token = jwt.sign({
+        id: user.id,
+        fullName: user.fullName,
+        mail: user.mail,
+        dateOfBirth: user.dateOfBirth
+    }, key, { expiresIn: '24h' });
+
+    return res.status(201).json({ token, user });
+};
