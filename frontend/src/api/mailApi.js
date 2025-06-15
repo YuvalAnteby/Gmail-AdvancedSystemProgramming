@@ -68,7 +68,6 @@ export async function toggleSpamReport(userId, mail) {
     })
     if (!res.ok)
         throw new Error(`reporting spam failed: ${res.status}`);
-    console.log(`marking spam: ${res.status}`);
 }
 
 /**
@@ -113,6 +112,7 @@ export async function toggleMailStar(userId, mail) {
     })
     if (!res.ok)
         throw new Error(`toggleStarred failed ${res.status}`);
+    return res.json();
 }
 
 
@@ -131,3 +131,21 @@ export async function restoreMail(userId, mail) {
     if (!res.ok)
         throw new Error(`restore mail: ${res.status}`);
 }
+/**
+ * GET api/mails/:query
+ * @param userId {number|string} user id that makes the search
+ * @param {string} query to search in mails
+ * @returns {Promise<any>}
+ */
+export const searchMails = async (userId, query) => {
+    const url = `${API_BASE}/mails/search/${encodeURIComponent(query)}`;
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'user-id': userId,
+        }
+    });
+    if (!res.ok)
+        throw new Error(`Search failed ${res.status}`);
+    return res.json();
+};

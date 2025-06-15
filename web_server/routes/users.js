@@ -10,6 +10,9 @@ router.post('/users', controller.signupUser);
 // GET /api/users/:id
 router.get('/users/:id', controller.getUser);
 
+// PATCH /api/users/:id
+router.patch('/users/:id', controller.editUser);
+
 // POST /api/users/login    (login)
 router.post('/tokens', controller.loginUser);
 

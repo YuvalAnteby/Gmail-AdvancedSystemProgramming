@@ -1,0 +1,107 @@
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+.search-dropdown.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.search-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+.search-item.highlighted {
+    background-color: #d6e3f3;
+}
+
+.dark-dropdown .search-item.highlighted {
+    background-color: #3a4a5c;
+}
+
+.search-item-content {
+    flex-grow: 1;
+}
+
+.search-item:hover {
+    background: #f1f1f1;
+}
+
+.search-item-subject {
+    text-align: left;
+    font-weight: bold;
+}
+
+.search-item-body {
+    text-align: left;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.search-item-date {
+    font-size: 0.85em;
+    color: #888;
+    white-space: nowrap;
+}
+
+.search-loading {
+    padding: 10px;
+    text-align: center;
+    font-style: italic;
+}
+
+
+/* ------ DARK THEME ------ */
+.dark-dropdown {
+    background-color: #2c2c2c;
+    color: white;
+    border: 1px solid #444;
+}
+
+.dark-dropdown .search-item {
+    border-bottom: 1px solid #444;
+}
+
+.dark-dropdown .search-item:hover {
+    background-color: #3a3a3a;
+}
+
+.dark-dropdown .search-item-body {
+    color: #ccc;
+}
+
+.dark-dropdown .search-item-date {
+    color: #aaa;
+}
+
+.dark-dropdown .search-loading {
+    color: #ddd;
+}
+
+/* animation when changing the theme */
+.search-dropdown,
+.search-item,
+.search-loading {
+    transition: background-color 0.2s ease, color 0.2s ease;
+}

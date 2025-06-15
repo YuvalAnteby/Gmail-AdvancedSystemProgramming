@@ -1,0 +1,55 @@
+/* Search bar */
+.search-bar {
+    flex-grow: 1;
+    margin: 0 16px;
+}
+/* input in search bar */
+.search-input {
+    flex-grow: 1;
+    min-width: 200px;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+/* Dark theme search bar */
+.dark-top-menu .search-input {
+    background-color: #303134;
+    color: white;
+}
+.dark-top-menu .search-input::placeholder {
+    color: #ccc;
+}
+/* Light theme search bar */
+.light-top-menu .search-input {
+    background-color: #e7e7e7;
+    color: #000;
+}
+.light-top-menu .search-input::placeholder {
+    color: #666;
+}
+/* Search icon button */
+.search-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+/* Icon visibility */
+.light-top-menu .search-btn i {
+    color: #5f6368; /* subtle dark grey used by Gmail */
+}
+.dark-top-menu .search-btn i {
+    color: #e8eaed; /* light grey used in dark Gmail */
+}
+
+.search-container {
+    position: relative;
+    flex-grow: 1;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 16px;
+}

@@ -225,8 +225,16 @@ const getMailsByQuery = (req, res) => {
     if (!query)
         return res.status(400).json({error: 'Empty query'});
     // Find the mails and return them, if there are no mails returns an empty array
-    const mails = Mails.searchInInbox(query, userId);
-    return res.status(200).json(mails);
+    const rawMails = Mails.searchInInbox(query, userId);
+    const fullMails = rawMails.map(m => {
+        return {
+            ...m,
+            from: usersToFullElement([m.from])[0],
+            sentTo: usersToFullElement(m.sentTo || []),
+            labels: labelsToFullElement(userId, m.labels || [])
+        }
+    })
+    return res.status(200).json(fullMails);
 }
 
 module.exports = {getLastMailsOrdered, getMailById, createNewMail, updateMail, deleteMailById, getMailsByQuery};

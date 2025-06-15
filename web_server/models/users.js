@@ -1,4 +1,5 @@
 // Author: Yuval Anteby ,dor darmon
+const res = require("express/lib/response");
 /**
  * User object structure:
  *  id - positive number
@@ -127,5 +128,47 @@ const createUser = (fullName, mail, password, dateOfBirth, image) => {
     return newUser;
 };
 
+/**
+ * Update user's attribute (that we allow changing)
+ * @param {number|string} id id of the user
+ * @param {string|undefined} password new password
+ * @param {string|undefined} image new image URL
+ * @returns {number|{id: (number|*), fullName: (string|*), mail: (string|*), image, dateOfBirth: (string|*)}}
+ * - code 400 if input is invalid
+ * - code 404 if user not found
+ * - user object with the updated attributes if successfully updated
+ */
+const updateUser = (id, password, image) => {
+    // make sure we received valid input
+    if (!id || (!password && !image))
+        return 400;
+    // make sure the user exists
+    const index = users.findIndex(user => user.id === id);
+    if (index === -1)
+        return 404;
+    // update the image URL if provided
+    if (image)
+        users[index].image = image;
+    // update a new password if provided
+    if (password)
+        users[index].password = password;
+    // we updated successfully - return the updated user (without the password
+    return {
+        id: users[index].id,
+        fullName: users[index].fullName,
+        mail: users[index].mail,
+        image: image,
+        dateOfBirth: users[index].dateOfBirth,
+    };
+}
 
-module.exports = {getAllUsers, getUserById, getSafeUserById, createUser, userExist, isAuthorizeUser, getUserByMail};
+module.exports = {
+    getAllUsers,
+    getUserById,
+    getSafeUserById,
+    createUser,
+    userExist,
+    isAuthorizeUser,
+    getUserByMail,
+    updateUser
+};

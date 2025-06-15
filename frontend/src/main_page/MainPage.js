@@ -1,29 +1,17 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './MainPage.css'
 import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
 import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
+import TopMenu from "./top_menu/TopMenu";
+import {useLocation} from "react-router-dom";
 
 const DEFAULT_USER_ID = 1; /// TODO replace with JWT
 
 
 /// TODO replace the placeholders with the real menus and real data
-// Placeholder for top menu
-const TopMenuPlaceholder = () => (
-    <div style={{
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08)',
-        borderRadius: 0,
-        alignContent: 'center',
-        padding: '20px',
-        color: 'black',
-        backgroundColor: '#ffef37'
-    }}
-    >
-        Top menu
-    </div>
-);
 // Placeholder for side menu
 const SideMenuPlaceholder = () => (
     <div
@@ -42,10 +30,11 @@ const SideMenuPlaceholder = () => (
     </div>
 );
 
-const MainPage = ({theme}) => {
+const MainPage = ({theme, setTheme}) => {
     const userId = DEFAULT_USER_ID;
 
-    const [inboxType, setInboxType] = useState('all');
+    const location = useLocation();
+    const [inboxType, setInboxType] = useState(location.state?.inboxType || 'all');
     const {
         emails,
         total,
@@ -81,11 +70,21 @@ const MainPage = ({theme}) => {
         });
     };
 
+    // Update state when location.state.inboxType changes
+    useEffect(() => {
+        if (location.state?.inboxType) {
+            setInboxType(location.state.inboxType);
+        }
+    }, [location.state?.inboxType]);
 
     return (
         <div className={`main-page ${theme}`}>
-            {/* ---- TODO TOP MENU ---- */}
-            <div className="col-12"><TopMenuPlaceholder theme={theme}/></div>
+            {/* ---- TOP MENU ---- */}
+            <div className="row mb-3">
+                <div className="col-12">
+                    <TopMenu theme={theme} setTheme={setTheme} userId={userId}/>
+                </div>
+            </div>
             {/* ---- MAIN LAYOUT ---- */}
             <div className="main-content">
                 {/* ---- TODO SIDE MENU ---- */}
