@@ -15,11 +15,7 @@ export default function SignupPage() {
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            setTheme(savedTheme);
-        } else {
-            localStorage.setItem('theme', 'dark');
-        }
+        if (savedTheme) setTheme(savedTheme);
     }, []);
 
     const toggleTheme = () => {
@@ -52,19 +48,33 @@ export default function SignupPage() {
             image: ''
         };
 
+        const sendUser = (imgData = '') => {
+            user.image = imgData;
+            registerUserWithJwt(user)
+                .then(token => {
+                    if (token) {
+                        localStorage.setItem('jwtToken', token);
+                        window.location.href = '/inbox';
+                    } else {
+                        alert('Signup failed: No token received');
+                    }
+                })
+                .catch(err => {
+                    console.error('Signup error:', err);
+                    alert('Signup failed. Please try again.');
+                });
+        };
+
         if (formData.profileImage) {
             const reader = new FileReader();
-            reader.onload = () => {
-                user.image = reader.result;
-                registerUserWithJwt(user);
-            };
+            reader.onload = () => sendUser(reader.result);
             reader.onerror = () => {
                 console.error("Image reading failed");
                 alert("Failed to read image.");
             };
             reader.readAsDataURL(formData.profileImage);
         } else {
-            registerUserWithJwt(user);
+            sendUser();
         }
     };
 
@@ -77,64 +87,23 @@ export default function SignupPage() {
             </div>
 
             <div className="signup-box">
-                <img
-                    src="/logo192.png" // ✅ uses logo from public folder
-                    alt="Logo"
-                    className="logo"
-                />
-                <h2>Create a mail Account</h2>
+                <img src="/logo192.png" alt="Logo" className="logo" />
+                <h2>Create a Mail Account</h2>
                 <p className="subtitle">Enter your details</p>
 
                 <form onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        name="fullName"
-                        placeholder="Full name"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        required
-                    />
-                    <input
-                        type="email"
-                        name="mail"
-                        placeholder="Email"
-                        value={formData.mail}
-                        onChange={handleChange}
-                        required
-                    />
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
-                    <input
-                        type="text"
-                        name="birthDate"
-                        placeholder="Date of birth (YYYY/MM/DD)"
-                        value={formData.birthDate}
-                        onChange={handleChange}
-                        required
-                    />
-
+                    <input type="text" name="fullName" placeholder="Full name" value={formData.fullName}
+                           onChange={handleChange} required />
+                    <input type="email" name="mail" placeholder="Email" value={formData.mail}
+                           onChange={handleChange} required />
+                    <input type="password" name="password" placeholder="Password" value={formData.password}
+                           onChange={handleChange} required />
+                    <input type="text" name="birthDate" placeholder="Date of birth (YYYY/MM/DD)"
+                           value={formData.birthDate} onChange={handleChange} required />
                     <label className="file-label">Upload profile image (optional):</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                    />
-
-                    {previewUrl && (
-                        <div className="image-preview">
-                            <img src={previewUrl} alt="Preview" />
-                        </div>
-                    )}
-
-                    <div className="actions">
-                        <button type="submit" className="next">Next</button>
-                    </div>
+                    <input type="file" accept="image/*" onChange={handleFileChange} />
+                    {previewUrl && <div className="image-preview"><img src={previewUrl} alt="Preview" /></div>}
+                    <div className="actions"><button type="submit" className="next">Next</button></div>
                 </form>
             </div>
         </div>

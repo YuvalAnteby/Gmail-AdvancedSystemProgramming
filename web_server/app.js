@@ -7,12 +7,13 @@ app.use(express.json());
 //app.use(cors({ origin: "http://localhost:3000" }));
 app.use(cors());
 
-
+const tokenRoutes=require('./routes/tokens')
 const inbox = require('./routes/mails');
 const users = require('./routes/users');
 const labels = require('./routes/labels');
 const blacklist = require('./routes/blacklist');
 
+app.use('/api/tokens', tokenRoutes);
 app.use('/api/mails', inbox);
 app.use('/api', users);
 app.use('/api/labels', labels);
