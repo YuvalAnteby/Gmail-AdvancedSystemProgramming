@@ -8,6 +8,7 @@ import { useMailToolbarHandlers } from "./hooks/useMailToolbarHandlers";
 import { useMails } from "./hooks/useMails";
 import TopMenu from "./top_menu/TopMenu";
 import { useLocation } from "react-router-dom";
+import ComposeEmail from "./ComposeEmail/ComposeEmail";
 
 const DEFAULT_USER_ID = 1; // TODO replace with JWT
 
@@ -16,6 +17,8 @@ const MainPage = ({ theme, setTheme }) => {
 
     const location = useLocation();
     const [inboxType, setInboxType] = useState(location.state?.inboxType || 'all');
+    const [showCompose, setShowCompose] = useState(false);
+
     const {
         emails,
         total,
@@ -31,7 +34,6 @@ const MainPage = ({ theme, setTheme }) => {
 
     // selected mail ids logic
     const [selectedMails, setSelectedMails] = useState(new Set());
-    const allEmails = emails;
     const allSelected = selectedMails.size === emails.length;
     const anySelected = selectedMails.size > 0;
 
@@ -39,13 +41,12 @@ const MainPage = ({ theme, setTheme }) => {
         userId,
         selectedMails,
         setSelectedMails,
-        allEmails,
+        emails,
         refreshMails
     );
 
-    // handle selection of mail using the checkbox
     const handleSelect = (mail, isChecked) => {
-        setSelectedMails((prev) => {
+        setSelectedMails(prev => {
             const copy = new Set(prev);
             if (isChecked) copy.add(mail);
             else copy.delete(mail);
@@ -53,17 +54,19 @@ const MainPage = ({ theme, setTheme }) => {
         });
     };
 
-    // Update state when location.state.inboxType changes
     useEffect(() => {
         if (location.state?.inboxType) {
             setInboxType(location.state.inboxType);
         }
     }, [location.state?.inboxType]);
 
-    // Compose handler
-    const handleComposeClick = () => {
-        // TODO: open compose modal or navigate to compose view
-        console.log('Compose clicked');
+    const handleComposeClick = () => setShowCompose(true);
+    const handleCancelCompose = () => setShowCompose(false);
+    const handleSendCompose = mail => {
+        // TODO: call your send-mail API
+        // then close and refresh:
+        setShowCompose(false);
+        refreshMails();
     };
 
     return (
@@ -108,19 +111,27 @@ const MainPage = ({ theme, setTheme }) => {
                         />
 
                         {/* ---- ACTUAL MAIL ROWS ---- */}
-                        {emails.map((email) => (
+                        {emails.map(email => (
                             <MailRow
-                                theme={theme}
                                 key={email.id}
+                                theme={theme}
                                 userId={userId}
                                 email={email}
-                                isSelected={[...selectedMails].some((m) => m.id === email.id)}
+                                isSelected={[...selectedMails].some(m => m.id === email.id)}
                                 onSelect={handleSelect}
                             />
                         ))}
                     </div>
                 </div>
             </div>
+
+            {/* ---- COMPOSE WINDOW ---- */}
+            {showCompose && (
+                <ComposeEmail
+                    onCancel={handleCancelCompose}
+                    onSend={handleSendCompose}
+                />
+            )}
         </div>
     );
 };
