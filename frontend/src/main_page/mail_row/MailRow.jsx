@@ -23,7 +23,6 @@ const MailRow = ({theme, userId, email, isSelected, onSelect}) => {
     const toggleStar = async (mail, e) => {
         e.stopPropagation()
         try {
-            console.log(">> Toggle Mail Row:", email);
             setIsStarred((prev) => !prev);
             email.isStarred = isStarred;
             await toggleMailStar(userId, email);
@@ -43,7 +42,7 @@ const MailRow = ({theme, userId, email, isSelected, onSelect}) => {
             />
 
             <i
-                className={`bi bi-star${isStarred ? "-fill" : ""} star-icon ${isStarred ? "starred" : ""}`}
+                className={`btn bi bi-star${isStarred ? "-fill" : ""} star-icon ${theme} ${isStarred ? "starred" : ""}`}
                 onClick={(e) => toggleStar(email, e)}
             />
 

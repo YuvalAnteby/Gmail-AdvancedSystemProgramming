@@ -41,7 +41,6 @@ export const useMailToolbarHandlers = (userId, selectedMails, setSelectedMails, 
         if (selectedMails.size === 0)
             return;
         try {
-            console.log(selectedMails);
             await Promise.all(Array.from(selectedMails).map((mail) => deleteMail(userId, mail)));
             setSelectedMails(new Set());
             refreshMails();

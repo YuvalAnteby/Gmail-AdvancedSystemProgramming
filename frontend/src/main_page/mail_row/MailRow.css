@@ -172,9 +172,11 @@
     color: #888888;
     transition: all 0.2s;
 }
-
-.star-icon:hover {
-    background-color: #f0f0f0;
+.star-icon.light:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.star-icon.dark:hover {
+    box-shadow: 0 4px 12px rgba(240, 240, 240, 0.15);
 }
 
 .star-icon.starred {
