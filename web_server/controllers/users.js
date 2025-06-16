@@ -1,5 +1,6 @@
 const Users = require('../models/users');
-const jwt = require('jsonwebtoken');
+const {signToken} = require("../utils/authentication");
+
 
 /**
  * Signs up a new user to the system, if a user with the same already exists it will not create a new one.
@@ -23,13 +24,7 @@ const signupUser = async (req, res) => {
     }
 
     const newUser = await Users.createUser(fullName, mail, password, dateOfBirth, image);
-
-    const token = jwt.sign({
-        id: newUser.id,
-        fullName: newUser.fullName,
-        mail: newUser.mail,
-        dateOfBirth: newUser.dateOfBirth
-    }, 'mySecretKey', {expiresIn: '24h'});
+    const token = signToken(newUser);
 
     return res.status(201).json({
         token,
@@ -85,18 +80,18 @@ const loginUser = async (req, res) => {
     if (!user)
         return res.status(401).json({error: 'wrong mail or password'});
 
-    const token = jwt.sign(
-        {
-            id: user.id,
-            fullName: user.fullName,
-            mail: user.mail,
-            dateOfBirth: user.dateOfBirth,
-            image: user.image
-        },
-        'mySecretKey',
-        {expiresIn: '24h'}
-    );
+    const token = signToken(user);
     return res.status(201).json({token: token});
 };
 
-module.exports = {signupUser, getUser, loginUser};
+/**
+ * Checks for JWT token validity, if we reached here successfully the JWT has been validated
+ * @param req request
+ * @param res response
+ * @returns code 200
+ */
+const isTokenValid = (req, res) => {
+    return res.status(200).json({user: req.user});
+};
+
+module.exports = {signupUser, getUser, loginUser, isTokenValid};
