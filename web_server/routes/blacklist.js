@@ -1,11 +1,12 @@
 const express = require('express')
 var router = express.Router();
 const controller = require('../controllers/blacklist');
+const Auth = require("../utils/authentication");
 
 router
-    .post('/', controller.addToBlacklist)
-    .get('/:url', controller.isInBlacklist)
-    .delete('/', controller.removeMailFromBlacklist)
-    .delete('/:url', controller.deleteFromBlacklist);
+    .post('/', Auth.authenticateToken, controller.addToBlacklist)
+    .get('/:url', Auth.authenticateToken, controller.isInBlacklist)
+    .delete('/:url', Auth.authenticateToken, controller.deleteFromBlacklist);
+    .delete('/:url', Auth.authenticateToken, controller.deleteFromBlacklist);
 
 module.exports = router;

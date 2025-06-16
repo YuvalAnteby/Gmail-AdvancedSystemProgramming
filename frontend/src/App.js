@@ -1,19 +1,23 @@
 import './App.css';
 import React, {useState} from "react";
-import {Routes, Route} from 'react-router-dom';
+import {Routes, Route, Navigate} from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import MainPage from "./main_page/MainPage";
+import SignupPage from "./first_Page/SignupPage";
+import LoginPage from "./first_Page/LoginPage";
 
 function App() {
-    const [theme, setTheme] = useState('light');
 
-  return (
-    <div className="App">
-        <Routes>
-            <Route path="/inbox" element={<MainPage theme={theme} setTheme={setTheme} />} />
-        </Routes>
-    </div>
-  );
+    return (
+        <div className="App">
+            <Routes>
+                <Route path="/" element={<Navigate to ="/login" />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/inbox" element={<MainPage />} />
+            </Routes>
+        </div>
+    );
 }
 
 export default App;

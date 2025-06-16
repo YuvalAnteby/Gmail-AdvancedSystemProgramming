@@ -5,7 +5,6 @@ import {MAILS_PER_PAGE} from "../../utils/constants";
 /**
  * Custom hook to fetch and refresh "mails" for a given userId and inboxType.
  *
- * @param {number|string} userId
  * @param {'all'|'incoming'|'sent'|'draft'|'star'|'trash'} inboxType
  * @returns {{
  *   emails: Array,
@@ -14,7 +13,7 @@ import {MAILS_PER_PAGE} from "../../utils/constants";
  *   refreshMails: () => Promise<void>
  * }}
  */
-export function useMails(userId, inboxType) {
+export function useMails(inboxType) {
     const [emails, setEmails] = useState([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
@@ -28,7 +27,7 @@ export function useMails(userId, inboxType) {
         setError(null);
 
         try {
-            const {mails, total} = await getMailsByType(userId, inboxType, page);
+            const {mails, total} = await getMailsByType(inboxType, page);
             setEmails(mails);
             setTotal(total);
         } catch (err) {
@@ -36,14 +35,12 @@ export function useMails(userId, inboxType) {
         } finally {
             setLoading(false);
         }
-    }, [userId, inboxType, page]);
+    }, [inboxType, page]);
 
     // Fetch initially, and whenever userId or inboxType changes
     useEffect(() => {
-        if (userId) {
-            refreshMails();
-        }
-    }, [userId, refreshMails]);
+        refreshMails();
+    }, [inboxType, refreshMails]);
 
     const hasNextPage = page * MAILS_PER_PAGE < total;
     const hasPrevPage = page > 1;

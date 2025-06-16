@@ -8,20 +8,20 @@ const API_BASE = "http://localhost:3001/api";
  * params: { inboxType: string (e.g. "all", "incoming", "sent", "draft", "star", "trash") }
  * Must include the 'user-id' header for auth.
  *
- * @param {number|string} userId
  * @param {'all'|'incoming'|'sent'|'draft'|'star'|'trash'} [inboxType]
  * @param {number} page
  * @returns Promise<array of mail objects> (up to 50).
  */
-export async function getMailsByType(userId, inboxType = "all", page = 1) {
+export async function getMailsByType(inboxType = "all", page = 1) {
     // change the URL to include the optional query param
     let url = `${API_BASE}/mails?inboxType=${encodeURIComponent(inboxType)}&page=${page}&limit=${MAILS_PER_PAGE}`;
-    // Perform GET with user-id header
+    const token = localStorage.getItem('token');
+
+    // Perform GET with the JWT token in the header
     const res = await fetch(url, {
         method: 'GET',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
     });
     if (!res.ok)
@@ -31,17 +31,17 @@ export async function getMailsByType(userId, inboxType = "all", page = 1) {
 
 /**
  * DELETE api/mails/:id
- * @param {number|string} userId
  * @param {Object} mail
  * @returns {Promise<void>}
  */
-export async function deleteMail(userId, mail) {
+export async function deleteMail(mail) {
     const url = `${API_BASE}/mails/${mail.id}`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: 'DELETE',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
         }
     })
     if (!res.ok)
@@ -50,17 +50,18 @@ export async function deleteMail(userId, mail) {
 
 /**
  * POST api/blacklist
- * @param {number|string} userId
  * @param {Object} mail
  * @returns {Promise<void>}
  */
-export async function toggleSpamReport(userId, mail) {
+export async function toggleSpamReport(mail) {
     const url = `${API_BASE}/blacklist`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: mail.isSpam ? 'DELETE' : 'POST',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             mailId: mail.id
@@ -72,17 +73,18 @@ export async function toggleSpamReport(userId, mail) {
 
 /**
  * PATCH api/mails/:id
- * @param {number|string} userId
  * @param {number|string} mailId
  * @returns {Promise<void>}
  */
-export async function markAsRead(userId, mailId) {
+export async function markAsRead(mailId) {
     const url = `${API_BASE}/mails/${mailId}`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: 'PATCH',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             isRead: true,
@@ -94,17 +96,18 @@ export async function markAsRead(userId, mailId) {
 
 /**
  * PATCH api/mails/:id
- * @param {number|string} userId
  * @param {Object} mail mail object to toggle it's star
  * @returns {Promise<void>}
  */
-export async function toggleMailStar(userId, mail) {
+export async function toggleMailStar(mail) {
     const url = `${API_BASE}/mails/${mail.id}`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: 'PATCH',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             isStarred: !mail.isStarred,
@@ -115,14 +118,20 @@ export async function toggleMailStar(userId, mail) {
     return res.json();
 }
 
-
-export async function restoreMail(userId, mail) {
+/**
+ * PATCH api/mails/:id
+ * @param mail mail object to restore from trash
+ * @returns {Promise<void>}
+ */
+export async function restoreMail(mail) {
     const url = `${API_BASE}/mails/${mail.id}`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: 'PATCH',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             isTrashed: false,
@@ -139,10 +148,13 @@ export async function restoreMail(userId, mail) {
  */
 export const searchMails = async (userId, query) => {
     const url = `${API_BASE}/mails/search/${encodeURIComponent(query)}`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: 'GET',
         headers: {
-            'user-id': userId,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         }
     });
     if (!res.ok)

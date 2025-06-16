@@ -14,7 +14,7 @@ const {convertLabelsToIds, labelsToFullElement} = require("../utils/labels");
  */
 const getLastMailsOrdered = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = req.headers['user-id'];
+    const userId = req.user.id;
     if (!userId)
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
     const inboxType = req.query.inboxType || 'all';
@@ -54,12 +54,18 @@ const getMailById = (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id))
         return res.status(400).json({error: 'No valid mail ID was given'});
-
+    // get the user's id
+    const userId = Number(req.user.id);
+    if (!userId)
+        return res.status(400).json({error: 'No valid user ID was given'});
     // Find the mail with the given id
     const mail = Mails.getMail(id);
     // Return 404 if not found, or a 200 with the mail as a json object
     if (!mail)
         return res.status(404).json({error: `No mail found with ID: ${id}`});
+    // ensure the mail belongs to the user
+    if (mail.owner != userId)
+        return res.status(403).json({error: 'mail do not belong to user'});
     return res.status(200).json(mail);
 }
 
@@ -77,7 +83,7 @@ const getMailById = (req, res) => {
  */
 const createNewMail = async (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = req.headers['user-id'];
+    const userId = Number(req.user.id);
     if (!userId)
         return res.status(400).json({error: 'User not authenticated - failed creating a new mail'});
     try {
@@ -118,7 +124,7 @@ const createNewMail = async (req, res) => {
  */
 const updateMail = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = Number(req.headers['user-id']);
+    const userId = Number(req.user.id);
     if (!userId)
         return res.status(400).json({error: 'User not authenticated - failed editing a mail'});
     // Make sure we got a mail id in the request, and it belongs to the user
@@ -134,7 +140,7 @@ const updateMail = (req, res) => {
 
     // otherwise it’s a mail already sent - only allow flags & labels
     const {isRead, isStarred, isTrashed, isSpam, labels} = req.body;
-    const labelsIds = convertLabelsToIds(userId, labels);
+    const labelsIds = convertLabelsToIds(userId, labels || []);
     const updated = Mails.editSentMail(mailId, isRead, isStarred, isTrashed, isSpam, labelsIds);
     if (updated)
         return res.status(200).json(updated);
@@ -195,7 +201,7 @@ const deleteMailById = (req, res) => {
     if (isNaN(mailId))
         return res.status(400).json({error: 'No valid mail ID was given'});
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = req.headers['user-id'];
+    const userId = Number(req.user.id);
     if (isNaN(userId))
         return res.status(400).json({error: 'User not authenticated'});
     // Delete the desired mail and return matching result
@@ -217,7 +223,7 @@ const deleteMailById = (req, res) => {
  */
 const getMailsByQuery = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = req.headers['user-id'];
+    const userId = Number(req.user.id);
     if (!userId)
         return res.status(400).json({error: 'User not authenticated'});
     // If the query is empty - returns 400 bad request

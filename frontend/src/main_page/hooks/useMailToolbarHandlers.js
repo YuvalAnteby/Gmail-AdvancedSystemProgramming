@@ -3,7 +3,6 @@ import {deleteMail, markAsRead, restoreMail, toggleSpamReport} from "../../api/m
 
 
 /**
- * @param {number} userId id of the current user
  * @param {Set<Object>} selectedMails
  * @param {function} setSelectedMails
  * @param {Object[]} allEmails
@@ -17,7 +16,7 @@ import {deleteMail, markAsRead, restoreMail, toggleSpamReport} from "../../api/m
  *   handleMarkSpam: function
  * }}
  */
-export const useMailToolbarHandlers = (userId, selectedMails, setSelectedMails, allEmails, refreshMails) => {
+export const useMailToolbarHandlers = (selectedMails, setSelectedMails, allEmails, refreshMails) => {
 
     // Handle selection of all mails (or canceling) using the checkbox
     const handleSelectAll = useCallback((e) => {
@@ -41,21 +40,21 @@ export const useMailToolbarHandlers = (userId, selectedMails, setSelectedMails, 
         if (selectedMails.size === 0)
             return;
         try {
-            await Promise.all(Array.from(selectedMails).map((mail) => deleteMail(userId, mail)));
+            await Promise.all(Array.from(selectedMails).map((mail) => deleteMail(mail)));
             setSelectedMails(new Set());
             refreshMails();
         } catch (error) {
             console.error("Error deleting mails:", error);
         }
 
-    }, [userId, selectedMails, setSelectedMails, refreshMails]);
+    }, [selectedMails, setSelectedMails, refreshMails]);
 
     // Mark selected mails as read
     const handleMarkAsRead = useCallback(async () => {
         if (selectedMails.size === 0)
             return;
         try {
-            await Promise.all(Array.from(selectedMails).map((mail) => markAsRead(userId, mail.id)));
+            await Promise.all(Array.from(selectedMails).map((mail) => markAsRead(mail.id)));
             setSelectedMails(new Set());
             refreshMails();
         } catch (error) {
@@ -69,7 +68,7 @@ export const useMailToolbarHandlers = (userId, selectedMails, setSelectedMails, 
         if (selectedMails.size === 0)
             return;
         try {
-            await Promise.all(Array.from(selectedMails).map((mail) => toggleSpamReport(userId, mail)));
+            await Promise.all(Array.from(selectedMails).map((mail) => toggleSpamReport(mail)));
             setSelectedMails(new Set());
             refreshMails();
         } catch (error) {

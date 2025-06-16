@@ -4,19 +4,18 @@ import './MainPage.css';
 import EmailSidebar from "./EmailSideMenu/EmailSideMenu";
 import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
-import { useMailToolbarHandlers } from "./hooks/useMailToolbarHandlers";
-import { useMails } from "./hooks/useMails";
 import TopMenu from "./top_menu/TopMenu";
 import { useLocation } from "react-router-dom";
 import ComposeEmail from "./ComposeEmail/ComposeEmail";
+import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
+import {useMails} from "./hooks/useMails";
+import {useRequireAuth} from "../utils/useAutoLogin";
 
-const DEFAULT_USER_ID = 1; // TODO replace with JWT
 
-const MainPage = ({ theme, setTheme }) => {
-    const userId = DEFAULT_USER_ID;
+const MainPage = ({theme}) => {
 
     const location = useLocation();
-    const [inboxType, setInboxType] = useState(location.state?.inboxType || 'all');
+    const [inboxType, setInboxType] = useState(location.state?.inboxType || 'incoming');
     const [showCompose, setShowCompose] = useState(false);
 
     const {
@@ -30,7 +29,7 @@ const MainPage = ({ theme, setTheme }) => {
         refreshMails,
         loading,
         error
-    } = useMails(userId, inboxType);
+    } = useMails(inboxType);
 
     // selected mail ids logic
     const [selectedMails, setSelectedMails] = useState(new Set());
@@ -38,7 +37,6 @@ const MainPage = ({ theme, setTheme }) => {
     const anySelected = selectedMails.size > 0;
 
     const handlers = useMailToolbarHandlers(
-        userId,
         selectedMails,
         setSelectedMails,
         emails,
@@ -113,7 +111,6 @@ const MainPage = ({ theme, setTheme }) => {
                         {/* ---- ACTUAL MAIL ROWS ---- */}
                         {emails.map(email => (
                             <MailRow
-                                key={email.id}
                                 theme={theme}
                                 userId={userId}
                                 email={email}
