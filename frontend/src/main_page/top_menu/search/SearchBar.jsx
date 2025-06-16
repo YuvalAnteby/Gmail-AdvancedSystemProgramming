@@ -3,9 +3,11 @@ import {useEffect, useState} from "react";
 import {useMailSearch} from "../../hooks/useMailSearch";
 import './SearchBar.css'
 import {getUserFromToken} from "../../../utils/tokenUtils";
+import {useTheme} from "../../../utils/useTheme";
 
-const SearchBar = ({userId, theme}) => {
-    const user =getUserFromToken();
+const SearchBar = () => {
+    const user = getUserFromToken();
+    const theme = useTheme();
 
     const [query, setQuery] = useState('');
     const {results, loading} = useMailSearch(user.id, query);

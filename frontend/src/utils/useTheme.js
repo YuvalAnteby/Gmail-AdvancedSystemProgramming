@@ -2,10 +2,10 @@ import {useEffect, useState} from "react";
 
 /**
  * Hook to manage the theme of the project.
- * @param {"light"|"dark"}defaultTheme
+ * @param {"light"|"dark"} defaultTheme
  * @returns {{theme: string, toggleTheme: function}}
  */
-export function useTheme(defaultTheme) {
+export function useTheme(defaultTheme= 'dark') {
     const [theme, setTheme] = useState(defaultTheme);
 
     // gets the current theme

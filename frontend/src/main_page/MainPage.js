@@ -9,7 +9,6 @@ import { useLocation } from "react-router-dom";
 import ComposeEmail from "./ComposeEmail/ComposeEmail";
 import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
-import {useRequireAuth} from "../utils/useAutoLogin";
 import {useTheme} from "../utils/useTheme";
 
 
@@ -29,8 +28,6 @@ const MainPage = () => {
         goToNextPage,
         goToPrevPage,
         refreshMails,
-        loading,
-        error
     } = useMails(inboxType);
 
     // selected mail ids logic
