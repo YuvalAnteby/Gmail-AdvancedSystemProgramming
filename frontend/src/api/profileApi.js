@@ -26,7 +26,9 @@ export const changeProfileImage = async (userId, file) => {
     if (!res.ok)
         throw new Error(`changing profile picture: ${res.status}`);
     console.log(`changing profile picture: ${res.status}`);
-    return res.json();
+    const updated = res.json();
+    console.log(updated);
+    return updated;
 }
 
 /**
@@ -36,8 +38,14 @@ export const changeProfileImage = async (userId, file) => {
  */
 export const fetchUserInfo = async (userId) => {
     const url = `${API_BASE}/users/${userId}`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: "GET",
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
     });
     if (!res.ok)
         throw new Error(`error fetching user info: ${res.status}`);

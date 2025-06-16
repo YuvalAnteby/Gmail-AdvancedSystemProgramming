@@ -1,5 +1,5 @@
 import './App.css';
-import React, {useState} from "react";
+import React from "react";
 import {Routes, Route, Navigate} from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import MainPage from "./main_page/MainPage";

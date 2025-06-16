@@ -2,10 +2,13 @@ import SearchResultsDropdown from "./SearchResultsDropdown";
 import {useEffect, useState} from "react";
 import {useMailSearch} from "../../hooks/useMailSearch";
 import './SearchBar.css'
+import {getUserFromToken} from "../../../utils/tokenUtils";
 
 const SearchBar = ({userId, theme}) => {
+    const user =getUserFromToken();
+
     const [query, setQuery] = useState('');
-    const {results, loading} = useMailSearch(userId, query);
+    const {results, loading} = useMailSearch(user.id, query);
 
 
     const handleSelectMail = (mail) => {

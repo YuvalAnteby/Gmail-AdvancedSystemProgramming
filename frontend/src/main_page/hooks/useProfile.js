@@ -1,22 +1,38 @@
 import {useEffect, useState} from 'react';
-import {fetchUserInfo, changeProfileImage} from "../../api/profileApi";
+import {changeProfileImage} from "../../api/profileApi";
+import {getUserFromToken} from "../../utils/tokenUtils";
 
-export const useProfile = (userId) => {
-    const [imageUrl, setImageUrl] = useState("/profile_default.png");
-    const [fullName, setFullName] = useState("User");
+export const useProfile = () => {
+    const token = getUserFromToken();
+
+    const [imageUrl, setImageUrl] = useState(token?.image || "/profile_default.png");
+    const [fullName, setFullName] = useState(token?.fullName || 'NAME_ERROR');
 
     useEffect(() => {
         const fetch = async () => {
-            const {imageUrl, fullName} = await fetchUserInfo(userId);
-            setImageUrl(imageUrl || '/profile_default.png');
-            setFullName(fullName);
+            if (token) {
+                const { imageUrl, fullName } = token;
+                setImageUrl(imageUrl || '/profile_default.png');
+                setFullName(fullName);
+            }
         };
-        if (userId) fetch();
-    }, [userId]);
+        fetch();
+    }, [token]);
+
+    useEffect(() => {
+        console.log('imageUrl updated:', imageUrl);
+    }, [imageUrl]);
 
     const updateImage = async (file) => {
-        const updatedUser = await changeProfileImage(userId, file);
-        setImageUrl(updatedUser.image);
+        try {
+            const updatedUser = await changeProfileImage(token.id, file);
+            if (updatedUser?.image)
+                setImageUrl(updatedUser.image);
+            else
+                console.warn("No image found in updatedUser response");
+        } catch (error) {
+            console.error("failed to update profile image: ", error);
+        }
     };
 
     return {imageUrl, fullName, updateImage};

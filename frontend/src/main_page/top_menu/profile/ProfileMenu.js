@@ -1,7 +1,7 @@
 import './ProfileMenu.css';
 import {useRef} from "react";
 
-const ProfileMenu = ({theme, setTheme, imageUrl, fullName, onUploadImage}) => {
+const ProfileMenu = ({theme, toggleTheme, imageUrl, fullName, onUploadImage}) => {
     const fileInputRef = useRef(null);
 
     const handleImageUpload = (e) => {
@@ -26,7 +26,7 @@ const ProfileMenu = ({theme, setTheme, imageUrl, fullName, onUploadImage}) => {
                 </button>
                 <button
                     className={`btn btn-outline-${theme === 'light' ? 'dark' : 'light'} btn-sm mt-3`}
-                    onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                    onClick={toggleTheme}
                 >
                     Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
                 </button>

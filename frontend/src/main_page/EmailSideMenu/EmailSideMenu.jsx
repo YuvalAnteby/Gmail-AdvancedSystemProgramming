@@ -2,12 +2,7 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-export default function EmailSidebar({
-                                         theme,
-                                         currentTab,
-                                         setCurrentTab,
-                                         onComposeClick,
-                                     }) {
+export default function EmailSidebar({theme, currentTab, setCurrentTab, onComposeClick}) {
     const isDark = theme === 'dark';
 
     const sidebarItems = [
@@ -24,7 +19,7 @@ export default function EmailSidebar({
             className={`d-flex flex-column p-3 ${
                 isDark ? 'bg-dark text-light border-secondary' : 'bg-white text-dark border-end'
             }`}
-            style={{ width: 240, height: '100vh' }}
+            style={{ height: '100vh' }}
         >
             <button
                 onClick={onComposeClick}

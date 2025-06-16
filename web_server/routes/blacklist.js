@@ -7,6 +7,5 @@ router
     .post('/', Auth.authenticateToken, controller.addToBlacklist)
     .get('/:url', Auth.authenticateToken, controller.isInBlacklist)
     .delete('/:url', Auth.authenticateToken, controller.deleteFromBlacklist);
-    .delete('/:url', Auth.authenticateToken, controller.deleteFromBlacklist);
 
 module.exports = router;

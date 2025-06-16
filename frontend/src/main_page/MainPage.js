@@ -10,11 +10,13 @@ import ComposeEmail from "./ComposeEmail/ComposeEmail";
 import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
 import {useRequireAuth} from "../utils/useAutoLogin";
+import {useTheme} from "../utils/useTheme";
 
 
-const MainPage = ({theme}) => {
-
+const MainPage = () => {
+    const {theme, toggleTheme} = useTheme('dark');
     const location = useLocation();
+
     const [inboxType, setInboxType] = useState(location.state?.inboxType || 'incoming');
     const [showCompose, setShowCompose] = useState(false);
 
@@ -72,7 +74,7 @@ const MainPage = ({theme}) => {
             {/* ---- TOP MENU ---- */}
             <div className="row mb-3">
                 <div className="col-12">
-                    <TopMenu theme={theme} setTheme={setTheme} userId={userId} />
+                    <TopMenu theme={theme} toggleTheme={toggleTheme} />
                 </div>
             </div>
 
@@ -104,15 +106,12 @@ const MainPage = ({theme}) => {
                             hasPrevPage={hasPrevPage}
                             goToNextPage={goToNextPage}
                             goToPrevPage={goToPrevPage}
-                            loading={loading}
-                            error={error}
                         />
 
                         {/* ---- ACTUAL MAIL ROWS ---- */}
                         {emails.map(email => (
                             <MailRow
                                 theme={theme}
-                                userId={userId}
                                 email={email}
                                 isSelected={[...selectedMails].some(m => m.id === email.id)}
                                 onSelect={handleSelect}
