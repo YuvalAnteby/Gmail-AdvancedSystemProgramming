@@ -4,20 +4,18 @@ const API_BASE = "http://localhost:3001/api";
 /**
  * GET /api/mails
  * Body: { inboxType: string (e.g. "all", "incoming", "sent", "draft", "star", "trash") }
- * Must include the 'user-id' header for auth.
  *
- * @param {number|string} userId
  * @param {'all'|'incoming'|'sent'|'draft'|'star'|'trash'} [inboxType]
  * @returns Promise<array of mail objects> (up to 50).
  */
-export async function getMailsByType(userId, inboxType = "all") {
+export async function getMailsByType(inboxType = "all") {
     // change the URL to include the optional query param
     let url = `${API_BASE}/mails`;
-    const token = localStorage.getItem('token'); //// TODO GREAT
+    const token = localStorage.getItem('token');
     // encode just in case but these are simple words
     if (inboxType)
         url += `?inboxType=${encodeURIComponent(inboxType)}`;
-    // Perform GET with user-id header
+    // Perform GET with the JWT token in the header
     const res = await fetch(url, {
         method: 'GET',
         headers: {
@@ -31,37 +29,37 @@ export async function getMailsByType(userId, inboxType = "all") {
 
 /**
  * DELETE api/mails/:id
- * @param {number|string} userId
  * @param {number|string} mailId
  * @returns {Promise<void>}
  */
-export async function deleteMail(userId, mailId) {
+export async function deleteMail(mailId) {
     const url = `${API_BASE}/mails/${mailId}`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: 'DELETE',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
         }
     })
     if (!res.ok)
         throw new Error(`getMails failed: ${res.status}`);
-    console.log(`deletion: ${res.status}`);
 }
 
 /**
  * POST api/blacklist
- * @param {number|string} userId
  * @param {number|string} mailId
  * @returns {Promise<void>}
  */
-export async function reportSpam(userId, mailId) {
+export async function reportSpam(mailId) {
     const url = `${API_BASE}/blacklist`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: 'POST',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             mailId: mailId
@@ -69,22 +67,22 @@ export async function reportSpam(userId, mailId) {
     })
     if (!res.ok)
         throw new Error(`reporting spam failed: ${res.status}`);
-    console.log(`marking spam: ${res.status}`);
 }
 
 /**
  * PATCH api/mails/:id
- * @param {number|string} userId
  * @param {number|string} mailId
  * @returns {Promise<void>}
  */
-export async function markAsRead(userId, mailId) {
+export async function markAsRead(mailId) {
     const url = `${API_BASE}/mails/${mailId}`;
+    const token = localStorage.getItem('token');
+
     const res = await fetch(url, {
         method: 'PATCH',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             isRead: true,
@@ -92,6 +90,4 @@ export async function markAsRead(userId, mailId) {
     })
     if (!res.ok)
         throw new Error(`marking read failed: ${res.status}`);
-    console.log(`marking read: ${res.status}`);
-
 }

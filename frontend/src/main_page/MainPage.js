@@ -5,8 +5,7 @@ import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
 import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
-
-const DEFAULT_USER_ID = 1; /// TODO replace with JWT
+import {useRequireAuth} from "../utils/useAutoLogin";
 
 
 /// TODO replace the placeholders with the real menus and real data
@@ -20,10 +19,11 @@ const SideMenuPlaceholder = ({theme}) => (
 );
 
 const MainPage = ({theme}) => {
-    const userId = DEFAULT_USER_ID;
+    // ensure the user is authenticated
+    useRequireAuth();
 
     const [inboxType, setInboxType] = useState('incoming');
-    const {emails, refreshMails } = useMails(userId, inboxType);
+    const {emails, refreshMails } = useMails(inboxType);
 
     // selected mail ids logic
     const [selectedIds, setSelectedIds] = useState(new Set());
@@ -32,7 +32,6 @@ const MainPage = ({theme}) => {
     const anySelected = selectedIds.size > 0;
 
     const handlers = useMailToolbarHandlers(
-        userId,
         selectedIds,
         setSelectedIds,
         allEmailIds,

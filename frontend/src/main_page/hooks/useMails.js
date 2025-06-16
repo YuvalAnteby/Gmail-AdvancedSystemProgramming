@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getMailsByType } from "../../api/mailApi";
+import {useState, useEffect, useCallback} from 'react';
+import {getMailsByType} from "../../api/mailApi";
 
 /**
  * Custom hook to fetch and refresh "mails" for a given userId and inboxType.
  *
- * @param {number|string} userId
  * @param {'all'|'incoming'|'sent'|'draft'|'star'|'trash'} inboxType
  * @returns {{
  *   emails: Array,
@@ -13,7 +12,7 @@ import { getMailsByType } from "../../api/mailApi";
  *   refreshMails: () => Promise<void>
  * }}
  */
-export function useMails(userId, inboxType) {
+export function useMails(inboxType) {
     const [emails, setEmails] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -24,21 +23,19 @@ export function useMails(userId, inboxType) {
         setError(null);
 
         try {
-            const data = await getMailsByType(userId, inboxType);
+            const data = await getMailsByType(inboxType);
             setEmails(data);
         } catch (err) {
             setError(err);
         } finally {
             setLoading(false);
         }
-    }, [userId, inboxType]);
+    }, [inboxType]);
 
     // Fetch initially, and whenever userId or inboxType changes
     useEffect(() => {
-        if (userId) {
-            refreshMails();
-        }
-    }, [userId, inboxType, refreshMails]);
+        refreshMails();
+    }, [inboxType, refreshMails]);
 
-    return { emails, loading, error, refreshMails };
+    return {emails, loading, error, refreshMails};
 }

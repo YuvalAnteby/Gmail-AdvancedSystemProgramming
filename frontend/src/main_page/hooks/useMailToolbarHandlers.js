@@ -3,7 +3,6 @@ import {deleteMail, markAsRead, reportSpam} from "../../api/mailApi";
 
 
 /**
- * @param {number} userId id of the current user
  * @param {Set<number>} selectedIds
  * @param {function} setSelectedIds
  * @param {number[]} allEmailIds
@@ -17,7 +16,7 @@ import {deleteMail, markAsRead, reportSpam} from "../../api/mailApi";
  *   handleMarkSpam: function
  * }}
  */
-export const useMailToolbarHandlers = (userId, selectedIds, setSelectedIds, allEmailIds, refreshMails) => {
+export const useMailToolbarHandlers = (selectedIds, setSelectedIds, allEmailIds, refreshMails) => {
 
     // Handle selection of all mails (or canceling) using the checkbox
     const handleSelectAll = useCallback((e) => {
@@ -41,21 +40,21 @@ export const useMailToolbarHandlers = (userId, selectedIds, setSelectedIds, allE
         if (selectedIds.size === 0)
             return;
         try {
-            await Promise.all(Array.from(selectedIds).map((mid) => deleteMail(userId, mid)));
+            await Promise.all(Array.from(selectedIds).map((mid) => deleteMail(mid)));
             setSelectedIds(new Set());
             refreshMails();
         } catch (error) {
             console.error("Error deleting mails:", error);
         }
 
-    }, [userId, selectedIds, setSelectedIds, refreshMails]);
+    }, [selectedIds, setSelectedIds, refreshMails]);
 
     // Mark selected mails as read
     const handleMarkAsRead = useCallback(async () => {
         if (selectedIds.size === 0)
             return;
         try {
-            await Promise.all(Array.from(selectedIds).map((mid) => markAsRead(userId, mid)));
+            await Promise.all(Array.from(selectedIds).map((mid) => markAsRead(mid)));
             setSelectedIds(new Set());
             refreshMails();
         } catch (error) {
@@ -69,7 +68,7 @@ export const useMailToolbarHandlers = (userId, selectedIds, setSelectedIds, allE
         if (selectedIds.size === 0)
             return;
         try {
-            await Promise.all(Array.from(selectedIds).map((mid) => reportSpam(userId, mid)));
+            await Promise.all(Array.from(selectedIds).map((mid) => reportSpam(mid)));
             setSelectedIds(new Set());
             refreshMails();
         } catch (error) {
