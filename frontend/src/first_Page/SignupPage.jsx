@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './SignupPage.css';
 import { registerUserWithJwt } from '../api/userApi';
 import {useTheme} from "../utils/useTheme";
+import {useNavigate} from "react-router-dom";
 
 export default function SignupPage() {
     const {theme, toggleTheme} = useTheme();
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -29,8 +31,27 @@ export default function SignupPage() {
         }
     };
 
+    const isValidDate = (dateStr) => {
+        // format check
+        if (!/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr))
+            return false;
+        // logic check
+        const [year, month, day] = dateStr.split('/').map(Number);
+        const date = new Date(`${year}-${month}-${day}`);
+        return (
+            date.getFullYear() === year &&
+            date.getMonth() === month - 1 && // JS months are 0-based
+            date.getDate() === day
+        );
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!isValidDate(formData.birthDate)) {
+            alert("Invalid birth date. Use format YYYY/MM/DD with a real date.");
+            return;
+        }
 
         const user = {
             fullName: formData.fullName,
@@ -45,7 +66,7 @@ export default function SignupPage() {
             registerUserWithJwt(user)
                 .then(token => {
                     if (token) {
-                        window.location.href = '/inbox';
+                        navigate('/inbox');
                     } else {
                         alert('Signup failed: No token received');
                     }

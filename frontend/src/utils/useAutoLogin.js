@@ -1,5 +1,6 @@
 import {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
+import {getUserFromToken} from "./tokenUtils";
 
 /**
  * Redirects user to inbox if a JWT token exists.
@@ -9,20 +10,10 @@ export function useAutoLogin() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            // Optionally: ping a lightweight auth-check endpoint to verify it's still valid
-            navigate("/inbox");
-        }
-    }, []);
-
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            navigate("/login", {replace: true});
-        }
-    }, []);
+        const user = getUserFromToken();
+        if (user) navigate("/inbox");
+        else navigate("/login");
+    }, [navigate]);
 }
 
 /**
@@ -33,8 +24,8 @@ export function useRequireAuth() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token)
+        const user = getUserFromToken();
+        if (!user)
             navigate("/login");
     })
 }
