@@ -17,7 +17,9 @@ export async function registerUserWithJwt(user) {
         }
 
         if (res.status === 201 && data.token) {
-            return data.token;
+            const token = data.token;
+            localStorage.setItem("token", token);
+            return token;
         } else {
             alert('Registration failed. Please try again.');
         }

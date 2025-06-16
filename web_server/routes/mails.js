@@ -1,9 +1,9 @@
 const express = require('express')
 var router = express.Router();
 const controller = require('../controllers/mails');
-
+const authenticateToken = require('../utils/authentication');
 router
-    .get('', controller.getLastMailsOrdered)
+    .get('', authenticateToken, controller.getLastMailsOrdered)
     .post('', controller.createNewMail);
 router.route('/:id')
     .get(controller.getMailById)

@@ -2,9 +2,13 @@ import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import './LoginPage.css';
 import {loginWithJwt} from "../api/userApi";
-import {useTheme} from "./hooks/useTheme";
+import {useTheme} from "../utils/useTheme";
+import {useAutoLogin} from "../utils/useAutoLogin";
 
 export default function LoginPage() {
+    // attempt to log in automatically if user's token is saved already
+    useAutoLogin();
+
     const {theme, toggleTheme} = useTheme();
     const [formData, setFormData] = useState({mail: '', password: ''});
     const navigate = useNavigate();
@@ -29,8 +33,7 @@ export default function LoginPage() {
             alert('Unexpected error, try again');
             return;
         }
-        // upon login success take the user to the inbox
-        navigate("/inbox", {replace: true});
+        navigate("/inbox");
     };
 
 

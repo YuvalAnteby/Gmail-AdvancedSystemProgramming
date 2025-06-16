@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './SignupPage.css';
 import { registerUserWithJwt } from '../api/userApi';
-import {useTheme} from "./hooks/useTheme";
+import {useTheme} from "../utils/useTheme";
 
 export default function SignupPage() {
     const {theme, toggleTheme} = useTheme();
@@ -45,7 +45,6 @@ export default function SignupPage() {
             registerUserWithJwt(user)
                 .then(token => {
                     if (token) {
-                        localStorage.setItem('jwtToken', token);
                         window.location.href = '/inbox';
                     } else {
                         alert('Signup failed: No token received');

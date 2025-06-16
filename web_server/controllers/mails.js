@@ -14,7 +14,7 @@ const {convertLabelsToIds, labelsToFullElement} = require("../utils/labels");
  */
 const getLastMailsOrdered = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = req.headers['user-id'];
+    const userId = req.user.id;
     if (!userId)
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
     const inboxType = req.query.inboxType;

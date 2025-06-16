@@ -77,14 +77,14 @@ const getUser = (req, res) => {
 const loginUser = async (req, res) => {
     // Get the mail and password from the body (according to instructions)
     const {mail, password} = req.body;
-    if (!mail || !password) {
+    if (!mail || !password)
         return res.status(400).json({error: 'mail and password required'});
-    }
+
     // Check if the mail and password match the saved ones in order to log in
     const user = Users.isAuthorizeUser(mail, password);
-    if (!user) {
+    if (!user)
         return res.status(401).json({error: 'wrong mail or password'});
-    }
+
     const token = jwt.sign(
         {
             id: user.id,
@@ -96,7 +96,7 @@ const loginUser = async (req, res) => {
         'mySecretKey',
         {expiresIn: '24h'}
     );
-    return res.status(201).json(token);
+    return res.status(201).json({token: token});
 };
 
 module.exports = {signupUser, getUser, loginUser};

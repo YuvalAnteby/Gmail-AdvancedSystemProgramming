@@ -13,6 +13,7 @@ const API_BASE = "http://localhost:3001/api";
 export async function getMailsByType(userId, inboxType = "all") {
     // change the URL to include the optional query param
     let url = `${API_BASE}/mails`;
+    const token = localStorage.getItem('token'); //// TODO GREAT
     // encode just in case but these are simple words
     if (inboxType)
         url += `?inboxType=${encodeURIComponent(inboxType)}`;
@@ -20,8 +21,7 @@ export async function getMailsByType(userId, inboxType = "all") {
     const res = await fetch(url, {
         method: 'GET',
         headers: {
-            'user-id': userId,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
     });
     if (!res.ok)
