@@ -1,7 +1,7 @@
 /* Search bar */
 .search-bar {
     flex-grow: 1;
-    margin: 12px 16px 0;
+    margin: 0 16px;
 }
 /* input in search bar */
 .search-input {

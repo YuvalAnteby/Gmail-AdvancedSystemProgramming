@@ -12,9 +12,9 @@
     0 2px 6px rgba(60,64,67,0.15);
     display: flex;
     flex-direction: column;
-    max-height: 80vh;
     font-family: 'Roboto', sans-serif;
     z-index: 1000;
+    transition: all 0.3s ease;
 }
 
 .compose-header {
@@ -51,6 +51,9 @@
 .compose-body {
     padding: 8px 12px;
     overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .compose-field {
@@ -94,12 +97,13 @@
 
 .compose-textarea {
     width: 100%;
+    flex: 1;
     border: none;
     outline: none;
     resize: none;
     font-size: 14px;
     line-height: 1.4;
-    min-height: 200px;
+    min-height: 100px;
 }
 
 .compose-footer {
@@ -156,4 +160,73 @@
 
 .discard-btn:hover {
     color: #d93025;
+}
+
+.to-input-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #ccc;
+    padding: 6px;
+    border-radius: 4px;
+    min-height: 38px;
+    position: relative;
+    background-color: #fff;
+}
+.email-tag {
+    background-color: #e2e6ea;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    color: #202124;
+}
+.email-tag i {
+    margin-left: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.autocomplete-list {
+    list-style: none;
+    padding: 0;
+    margin: 2px 0 0;
+    border: 1px solid #ccc;
+    background: #fff;
+    position: absolute;
+    z-index: 10;
+    overflow-y: auto;
+    width: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.autocomplete-list li {
+    padding: 6px 10px;
+    cursor: pointer;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.autocomplete-list li:hover {
+    background-color: #f1f3f4;
+}
+.compose-email.expanded {
+    position: fixed;
+    top: 5vh;
+    left: 5vw;
+    width: 90vw;
+    height: 90vh;
+    z-index: 2000;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+    transition: all 0.3s ease;
 }

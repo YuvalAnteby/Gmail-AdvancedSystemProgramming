@@ -40,6 +40,4 @@ const mailUserFields = (mail) => {
         .map(s => s.toLowerCase());
 };
 
-
-
 module.exports = {convertMailsToIds, usersToFullElement, mailUserFields};

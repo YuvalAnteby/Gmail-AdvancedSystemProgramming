@@ -7,11 +7,12 @@ import {toggleMailStar} from "../../api/mailApi";
 /**
  * props:
  *   - theme: {String} dark or light according to user preference
+ *   - userId: {number|string} user's id
  *   - email: {Object} email object
  *   - isSelected: {boolean} (whether this row is currently checked)
  *   - onSelect: function when marking a mail as selected for mass actions on them
  */
-const MailRow = ({theme, email, isSelected, onSelect}) => {
+const MailRow = ({theme, userId, email, isSelected, onSelect}) => {
 
     const handleMailOpen = () => {
         console.log(">> Open Mail Row:", email);
@@ -24,7 +25,7 @@ const MailRow = ({theme, email, isSelected, onSelect}) => {
         try {
             setIsStarred((prev) => !prev);
             email.isStarred = isStarred;
-            await toggleMailStar(email);
+            await toggleMailStar(userId, email);
         } catch (e) {
             console.error(e);
         }

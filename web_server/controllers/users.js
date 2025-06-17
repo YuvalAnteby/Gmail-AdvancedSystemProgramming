@@ -1,6 +1,4 @@
 const Users = require('../models/users');
-const {signToken} = require("../utils/authentication");
-
 
 /**
  * Signs up a new user to the system, if a user with the same already exists it will not create a new one.
@@ -10,9 +8,9 @@ const {signToken} = require("../utils/authentication");
  * - code 201 and the new user json object if created successfully
  * - code 400 if failed because of an existing mail or a missing attribute
  */
-const signupUser = async (req, res) => {
-    const {fullName, mail, password, dateOfBirth, image} = req.body;
-
+const signupUser = (req, res) => {
+    const { fullName, mail, password, dateOfBirth, image } = req.body;
+    // Check if we have a missing attribute
     for (const field of ['fullName', 'mail', 'password', 'dateOfBirth']) {
         if (!req.body[field]) {
             return res.status(400).json({ error: `${field} is required` });
@@ -22,20 +20,10 @@ const signupUser = async (req, res) => {
     if (Users.userExist(mail)) {
         return res.status(400).json({ error: 'mail already exists' });
     }
-
-    const newUser = await Users.createUser(fullName, mail, password, dateOfBirth, image);
-    const token = signToken(newUser);
-
-    return res.status(201).json({
-        token,
-        user: {
-            id: newUser.id,
-            fullName: newUser.fullName,
-            mail: newUser.mail,
-            dateOfBirth: newUser.dateOfBirth,
-            image: newUser.image
-        }
-    });
+    const newUser = Users.createUser(fullName, mail, password, dateOfBirth, image);
+    // Return the new user object without the password
+    const { password: pw, ...safeUser } = newUser;
+    return res.status(201).json(safeUser);
 };
 
 /**
@@ -65,23 +53,22 @@ const getUser = (req, res) => {
  * @param req request
  * @param res response
  * @returns
- * - code 200 and the JWT token if logged in successfully
+ * - code 200 and the user's id if logged in successfully
  * - code 401 if input has wrong mail or password
  * - code 400 if missing mail or password (or both)
  */
-const loginUser = async (req, res) => {
+const loginUser = (req, res) => {
     // Get the mail and password from the body (according to instructions)
-    const {mail, password} = req.body;
-    if (!mail || !password)
-        return res.status(400).json({error: 'mail and password required'});
-
+    const { mail, password } = req.body;
+    if (!mail || !password) {
+        return res.status(400).json({ error: 'mail and password required' });
+    }
     // Check if the mail and password match the saved ones in order to log in
     const user = Users.isAuthorizeUser(mail, password);
-    if (!user)
-        return res.status(401).json({error: 'wrong mail or password'});
-
-    const token = signToken(user);
-    return res.status(200).json({token: token});
+    if (!user) {
+        return res.status(401).json({ error: 'wrong mail or password' });
+    }
+    return res.status(200).json({id: user.id});
 };
 
 /**
@@ -111,14 +98,4 @@ const editUser = (req, res) => {
     return res.status(200).json(user);
 }
 
-/**
- * Checks for JWT token validity, if we reached here successfully the JWT has been validated
- * @param req request
- * @param res response
- * @returns code 200
- */
-const isTokenValid = (req, res) => {
-    return res.status(200).json({user: req.user});
-};
-
-module.exports = { signupUser, getUser, loginUser, editUser, isTokenValid };
+module.exports = { signupUser, getUser, loginUser, editUser };

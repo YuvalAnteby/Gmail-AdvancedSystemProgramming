@@ -1,21 +1,13 @@
 import './ProfileMenu.css';
 import {useRef} from "react";
-import {useNavigate} from "react-router-dom";
 
-const ProfileMenu = ({theme, toggleTheme, imageUrl, fullName, onUploadImage}) => {
+const ProfileMenu = ({theme, setTheme, imageUrl, fullName, onUploadImage}) => {
     const fileInputRef = useRef(null);
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) onUploadImage(file);
     };
-
-    // handle logout click
-    const navigate = useNavigate();
-    const onLogoutClick = () => {
-        localStorage.removeItem("token");
-        navigate("/");
-    }
 
     return (
         <div className={`profile-popup ${theme}-popup`}>
@@ -34,11 +26,11 @@ const ProfileMenu = ({theme, toggleTheme, imageUrl, fullName, onUploadImage}) =>
                 </button>
                 <button
                     className={`btn btn-outline-${theme === 'light' ? 'dark' : 'light'} btn-sm mt-3`}
-                    onClick={toggleTheme}
+                    onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
                 >
                     Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
                 </button>
-                <button className="btn btn-outline-danger btn-sm mt-3" onClick={onLogoutClick}>
+                <button className="btn btn-outline-danger btn-sm mt-3" onClick={() => console.log("Logging out...")}>
                     Logout
                 </button>
             </div>

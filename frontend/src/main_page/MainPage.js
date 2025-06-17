@@ -4,28 +4,24 @@ import './MainPage.css';
 import EmailSidebar from "./EmailSideMenu/EmailSideMenu";
 import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
+import { useMailToolbarHandlers } from "./hooks/useMailToolbarHandlers";
+import { useMails } from "./hooks/useMails";
 import TopMenu from "./top_menu/TopMenu";
 import { useLocation } from "react-router-dom";
 import ComposeEmail from "./ComposeEmail/ComposeEmail";
-import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
-import {useMails} from "./hooks/useMails";
-import {useTheme} from "../utils/useTheme";
-import {useRequireAuth} from "../utils/useAutoLogin";
 
+const DEFAULT_USER_ID = 1; // TODO replace with JWT
 
-const MainPage = () => {
-    // ensure the user is authenticated before rendering
-    useRequireAuth();
+const MainPage = ({ theme, setTheme }) => {
+    const userId = DEFAULT_USER_ID;
 
-    const {theme, toggleTheme} = useTheme('dark');
     const location = useLocation();
-
-    // views change hooks
-    const [inboxType, setInboxType] = useState(location.state?.inboxType || 'incoming');
+    const [inboxType, setInboxType] = useState(location.state?.inboxType || 'all');
     const [showCompose, setShowCompose] = useState(false);
-    const [showSidebar, setShowSidebar] = useState(() => window.innerWidth >= 768);
+    const [isExpanded, setIsExpanded] = useState(false);
 
-    const {emails,
+    const {
+        emails,
         total,
         page,
         hasNextPage,
@@ -33,21 +29,22 @@ const MainPage = () => {
         goToNextPage,
         goToPrevPage,
         refreshMails,
-    } = useMails(inboxType);
+        loading,
+        error
+    } = useMails(userId, inboxType);
 
-    // selected mail ids logic
     const [selectedMails, setSelectedMails] = useState(new Set());
     const allSelected = selectedMails.size === emails.length;
     const anySelected = selectedMails.size > 0;
 
     const handlers = useMailToolbarHandlers(
+        userId,
         selectedMails,
         setSelectedMails,
         emails,
         refreshMails
     );
 
-    // handles mails selection
     const handleSelect = (mail, isChecked) => {
         setSelectedMails(prev => {
             const copy = new Set(prev);
@@ -57,45 +54,29 @@ const MainPage = () => {
         });
     };
 
-    // checks inbox type change
     useEffect(() => {
         if (location.state?.inboxType) {
             setInboxType(location.state.inboxType);
         }
     }, [location.state?.inboxType]);
 
-    // handlers for mail compose
     const handleComposeClick = () => setShowCompose(true);
     const handleCancelCompose = () => setShowCompose(false);
     const handleSendCompose = mail => {
-        // TODO: call your send-mail API
-        // then close and refresh:
         setShowCompose(false);
         refreshMails();
     };
 
-    // side menu un/show update
-    useEffect(() => {
-        const handleResize = () => {
-            setShowSidebar(window.innerWidth >= 768);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
     return (
         <div className={`main-page ${theme}`}>
-            {/* ---- TOP MENU ---- */}
             <div className="row mb-3">
                 <div className="col-12">
-                    <TopMenu theme={theme} toggleTheme={toggleTheme} />
+                    <TopMenu theme={theme} setTheme={setTheme} userId={userId} />
                 </div>
             </div>
 
-            {/* ---- MAIN LAYOUT ---- */}
             <div className="main-content row g-0">
-                {/* ---- SIDE MENU ---- */}
-                <div className={`col-md-2 p-0 ${showSidebar ? '' : 'd-none'} d-md-block`}>
+                <div className="col-md-2 p-0">
                     <EmailSidebar
                         theme={theme}
                         currentTab={inboxType}
@@ -104,10 +85,8 @@ const MainPage = () => {
                     />
                 </div>
 
-                {/* ---- MAIL LIST CONTAINER ---- */}
                 <div className="col-md-10 p-0">
                     <div className={`mail-list-container ${theme}`}>
-                        {/* ---- TOOLBAR ---- */}
                         <ToolBar
                             theme={theme}
                             inboxType={inboxType}
@@ -120,13 +99,15 @@ const MainPage = () => {
                             hasPrevPage={hasPrevPage}
                             goToNextPage={goToNextPage}
                             goToPrevPage={goToPrevPage}
+                            loading={loading}
+                            error={error}
                         />
 
-                        {/* ---- ACTUAL MAIL ROWS ---- */}
                         {emails.map(email => (
                             <MailRow
                                 key={email.id}
                                 theme={theme}
+                                userId={userId}
                                 email={email}
                                 isSelected={[...selectedMails].some(m => m.id === email.id)}
                                 onSelect={handleSelect}
@@ -136,11 +117,20 @@ const MainPage = () => {
                 </div>
             </div>
 
-            {/* ---- COMPOSE WINDOW ---- */}
             {showCompose && (
                 <ComposeEmail
-                    onCancel={handleCancelCompose}
-                    onSend={handleSendCompose}
+                    userId={userId}
+                    isExpanded={isExpanded}
+                    onCancel={() => {
+                        setShowCompose(false);
+                        setIsExpanded(false);
+                    }}
+                    onSend={() => {
+                        setShowCompose(false);
+                        setIsExpanded(false);
+                        refreshMails();
+                    }}
+                    onExpand={() => setIsExpanded(!isExpanded)}
                 />
             )}
         </div>

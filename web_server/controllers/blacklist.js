@@ -15,7 +15,7 @@ const {extractUrls} = require("../utils/mails");
  * 502 on server error
  */
 exports.addToBlacklist = async (req, res) => {
-    const userId = Number(req.user.id);
+    const userId = req.headers['user-id'];
     const rawUrl = req.body.url;
     const mailId = req.body.mailId;
     // check for valid input

@@ -6,13 +6,12 @@ import ProfileMenu from "./profile/ProfileMenu";
 import SearchBar from "./search/SearchBar";
 import {useProfile} from "../hooks/useProfile";
 
-const TopMenu = ({theme, toggleTheme}) => {
+const TopMenu = ({theme, setTheme, userId}) => {
     const navigate = useNavigate();
     const menuRef = useRef(null);
     const [showMenu, setShowMenu] = useState(false);
 
-
-    const {imageUrl, fullName, updateImage} = useProfile();
+    const {imageUrl, fullName, updateImage} = useProfile(userId);
 
     const onLogoClick = () => {
         setShowMenu(false);
@@ -30,7 +29,7 @@ const TopMenu = ({theme, toggleTheme}) => {
             </button>
 
             <div className="search-container d-flex align-items-center" style={{position: 'relative'}}>
-                <SearchBar theme={theme}/>
+                <SearchBar userId={userId} theme={theme}/>
             </div>
 
             <div className="position-relative" ref={menuRef}>
@@ -40,7 +39,7 @@ const TopMenu = ({theme, toggleTheme}) => {
                 {showMenu && (
                     <ProfileMenu
                         theme={theme}
-                        toggleTheme={toggleTheme}
+                        setTheme={setTheme}
                         imageUrl={imageUrl}
                         fullName={fullName}
                         onUploadImage={updateImage}

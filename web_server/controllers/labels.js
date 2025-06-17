@@ -19,14 +19,14 @@ const getAllLabels = (req, res) => {
 
 /**
  * POST /api/labels
- * Creates a new label.
+ * Creates a new label. Expects a numeric “userid” header and a JSON
  * @returns 201 Created with Location header only
  * Errors:
  *   - 400 Bad Request if name is missing
  *   - 400 Bad Request if creation fails
  */
 const createNewLabel = (req, res) => {
-    const userId = Number(req.user.id);
+    const userId = Number(req.headers['user-id']);
     const labelName = req.body.name;
 
     if (!labelName) {

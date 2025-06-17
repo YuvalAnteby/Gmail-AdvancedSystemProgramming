@@ -2,13 +2,10 @@ import SearchResultsDropdown from "./SearchResultsDropdown";
 import {useEffect, useState} from "react";
 import {useMailSearch} from "../../hooks/useMailSearch";
 import './SearchBar.css'
-import {getUserFromToken} from "../../../utils/tokenUtils";
 
-const SearchBar = ({theme}) => {
-    const user = getUserFromToken();
-
+const SearchBar = ({userId, theme}) => {
     const [query, setQuery] = useState('');
-    const {results, loading} = useMailSearch(user.id, query);
+    const {results, loading} = useMailSearch(userId, query);
 
 
     const handleSelectMail = (mail) => {
@@ -44,7 +41,7 @@ const SearchBar = ({theme}) => {
 
 
     return (
-        <div className="search-bar position-relative">
+        <div className="search-input-wrapper position-relative" style={{flexGrow: 1}}>
             <input
                 type="text"
                 className={`form-control search-input ${theme}`}

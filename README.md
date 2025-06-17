@@ -28,8 +28,7 @@ First clone the project
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
 cd Gmail-AdvancedSystemProgramming/python_client
 ```
-**If you want to change the configuration (ports, names, bloom filter integers etc.) you can do it in dockerfiles 
-and docker compose.**
+**If you want to change the configuration (ports, names, bloom filter integers etc.) you can do it in dockerfiles and docker compose.**
 
 ### To test the python client and bloom filter server
 This will build and run only the test related containers (CPP server, gtest, python test)

@@ -1,5 +1,3 @@
-import {convertToBase64} from "../utils/files";
-
 /**
  * File responsible on calls to the web server for profile related information.
  */
@@ -14,9 +12,7 @@ const API_BASE = "http://localhost:3001/api";
  */
 export const changeProfileImage = async (userId, file) => {
     const url = `${API_BASE}/users/${userId}`;
-    // Convert file to base64
-    const base64 = await convertToBase64(file);
-
+    const objectURL = URL.createObjectURL(file);
     const res = await fetch(url, {
         method: "PATCH",
         headers: {
@@ -24,11 +20,12 @@ export const changeProfileImage = async (userId, file) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            "image": base64
+            "image": objectURL
         })
     });
     if (!res.ok)
         throw new Error(`changing profile picture: ${res.status}`);
+    console.log(`changing profile picture: ${res.status}`);
     return res.json();
 }
 
@@ -39,16 +36,11 @@ export const changeProfileImage = async (userId, file) => {
  */
 export const fetchUserInfo = async (userId) => {
     const url = `${API_BASE}/users/${userId}`;
-    const token = localStorage.getItem('token');
-
     const res = await fetch(url, {
         method: "GET",
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
     });
     if (!res.ok)
         throw new Error(`error fetching user info: ${res.status}`);
+    console.log(`fetching user info: ${res.status}`);
     return res.json();
 }
