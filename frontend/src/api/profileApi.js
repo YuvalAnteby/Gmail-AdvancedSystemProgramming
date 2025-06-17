@@ -1,3 +1,5 @@
+import {convertToBase64} from "../utils/files";
+
 /**
  * File responsible on calls to the web server for profile related information.
  */
@@ -12,7 +14,9 @@ const API_BASE = "http://localhost:3001/api";
  */
 export const changeProfileImage = async (userId, file) => {
     const url = `${API_BASE}/users/${userId}`;
-    const objectURL = URL.createObjectURL(file);
+    // Convert file to base64
+    const base64 = await convertToBase64(file);
+
     const res = await fetch(url, {
         method: "PATCH",
         headers: {
@@ -20,7 +24,7 @@ export const changeProfileImage = async (userId, file) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            "image": objectURL
+            "image": base64
         })
     });
     if (!res.ok)
