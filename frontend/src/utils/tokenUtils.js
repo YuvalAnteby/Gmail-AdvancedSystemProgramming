@@ -32,10 +32,3 @@ export function getUserFromToken() {
         return null;
     }
 }
-
-/**
- * Logs the user out by removing the JWT token
- */
-export function logout() {
-    localStorage.removeItem("token");
-}

@@ -1,5 +1,6 @@
 import './ProfileMenu.css';
 import {useRef} from "react";
+import {useNavigate} from "react-router-dom";
 
 const ProfileMenu = ({theme, toggleTheme, imageUrl, fullName, onUploadImage}) => {
     const fileInputRef = useRef(null);
@@ -8,6 +9,13 @@ const ProfileMenu = ({theme, toggleTheme, imageUrl, fullName, onUploadImage}) =>
         const file = e.target.files[0];
         if (file) onUploadImage(file);
     };
+
+    // handle logout click
+    const navigate = useNavigate();
+    const onLogoutClick = () => {
+        localStorage.removeItem("token");
+        navigate("/");
+    }
 
     return (
         <div className={`profile-popup ${theme}-popup`}>
@@ -30,7 +38,7 @@ const ProfileMenu = ({theme, toggleTheme, imageUrl, fullName, onUploadImage}) =>
                 >
                     Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
                 </button>
-                <button className="btn btn-outline-danger btn-sm mt-3" onClick={() => console.log("Logging out...")}>
+                <button className="btn btn-outline-danger btn-sm mt-3" onClick={onLogoutClick}>
                     Logout
                 </button>
             </div>

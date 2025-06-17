@@ -10,9 +10,13 @@ import ComposeEmail from "./ComposeEmail/ComposeEmail";
 import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
 import {useTheme} from "../utils/useTheme";
+import {useRequireAuth} from "../utils/useAutoLogin";
 
 
 const MainPage = () => {
+    // ensure the user is authenticated before rendering
+    useRequireAuth();
+
     const {theme, toggleTheme} = useTheme('dark');
     const location = useLocation();
 
