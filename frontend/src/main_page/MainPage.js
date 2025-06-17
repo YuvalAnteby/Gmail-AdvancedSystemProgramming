@@ -16,8 +16,10 @@ const MainPage = () => {
     const {theme, toggleTheme} = useTheme('dark');
     const location = useLocation();
 
+    // views change hooks
     const [inboxType, setInboxType] = useState(location.state?.inboxType || 'incoming');
     const [showCompose, setShowCompose] = useState(false);
+    const [showSidebar, setShowSidebar] = useState(() => window.innerWidth >= 768);
 
     const {
         emails,
@@ -42,6 +44,7 @@ const MainPage = () => {
         refreshMails
     );
 
+    // handles mails selection
     const handleSelect = (mail, isChecked) => {
         setSelectedMails(prev => {
             const copy = new Set(prev);
@@ -51,12 +54,14 @@ const MainPage = () => {
         });
     };
 
+    // checks inbox type change
     useEffect(() => {
         if (location.state?.inboxType) {
             setInboxType(location.state.inboxType);
         }
     }, [location.state?.inboxType]);
 
+    // handlers for mail compose
     const handleComposeClick = () => setShowCompose(true);
     const handleCancelCompose = () => setShowCompose(false);
     const handleSendCompose = mail => {
@@ -78,7 +83,7 @@ const MainPage = () => {
             {/* ---- MAIN LAYOUT ---- */}
             <div className="main-content row g-0">
                 {/* ---- SIDE MENU ---- */}
-                <div className="col-md-2 p-0">
+                <div className={`col-md-2 p-0 ${showSidebar ? '' : 'd-none'} d-md-block`}>
                     <EmailSidebar
                         theme={theme}
                         currentTab={inboxType}

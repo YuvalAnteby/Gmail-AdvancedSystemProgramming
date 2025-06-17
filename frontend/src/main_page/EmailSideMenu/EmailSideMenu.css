@@ -1,47 +1,65 @@
 .sidebar {
-    width: 240px;
-    border-right: 1px solid #e0e0e0;
     display: flex;
     flex-direction: column;
-    background-color: #ffffff;
-    height: 100%;
+    padding: 1rem;
+    height: 100vh;
+}
+.sidebar.light{
+    color: var(--bs-light-rgb);
+    border-right: 1px solid var(--bs-border-color);
+}
+.sidebar.dark{
+    color: var(--bs-dark-rgb);
+    border-right: 1px solid var(--bs-border-color, #dee2e6);
 }
 
 .compose-button {
-    margin: 16px;
-    padding: 12px 24px;
-    background-color: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 24px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
+    margin-bottom: 1rem;
+}
+.compose-button.light {
+    background-color: var(--bs-primary);
+    color: #fff;
+    border: 1px solid var(--bs-primary);
+}
+.compose-button.dark {
+    background-color: transparent;
+    color: #f8f9fa; /* Bootstrap's light */
+    border: 1px solid #f8f9fa;
+}
+
+.sidebar .nav-link {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-align: left;
     align-items: center;
-    gap: 8px;
-    transition: background-color 0.2s;
-    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.2);
+    justify-content: space-between;
+    transition: background-color 0.2s, color 0.2s;
 }
-
-.compose-button:hover {
-    background-color: #1565c0;
-    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+/* Inactive appearance */
+.sidebar.light .nav-link {
+    background-color: transparent;
+    color: #000;
 }
-
-.compose-button:active {
-    transform: translateY(1px);
+.sidebar.dark .nav-link {
+    background-color: transparent;
+    color: #f8f9fa;
 }
-
-.compose-icon {
-    width: 16px;
-    height: 16px;
+/* Active appearance */
+.sidebar.light .nav-link.active-tab {
+    background-color: var(--bs-primary);
+    color: white;
 }
-
-.sidebar-nav {
-    flex: 1;
-    padding: 8px;
-    overflow-y: auto;
+.sidebar.dark .nav-link.active-tab {
+    background-color: var(--bs-secondary);
+    color: white;
+}
+/* Hover effects */
+.sidebar .nav-link:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+.sidebar.dark .nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
 }
 
 .nav-item {
@@ -58,17 +76,11 @@
     margin-bottom: 4px;
     user-select: none;
 }
-
-.nav-item:hover {
-    background-color: #f5f5f5;
-}
-
 .nav-item.active {
     background-color: #e3f2fd;
     color: #1976d2;
     font-weight: 500;
 }
-
 .nav-icon {
     width: 16px;
     height: 16px;
