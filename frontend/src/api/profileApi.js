@@ -25,10 +25,7 @@ export const changeProfileImage = async (userId, file) => {
     });
     if (!res.ok)
         throw new Error(`changing profile picture: ${res.status}`);
-    console.log(`changing profile picture: ${res.status}`);
-    const updated = res.json();
-    console.log(updated);
-    return updated;
+    return res.json();
 }
 
 /**
@@ -49,6 +46,5 @@ export const fetchUserInfo = async (userId) => {
     });
     if (!res.ok)
         throw new Error(`error fetching user info: ${res.status}`);
-    console.log(`fetching user info: ${res.status}`);
     return res.json();
 }

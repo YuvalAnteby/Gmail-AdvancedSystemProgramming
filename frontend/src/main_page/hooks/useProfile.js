@@ -1,27 +1,28 @@
 import {useEffect, useState} from 'react';
-import {changeProfileImage} from "../../api/profileApi";
+import {changeProfileImage, fetchUserInfo} from "../../api/profileApi";
 import {getUserFromToken} from "../../utils/tokenUtils";
 
 export const useProfile = () => {
     const token = getUserFromToken();
 
-    const [imageUrl, setImageUrl] = useState(token?.image || "/profile_default.png");
-    const [fullName, setFullName] = useState(token?.fullName || 'NAME_ERROR');
+    const [imageUrl, setImageUrl] = useState("/profile_default.png");
+    const [fullName, setFullName] = useState("User");
 
     useEffect(() => {
-        const fetch = async () => {
-            if (token) {
-                const { imageUrl, fullName } = token;
-                setImageUrl(imageUrl || '/profile_default.png');
-                setFullName(fullName);
+        if (!token?.id) return;
+
+        const loadUser = async () => {
+            try {
+                const user = await fetchUserInfo(token.id);
+                setImageUrl(user.image || '/profile_default.png');
+                setFullName(user.fullName || 'User');
+            } catch (err) {
+                console.error("Failed to fetch user info:", err);
             }
         };
-        fetch();
-    }, [token]);
 
-    useEffect(() => {
-        console.log('imageUrl updated:', imageUrl);
-    }, [imageUrl]);
+        loadUser();
+    }, [token]);
 
     const updateImage = async (file) => {
         try {

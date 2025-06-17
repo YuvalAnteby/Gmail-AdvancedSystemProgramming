@@ -21,8 +21,7 @@ const MainPage = () => {
     const [showCompose, setShowCompose] = useState(false);
     const [showSidebar, setShowSidebar] = useState(() => window.innerWidth >= 768);
 
-    const {
-        emails,
+    const {emails,
         total,
         page,
         hasNextPage,
@@ -71,6 +70,15 @@ const MainPage = () => {
         refreshMails();
     };
 
+    // side menu un/show update
+    useEffect(() => {
+        const handleResize = () => {
+            setShowSidebar(window.innerWidth >= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <div className={`main-page ${theme}`}>
             {/* ---- TOP MENU ---- */}
@@ -113,6 +121,7 @@ const MainPage = () => {
                         {/* ---- ACTUAL MAIL ROWS ---- */}
                         {emails.map(email => (
                             <MailRow
+                                key={email.id}
                                 theme={theme}
                                 email={email}
                                 isSelected={[...selectedMails].some(m => m.id === email.id)}
