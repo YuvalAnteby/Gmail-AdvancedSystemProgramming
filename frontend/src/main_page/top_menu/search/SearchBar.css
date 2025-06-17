@@ -1,5 +1,6 @@
 /* Search bar */
 .search-bar {
+    flex-grow: 1;
     margin: 12px 16px 0;
 }
 /* input in search bar */

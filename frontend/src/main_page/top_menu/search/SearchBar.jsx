@@ -3,11 +3,9 @@ import {useEffect, useState} from "react";
 import {useMailSearch} from "../../hooks/useMailSearch";
 import './SearchBar.css'
 import {getUserFromToken} from "../../../utils/tokenUtils";
-import {useTheme} from "../../../utils/useTheme";
 
-const SearchBar = () => {
+const SearchBar = ({theme}) => {
     const user = getUserFromToken();
-    const theme = useTheme();
 
     const [query, setQuery] = useState('');
     const {results, loading} = useMailSearch(user.id, query);
@@ -46,7 +44,7 @@ const SearchBar = () => {
 
 
     return (
-        <div className="search-bar position-relative" style={{flexGrow: 1}}>
+        <div className="search-bar position-relative">
             <input
                 type="text"
                 className={`form-control search-input ${theme}`}
