@@ -46,7 +46,7 @@ const SearchBar = () => {
 
 
     return (
-        <div className="search-input-wrapper position-relative" style={{flexGrow: 1}}>
+        <div className="search-bar position-relative" style={{flexGrow: 1}}>
             <input
                 type="text"
                 className={`form-control search-input ${theme}`}
