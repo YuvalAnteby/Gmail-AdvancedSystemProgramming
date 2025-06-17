@@ -27,7 +27,7 @@ const ToolBar = ({
     return (
         <div className="toolbar-container">
             {/* SELECT ALL - always shown */}
-            <div className={`select-all ${theme}`} style={{marginRight: '12px'}}>
+            <div className={`select-all toolbar-text ${theme}`}>
                 <input
                     ref={selectAllRef}
                     type="checkbox"
@@ -77,14 +77,14 @@ const ToolBar = ({
                     {inboxType === 'trash' && (
                         <div className="d-flex flex-row">
                             <button
-                                className="btn btn-sm"
+                                className={`btn btn-sm toolbar-text ${theme}`}
                                 title="delete forever"
                                 onClick={btnHandlers.handleDelete}
                             >
                                 Delete forever
                             </button>
                             <button
-                                className="btn btn-sm"
+                                className={`btn btn-sm toolbar-text ${theme}`}
                                 title="restore mail"
                                 onClick={btnHandlers.handleRestore}
                             >

@@ -14,11 +14,12 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
+    margin-right: 12px;
 }
-.select-all.light {
+.toolbar-text.light {
     color: #000000;
 }
-.select-all.dark {
+.toolbar-text.dark {
     color: white;
 }
 
