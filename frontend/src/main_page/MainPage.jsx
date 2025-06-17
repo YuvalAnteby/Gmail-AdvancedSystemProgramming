@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import './MainPage.css';
+import "./MainPage.css";
 import EmailSidebar from "./EmailSideMenu/EmailSideMenu";
 import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
@@ -14,9 +14,8 @@ const DEFAULT_USER_ID = 1; // TODO replace with JWT
 
 const MainPage = ({ theme, setTheme }) => {
     const userId = DEFAULT_USER_ID;
-
     const location = useLocation();
-    const [inboxType, setInboxType] = useState(location.state?.inboxType || 'all');
+    const [inboxType, setInboxType] = useState(location.state?.inboxType || "all");
     const [showCompose, setShowCompose] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -30,7 +29,7 @@ const MainPage = ({ theme, setTheme }) => {
         goToPrevPage,
         refreshMails,
         loading,
-        error
+        error,
     } = useMails(userId, inboxType);
 
     const [selectedMails, setSelectedMails] = useState(new Set());
@@ -46,7 +45,7 @@ const MainPage = ({ theme, setTheme }) => {
     );
 
     const handleSelect = (mail, isChecked) => {
-        setSelectedMails(prev => {
+        setSelectedMails((prev) => {
             const copy = new Set(prev);
             if (isChecked) copy.add(mail);
             else copy.delete(mail);
@@ -62,7 +61,7 @@ const MainPage = ({ theme, setTheme }) => {
 
     const handleComposeClick = () => setShowCompose(true);
     const handleCancelCompose = () => setShowCompose(false);
-    const handleSendCompose = mail => {
+    const handleSendCompose = (mail) => {
         setShowCompose(false);
         refreshMails();
     };
@@ -103,13 +102,13 @@ const MainPage = ({ theme, setTheme }) => {
                             error={error}
                         />
 
-                        {emails.map(email => (
+                        {emails.map((email) => (
                             <MailRow
                                 key={email.id}
                                 theme={theme}
                                 userId={userId}
                                 email={email}
-                                isSelected={[...selectedMails].some(m => m.id === email.id)}
+                                isSelected={[...selectedMails].some((m) => m.id === email.id)}
                                 onSelect={handleSelect}
                             />
                         ))}
@@ -119,6 +118,7 @@ const MainPage = ({ theme, setTheme }) => {
 
             {showCompose && (
                 <ComposeEmail
+                    theme={theme}
                     userId={userId}
                     isExpanded={isExpanded}
                     onCancel={() => {
@@ -130,7 +130,7 @@ const MainPage = ({ theme, setTheme }) => {
                         setIsExpanded(false);
                         refreshMails();
                     }}
-                    onExpand={() => setIsExpanded(!isExpanded)}
+                    onExpand={() => setIsExpanded((e) => !e)}
                 />
             )}
         </div>

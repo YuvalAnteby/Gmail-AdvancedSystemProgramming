@@ -1,31 +1,37 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { sendNewMail } from '../../api/mailApi';
-import { searchUsersByEmail } from '../../api/userApi'; // when we switch to a real API
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import './ComposeEmail.css';
+import React, { useState, useEffect } from "react";
+import { sendNewMail } from "../../api/mailApi";
+//import { searchUsersByEmail } from "../../api/userApi"; // when we switch to a real API
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "./ComposeEmail.css";
 
 const users = [
     { id: 1, fullName: "Yuval Anteby", mail: "yuval@gmail.com" },
     { id: 2, fullName: "Dor Darmon", mail: "dor@gmail.com" },
-    { id: 3, fullName: "Roee Chaim", mail: "roee@gmail.com" }
+    { id: 3, fullName: "Roee Chaim", mail: "roee@gmail.com" },
 ];
 
-export default function ComposeEmail({ userId, onCancel, onSend, onExpand, isExpanded }) {
-    const [subject, setSubject]       = useState('');
-    const [body, setBody]             = useState('');
-    const [toInput, setToInput]       = useState('');
+export default function ComposeEmail({
+                                         userId,
+                                         theme,
+                                         onCancel,
+                                         onSend,
+                                         onExpand,
+                                         isExpanded,
+                                     }) {
+    const [subject, setSubject] = useState("");
+    const [body, setBody] = useState("");
+    const [toInput, setToInput] = useState("");
     const [toSuggestions, setToSuggestions] = useState([]);
-    const [toList, setToList]         = useState([]);
+    const [toList, setToList] = useState([]);
 
-    // Autocomplete filter
     useEffect(() => {
         if (toInput.length >= 2) {
-            // replace users.filter(...) with real API call if needed:
-            const filtered = users.filter(u =>
-                u.mail.toLowerCase().includes(toInput.toLowerCase()) &&
-                !toList.some(added => added.id === u.id)
+            const filtered = users.filter(
+                (u) =>
+                    u.mail.toLowerCase().includes(toInput.toLowerCase()) &&
+                    !toList.some((added) => added.id === u.id)
             );
             setToSuggestions(filtered);
         } else {
@@ -33,10 +39,9 @@ export default function ComposeEmail({ userId, onCancel, onSend, onExpand, isExp
         }
     }, [toInput, toList]);
 
-    // Send mail for real
     const handleSend = async () => {
         try {
-            const recipients = toList.map(u => u.mail);
+            const recipients = toList.map((u) => u.mail);
             const mailData = {
                 subject,
                 body,
@@ -51,9 +56,9 @@ export default function ComposeEmail({ userId, onCancel, onSend, onExpand, isExp
         }
     };
 
-    // Auto-save draft on minimize/close
     const handleAutoSaveDraftAndClose = async () => {
-        const hasContent = subject.trim() || body.trim() || toList.length > 0;
+        const hasContent =
+            subject.trim() || body.trim() || toList.length > 0;
         if (!hasContent) {
             onCancel();
             return;
@@ -63,7 +68,7 @@ export default function ComposeEmail({ userId, onCancel, onSend, onExpand, isExp
             const mailData = {
                 subject,
                 body,
-                sentTo: toList.map(u => u.mail),
+                sentTo: toList.map((u) => u.mail),
                 saveAsDraft: true,
             };
             await sendNewMail(userId, mailData);
@@ -76,53 +81,72 @@ export default function ComposeEmail({ userId, onCancel, onSend, onExpand, isExp
     };
 
     return (
-        <div className={`compose-email ${isExpanded ? "expanded" : ""}`}>
-            {/* Header */}
+        <div className={`compose-email ${theme} ${isExpanded ? "expanded" : ""}`}>
             <div className="compose-header">
                 <span className="compose-title">New Message</span>
                 <div className="compose-controls">
-                    <button className="control-btn" title="Minimize" onClick={handleAutoSaveDraftAndClose}>
+                    <button
+                        className="control-btn"
+                        title="Minimize"
+                        onClick={handleAutoSaveDraftAndClose}
+                    >
                         <i className="bi bi-dash"></i>
                     </button>
-                    <button className="control-btn" title={isExpanded ? "Collapse" : "Expand"} onClick={onExpand}>
-                        <i className={`bi ${isExpanded ? "bi-fullscreen-exit" : "bi-fullscreen"}`}></i>
+                    <button
+                        className="control-btn"
+                        title={isExpanded ? "Collapse" : "Expand"}
+                        onClick={onExpand}
+                    >
+                        <i
+                            className={`bi ${
+                                isExpanded ? "bi-fullscreen-exit" : "bi-fullscreen"
+                            }`}
+                        ></i>
                     </button>
-                    <button className="control-btn" title="Close" onClick={handleAutoSaveDraftAndClose}>
+                    <button
+                        className="control-btn"
+                        title="Close"
+                        onClick={handleAutoSaveDraftAndClose}
+                    >
                         <i className="bi bi-x-lg"></i>
                     </button>
                 </div>
             </div>
 
-            {/* Body */}
             <div className="compose-body">
-                {/* To field */}
                 <div className="compose-field">
                     <span className="field-label">To</span>
                     <div className="to-input-wrapper">
-                        {toList.map(user => (
+                        {toList.map((user) => (
                             <span key={user.id} className="email-tag">
                 {user.mail}
-                                <i className="bi bi-x" onClick={() =>
-                                    setToList(toList.filter(u => u.id !== user.id))
-                                } />
+                                <i
+                                    className="bi bi-x"
+                                    onClick={() =>
+                                        setToList(toList.filter((u) => u.id !== user.id))
+                                    }
+                                />
               </span>
                         ))}
                         <input
                             type="text"
                             value={toInput}
-                            onChange={e => setToInput(e.target.value)}
+                            onChange={(e) => setToInput(e.target.value)}
                             className="field-input"
                             placeholder="Type email..."
                         />
                     </div>
                     {toSuggestions.length > 0 && (
                         <ul className="autocomplete-list">
-                            {toSuggestions.map(user => (
-                                <li key={user.id} onClick={() => {
-                                    setToList([...toList, user]);
-                                    setToInput('');
-                                    setToSuggestions([]);
-                                }}>
+                            {toSuggestions.map((user) => (
+                                <li
+                                    key={user.id}
+                                    onClick={() => {
+                                        setToList([...toList, user]);
+                                        setToInput("");
+                                        setToSuggestions([]);
+                                    }}
+                                >
                                     {user.fullName} &lt;{user.mail}&gt;
                                 </li>
                             ))}
@@ -130,19 +154,17 @@ export default function ComposeEmail({ userId, onCancel, onSend, onExpand, isExp
                     )}
                 </div>
 
-                {/* Subject */}
                 <div className="compose-field">
                     <span className="field-label">Subject</span>
                     <input
                         type="text"
                         value={subject}
-                        onChange={e => setSubject(e.target.value)}
+                        onChange={(e) => setSubject(e.target.value)}
                         className="field-input"
                         placeholder="Subject"
                     />
                 </div>
 
-                {/* Formatting toolbar */}
                 <div className="compose-toolbar">
                     <i className="bi bi-type-bold"></i>
                     <i className="bi bi-type-italic"></i>
@@ -152,16 +174,14 @@ export default function ComposeEmail({ userId, onCancel, onSend, onExpand, isExp
                     <i className="bi bi-list-ul"></i>
                 </div>
 
-                {/* Body textarea */}
                 <textarea
                     value={body}
-                    onChange={e => setBody(e.target.value)}
+                    onChange={(e) => setBody(e.target.value)}
                     className="compose-textarea"
                     placeholder="Compose your email..."
                 />
             </div>
 
-            {/* Footer */}
             <div className="compose-footer">
                 <div className="footer-left">
                     <button className="attach-btn" title="Attach files">
