@@ -122,7 +122,6 @@ export async function markAsRead(mailId) {
 export async function toggleMailStar(mail) {
     const url = `${API_BASE}/mails/${mail.id}`;
     const token = localStorage.getItem('token');
-
     const res = await fetch(url, {
         method: 'PATCH',
         headers: {

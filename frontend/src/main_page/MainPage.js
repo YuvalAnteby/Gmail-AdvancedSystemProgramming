@@ -11,7 +11,7 @@ import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
 import {useTheme} from "../utils/useTheme";
 import {useRequireAuth} from "../utils/useAutoLogin";
-import SkeletonEmail from "../loading_component/SkeletonEmail";
+import SkeletonEmail from "../components/loading/SkeletonEmail";
 
 
 const MainPage = () => {
@@ -136,6 +136,7 @@ const MainPage = () => {
                                 inboxType={inboxType}
                                 isSelected={[...selectedMails].some(m => m.id === email.id)}
                                 onSelect={handleSelect}
+                                onUpdate={refreshMails}
                             />
                         ))}
                     </div>

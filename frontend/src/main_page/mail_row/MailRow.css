@@ -157,33 +157,6 @@
     color: #ffffff;
 }
 
-/* star button */
-.star-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    padding: 4px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    width: 16px;
-    height: 16px;
-    color: #888888;
-    transition: all 0.2s;
-}
-.star-icon.light:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-.star-icon.dark:hover {
-    box-shadow: 0 4px 12px rgba(240, 240, 240, 0.15);
-}
-
-.star-icon.starred {
-    color: #ffc107;
-    fill: #ffc107;
-}
-
 .bi-clock.light {
     color: #666666;
 }

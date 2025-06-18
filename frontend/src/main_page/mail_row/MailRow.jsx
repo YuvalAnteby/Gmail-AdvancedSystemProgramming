@@ -1,8 +1,7 @@
 import "./MailRow.css"
 import {formatDate} from "../../utils/formatDate";
-import {useState} from "react";
-import {toggleMailStar} from "../../api/mailApi";
 import {useNavigate} from "react-router-dom";
+import StarButton from "../../components/StarButton/StarButton";
 
 
 /**
@@ -11,8 +10,9 @@ import {useNavigate} from "react-router-dom";
  *  @prop {string} inboxType what type of inbox we see this mail from (e.g. spam, trash etc)
  *  @prop {boolean} isSelected whether this row is currently checked
  *  @prop {function} onSelect when marking a mail as selected for mass actions on them
+ *  @prop {function} onUpdate when updating a mail object this function will trigger
  */
-const MailRow = ({theme, email, inboxType, isSelected, onSelect}) => {
+const MailRow = ({theme, email, inboxType, isSelected, onSelect, onUpdate}) => {
 
     // handling clicking on a mail to read it
     const navigate = useNavigate();
@@ -20,19 +20,6 @@ const MailRow = ({theme, email, inboxType, isSelected, onSelect}) => {
         console.log(">> Open Mail Row:", email);
         /// TODO mark as read
         navigate(`/mails/${email.id}`, {state: {inboxType}});
-    }
-
-    const [isStarred, setIsStarred] = useState(email.isStarred);
-    const toggleStar = async (mail, e) => {
-        e.stopPropagation()
-        try {
-            setIsStarred((prev) => !prev);
-            email.isStarred = isStarred;
-            await toggleMailStar(email);
-        } catch (e) {
-            console.error(e);
-        }
-
     }
 
     return (
@@ -44,10 +31,7 @@ const MailRow = ({theme, email, inboxType, isSelected, onSelect}) => {
                 onClick={(e) => e.stopPropagation()}
             />
 
-            <i
-                className={`btn bi bi-star${isStarred ? "-fill" : ""} star-icon ${theme} ${isStarred ? "starred" : ""}`}
-                onClick={(e) => toggleStar(email, e)}
-            />
+            <StarButton email={email} theme={theme} onToggle={onUpdate} />
 
             <div className="email-content" onClick={handleMailOpen}>
                 <div className={`email-sender ${theme}`}>{email.from.fullName}</div>

@@ -3,6 +3,10 @@
     align-items: flex-start;
     gap: 16px;
 }
+.sender-info.dark {
+    color: #f0f0f0;
+}
+
 .sender-details {
     flex: 1;
 }
@@ -32,29 +36,18 @@
 
 .sender-email-text {
     font-size: 14px;
-    color: #666666;
     font-weight: normal;
+    color: inherit;
 }
 
-.star-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
+.sender-info.dark .sender-email-text,
+.sender-info.dark .recipient-info {
+    color: #cccccc;
 }
-.star-button:hover {
-    background-color: #e0e0e0;
-}
-.star-icon {
-    width: 16px;
-    height: 16px;
-    color: #666666;
-}
+
+
+
+
 
 .recipient-info {
     font-size: 14px;

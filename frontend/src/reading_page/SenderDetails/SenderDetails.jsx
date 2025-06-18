@@ -1,17 +1,16 @@
 import './SenderDetails.css'
 import {DEFAULT_AVATAR} from "../../utils/constants";
+import StarButton from "../../components/StarButton/StarButton";
 
-const SenderDetails = ({email}) => {
+const SenderDetails = ({email, theme, onUpdate}) => {
     return (
-        <div className="sender-info">
+        <div className={`sender-info ${theme}`}>
             <img src={email.from.image || DEFAULT_AVATAR} alt="sender" className="avatar"/>
             <div className="sender-details">
                 <h3 className="sender-name">
                     {email.from.fullName}
                     <span className="sender-email-text">&lt;{email.from.mail}&gt;</span>
-                    <button className="star-button" title="Star this email">
-                        <i className="bi bi-star"/> {/* FIXME */}
-                    </button>
+                    <StarButton email={email} theme={theme} onToggle={onUpdate}/>
                 </h3>
                 <div className="recipient-info">
                     to {email.sentTo.map((user, index) => (

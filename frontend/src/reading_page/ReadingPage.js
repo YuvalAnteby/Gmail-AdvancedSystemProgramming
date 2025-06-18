@@ -6,7 +6,7 @@ import ReadingHeader from "./ReadingHeader/ReadingHeader";
 import './ReadingPage.css'
 import SenderDetails from "./SenderDetails/SenderDetails";
 import {formatFullTime} from "../utils/formatDate";
-import SkeletonEmail from "../loading_component/SkeletonEmail";
+import SkeletonEmail from "../components/loading/SkeletonEmail";
 
 const ReadingPage = () => {
 
@@ -45,6 +45,10 @@ const ReadingPage = () => {
         alert("forward");
     }
 
+    const handleStarToggle = (newStarValue) => {
+        setEmail(prev => ({...prev, isStarred: newStarValue}));
+    };
+
     return (
         <div className={`email-view ${theme}`}>
             {/* Header */}
@@ -57,8 +61,9 @@ const ReadingPage = () => {
                     <div className="email-view-content">
                         <h1 className="email-view-title">{email.subject}</h1>
                         {/* sender's info */}
-                        <div className="email-view-meta">
-                            <SenderDetails email={email}/>
+                        <div className={`email-view-meta ${theme}`}>
+                            <SenderDetails email={email} theme={theme} onUpdate={handleStarToggle}/>
+                            {/* TODO FIXME */}
                             <div className="email-date">{formatFullTime(email.sentAt || email.createdAt)}</div>
                         </div>
                         {/* main mail's text */}
