@@ -66,7 +66,12 @@ const getMailById = (req, res) => {
     // ensure the mail belongs to the user
     if (mail.owner != userId)
         return res.status(403).json({error: 'mail do not belong to user'});
-    return res.status(200).json(mail);
+    return res.status(200).json({
+        ...mail,
+        from: usersToFullElement([mail.from])[0],
+        sentTo: usersToFullElement(mail.sentTo || []),
+        labels: labelsToFullElement(userId, mail.labels || [])
+    });
 }
 
 /**

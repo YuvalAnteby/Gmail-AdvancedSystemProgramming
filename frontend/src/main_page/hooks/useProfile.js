@@ -1,11 +1,12 @@
 import {useEffect, useState} from 'react';
 import {changeProfileImage, fetchUserInfo} from "../../api/profileApi";
 import {getUserFromToken} from "../../utils/tokenUtils";
+import {DEFAULT_AVATAR} from "../../utils/constants";
 
 export const useProfile = () => {
     const token = getUserFromToken();
 
-    const [imageUrl, setImageUrl] = useState("/profile_default.png");
+    const [imageUrl, setImageUrl] = useState(DEFAULT_AVATAR);
     const [fullName, setFullName] = useState("User");
 
     useEffect(() => {

@@ -26,7 +26,7 @@ const mails = [
         id: 1,
         owner: 1,
         from: 1,
-        sentTo: [1],
+        sentTo: [1, 2, 3],
         subject: "Project update",
         body: "Here’s what we changed in v2.0...",
         createdAt: new Date('2025-06-03T20:27:11.000Z'),

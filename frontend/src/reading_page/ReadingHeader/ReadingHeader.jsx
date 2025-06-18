@@ -1,6 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import './ReadingHeader.css'
-import {APP_NAME} from "../../utils/constants";
+import {APP_NAME, DEFAULT_AVATAR} from "../../utils/constants";
 import ProfileMenu from "../../main_page/top_menu/profile/ProfileMenu";
 import {useProfile} from "../../main_page/hooks/useProfile";
 import {useOutsideClick} from "../../main_page/hooks/useOutsideClick";
@@ -83,7 +83,7 @@ const ReadingHeader = ({theme, toggleTheme, email, inboxType}) => {
             {/* profile and profile menu for more actions */}
             <div className="position-relative" ref={menuRef}>
                 <button onClick={onProfileClick} className="profile-btn">
-                    <img src={imageUrl} alt="Profile" className="profile-img"/>
+                    <img src={imageUrl || DEFAULT_AVATAR} alt="Profile" className="profile-img"/>
                 </button>
                 {showMenu && (
                     <ProfileMenu
