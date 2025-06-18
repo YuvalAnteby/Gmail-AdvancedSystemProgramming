@@ -11,6 +11,7 @@ import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
 import {useTheme} from "../utils/useTheme";
 import {useRequireAuth} from "../utils/useAutoLogin";
+import SkeletonEmail from "../loading_component/SkeletonEmail";
 
 
 const MainPage = () => {
@@ -34,6 +35,7 @@ const MainPage = () => {
         goToNextPage,
         goToPrevPage,
         refreshMails,
+        loading
     } = useMails(inboxType);
 
     // selected mail ids logic
@@ -84,7 +86,7 @@ const MainPage = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    console.log(emails)
+    // regular screen
     return (
         <div className={`main-page ${theme}`}>
             {/* ---- TOP MENU ---- */}
@@ -123,9 +125,10 @@ const MainPage = () => {
                             goToNextPage={goToNextPage}
                             goToPrevPage={goToPrevPage}
                         />
-
+                        {/* ---- loading screen ---- */}
+                        {loading && (<SkeletonEmail rows={10} />)}
                         {/* ---- ACTUAL MAIL ROWS ---- */}
-                        {emails.map(email => (
+                        {!loading && emails.map(email => (
                             <MailRow
                                 key={email.id}
                                 theme={theme}

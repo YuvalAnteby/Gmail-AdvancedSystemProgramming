@@ -8,10 +8,11 @@
 }
 .main-page.light {
     background-color: var(--light-bg-page);
+    color: black;
 }
 .main-page.dark {
     background-color: var(--dark-bg-page);
-
+    color: white;
 }
 
 /* ─── SIDE MENU + MAILS LIST ───────────────────────────────── */

@@ -1,0 +1,59 @@
+.skeleton-inbox {
+    padding: 12px;
+}
+
+/* Each row skeleton mimics a mail entry */
+.skeleton-mail-row {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Shared shimmer effect */
+.skeleton-mail-row div {
+    background: linear-gradient(90deg, #ccc 25%, #e0e0e0 50%, #ccc 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 4px;
+}
+.main-page.dark .skeleton-mail-row div {
+    background: linear-gradient(90deg, #444 25%, #666 50%, #444 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 4px;
+}
+
+/* Individual parts */
+.skeleton-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 16px;
+}
+
+.skeleton-sender {
+    width: 120px;
+    height: 16px;
+    margin-right: 24px;
+}
+
+.skeleton-subject {
+    flex: 1;
+    height: 16px;
+    margin-right: 24px;
+}
+
+.skeleton-date {
+    width: 80px;
+    height: 16px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
