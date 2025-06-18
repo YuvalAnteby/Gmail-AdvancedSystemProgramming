@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './EmailSideMenu.css'
 
-export default function EmailSidebar({theme, currentTab, setCurrentTab, onComposeClick}) {
+export default function EmailSidebar({theme, currentTab, setCurrentTab, onComposeClick, setShowSidebar}) {
 
     const sidebarItems = [
         {id: 'all', label: 'All Mail', iconClass: 'bi-envelope'},
@@ -15,16 +15,37 @@ export default function EmailSidebar({theme, currentTab, setCurrentTab, onCompos
         {id: 'spam', label: 'Spam', iconClass: 'bi-exclamation-octagon'},
     ];
 
+    const onTabClick = (e, itemId) => {
+        e.preventDefault();
+        setCurrentTab('incoming'); // or whatever value
+        if (window.innerWidth < 768) {
+            setShowSidebar(false); // only on small screens
+        }
+        setCurrentTab(itemId);
+    }
+
+    const [showComposeBtn, setShowComposeBtn] = useState(true);
+    // side menu un/show update
+    useEffect(() => {
+        const handleResize = () => {
+            setShowComposeBtn(window.innerWidth >= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <div className={`sidebar ${theme}`}
         >
-            <button
-                onClick={onComposeClick}
-                className={`btn compose-button ${theme}`}
-            >
-                <i className="bi bi-pencil-square me-2"/>
-                Compose
-            </button>
+            {!showComposeBtn && (
+                <button
+                    onClick={onComposeClick}
+                    className={`btn compose-button ${theme}`}
+                >
+                    <i className="bi bi-pencil-square me-2"/>
+                    Compose
+                </button>
+            )}
 
             <ul className="nav nav-pills flex-column">
                 {sidebarItems.map(item => {
@@ -34,10 +55,7 @@ export default function EmailSidebar({theme, currentTab, setCurrentTab, onCompos
                             <a
                                 className={`nav-link d-flex ${active ? 'active-tab' : ''}`}
                                 href="#"
-                                onClick={e => {
-                                    e.preventDefault();
-                                    setCurrentTab(item.id);
-                                }}
+                                onClick={e => onTabClick(e, item.id)}
                             >
                 <span className="d-flex align-items-center">
                   <i className={`bi ${item.iconClass} me-2`}/>

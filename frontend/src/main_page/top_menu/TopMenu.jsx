@@ -7,7 +7,7 @@ import SearchBar from "./search/SearchBar";
 import {useProfile} from "../hooks/useProfile";
 import {APP_NAME} from "../../utils/constants";
 
-const TopMenu = ({theme, toggleTheme, inboxType}) => {
+const TopMenu = ({theme, toggleTheme, inboxType, setShowSidebar}) => {
     const navigate = useNavigate();
     const menuRef = useRef(null);
     const [showMenu, setShowMenu] = useState(false);
@@ -21,6 +21,10 @@ const TopMenu = ({theme, toggleTheme, inboxType}) => {
 
     const onProfileClick = () => setShowMenu(prev => !prev);
     useOutsideClick(menuRef, () => setShowMenu(false), showMenu);
+
+    const onHamburgerClick = () => {
+        setShowSidebar(prev => !prev);
+    }
 
     // side menu un/show logo + name
     const [showLogoName, setShowLogoName] = useState(true);
@@ -38,6 +42,11 @@ const TopMenu = ({theme, toggleTheme, inboxType}) => {
                 <button className="btn logo-btn" onClick={onLogoClick}>
                     <img src="/logo192.png" alt="icon" className="logo-img"/>
                     <span className={`logo-text ${theme}`}>{APP_NAME}</span>
+                </button>
+            )}
+            {!showLogoName && (
+                <button className="btn logo-btn logo-btn" onClick={onHamburgerClick}>
+                    <i className="bi bi-list" />
                 </button>
             )}
 

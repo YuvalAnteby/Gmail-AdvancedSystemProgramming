@@ -92,7 +92,12 @@ const MainPage = () => {
             {/* ---- TOP MENU ---- */}
             <div className="row mb-3">
                 <div className="col-12">
-                    <TopMenu theme={theme} toggleTheme={toggleTheme} inboxType={inboxType} />
+                    <TopMenu
+                        theme={theme}
+                        toggleTheme={toggleTheme}
+                        inboxType={inboxType}
+                        setShowSidebar={setShowSidebar}
+                    />
                 </div>
             </div>
 
@@ -105,6 +110,7 @@ const MainPage = () => {
                         currentTab={inboxType}
                         setCurrentTab={setInboxType}
                         onComposeClick={handleComposeClick}
+                        setShowSidebar={setShowSidebar}
                     />
                 </div>
 
@@ -126,7 +132,7 @@ const MainPage = () => {
                             goToPrevPage={goToPrevPage}
                         />
                         {/* ---- loading screen ---- */}
-                        {loading && (<SkeletonEmail rows={10} />)}
+                        {loading && (<SkeletonEmail rows={10}/>)}
                         {/* ---- ACTUAL MAIL ROWS ---- */}
                         {!loading && emails.map(email => (
                             <MailRow
