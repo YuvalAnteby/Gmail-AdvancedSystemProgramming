@@ -1,4 +1,4 @@
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import "./TopMenu.css";
 import {useNavigate} from "react-router-dom";
 import {useOutsideClick} from "../hooks/useOutsideClick";
@@ -12,7 +12,6 @@ const TopMenu = ({theme, toggleTheme, inboxType}) => {
     const menuRef = useRef(null);
     const [showMenu, setShowMenu] = useState(false);
 
-
     const {imageUrl, fullName, updateImage} = useProfile();
 
     const onLogoClick = () => {
@@ -23,15 +22,27 @@ const TopMenu = ({theme, toggleTheme, inboxType}) => {
     const onProfileClick = () => setShowMenu(prev => !prev);
     useOutsideClick(menuRef, () => setShowMenu(false), showMenu);
 
+    // side menu un/show logo + name
+    const [showLogoName, setShowLogoName] = useState(true);
+    useEffect(() => {
+        const handleResize = () => {
+            setShowLogoName(window.innerWidth >= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <div className={`top-menu-wrapper ${theme} px-3`}>
-            <button className="btn logo-btn" onClick={onLogoClick}>
-                <img src="/logo192.png" alt="icon" className="logo-img"/>
-                <span className={`logo-text ${theme}`}>{APP_NAME}</span>
-            </button>
+            {showLogoName && (
+                <button className="btn logo-btn" onClick={onLogoClick}>
+                    <img src="/logo192.png" alt="icon" className="logo-img"/>
+                    <span className={`logo-text ${theme}`}>{APP_NAME}</span>
+                </button>
+            )}
 
             <div className="search-container d-flex align-items-center" style={{position: 'relative'}}>
-                <SearchBar theme={theme} inboxType={inboxType} />
+                <SearchBar theme={theme} inboxType={inboxType}/>
             </div>
 
             <div className="position-relative" ref={menuRef}>
