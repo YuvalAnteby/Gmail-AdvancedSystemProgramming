@@ -27,17 +27,21 @@ const ReadingHeader = ({theme, toggleTheme, email, inboxType}) => {
     const onActionClick = async (actionFunction, funcInput, actionLabel) => {
         try {
             await actionFunction(funcInput);
-            navigate(-1);
+            navigate('/inbox', {state: {inboxType: inboxType}});
         } catch (error) {
             console.error(`Error ${actionLabel} mail:`, error);
         }
+    }
+
+    const onBackClick = () => {
+        navigate('/inbox', {state: {inboxType: inboxType}});
     }
 
     return (
         <header className={`email-view-header ${theme}`}>
             <div className="d-flex flex-row">
                 {/* back button */}
-                <button className={`reading-button ${theme}`} title="Back to inbox" onClick={() => navigate(-1)}>
+                <button className={`reading-button ${theme}`} title="Back to inbox" onClick={onBackClick}>
                     <i className="bi bi-arrow-left back-icon ${theme}"/>
                 </button>
                 {/* logo and name */}

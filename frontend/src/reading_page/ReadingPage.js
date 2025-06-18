@@ -34,7 +34,6 @@ const ReadingPage = () => {
         loadEmail().then();
     }, [id])
 
-
     const onReplyClick = () => {
         /// TODO reply to mail
         alert("reply");
@@ -63,7 +62,6 @@ const ReadingPage = () => {
                         {/* sender's info */}
                         <div className={`email-view-meta ${theme}`}>
                             <SenderDetails email={email} theme={theme} onUpdate={handleStarToggle}/>
-                            {/* TODO FIXME */}
                             <div className="email-date">{formatFullTime(email.sentAt || email.createdAt)}</div>
                         </div>
                         {/* main mail's text */}
