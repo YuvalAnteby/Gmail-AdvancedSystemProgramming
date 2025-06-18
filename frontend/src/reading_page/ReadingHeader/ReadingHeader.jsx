@@ -50,7 +50,7 @@ const ReadingHeader = ({theme, toggleTheme, email, inboxType}) => {
                     <span className={`logo-text ${theme}`}>{APP_NAME}</span>
                 </div>
             </div>
-            {/* TODO additional actions */}
+            {/* additional actions */}
             <div
                 className="email-actions">
                 {/* move to trash or delete mail */}

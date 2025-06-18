@@ -303,7 +303,6 @@ const deleteMail = (userId, mailId) => {
     return 204;
 }
 
-/// TODO according to instructions - need to check if an attribute has the query, many use ids so might need to be changed later on
 /**
  * Searches in inbox for a query
  * @param query value to be searched in inbox
