@@ -42,7 +42,7 @@ const ReadingHeader = ({theme, toggleTheme, email, inboxType}) => {
             <div className="d-flex flex-row">
                 {/* back button */}
                 <button className={`reading-button ${theme}`} title="Back to inbox" onClick={onBackClick}>
-                    <i className="bi bi-arrow-left back-icon ${theme}"/>
+                    <i className={`bi bi-arrow-left back-icon ${theme}`}/>
                 </button>
                 {/* logo and name */}
                 <div className="d-flex flex-row align-items-center">
