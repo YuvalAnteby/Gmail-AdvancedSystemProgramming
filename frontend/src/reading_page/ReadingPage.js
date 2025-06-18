@@ -35,6 +35,16 @@ const ReadingPage = () => {
         return <div className="loading">Loading...</div>
     }
 
+    const onReplyClick = () => {
+        /// TODO reply to mail
+        alert("reply");
+    }
+
+    const onForwardClick = () => {
+        /// TODO forward mail to someone
+        alert("forward");
+    }
+
     return (
         <div className="email-view">
             {/* Header */}
@@ -52,11 +62,11 @@ const ReadingPage = () => {
                 <div className="separator"></div>
                 {/* actions related to replying */}
                 <div className="reply-actions">
-                    <button className="reply-button primary">
+                    <button className="reply-button primary" title="Reply" onClick={onReplyClick}>
                         <i className="bi bi-reply"/>
                         Reply
                     </button>
-                    <button className="reply-button secondary">
+                    <button className="reply-button secondary" title="forward" onClick={onForwardClick}>
                         <i className="bi bi-arrow-90deg-right"></i>
                         Forward
                     </button>
