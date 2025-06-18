@@ -92,7 +92,7 @@ const MainPage = () => {
             {/* ---- TOP MENU ---- */}
             <div className="row mb-3">
                 <div className="col-12">
-                    <TopMenu theme={theme} toggleTheme={toggleTheme}/>
+                    <TopMenu theme={theme} toggleTheme={toggleTheme} inboxType={inboxType} />
                 </div>
             </div>
 

@@ -3,18 +3,21 @@ import {useEffect, useState} from "react";
 import {useMailSearch} from "../../hooks/useMailSearch";
 import './SearchBar.css'
 import {getUserFromToken} from "../../../utils/tokenUtils";
+import {useNavigate} from "react-router-dom";
+import {markMailAsRead} from "../../../utils/mailUtils";
 
-const SearchBar = ({theme}) => {
+const SearchBar = ({theme, inboxType}) => {
     const user = getUserFromToken();
 
     const [query, setQuery] = useState('');
     const {results, loading} = useMailSearch(user.id, query);
 
 
-    const handleSelectMail = (mail) => {
-        console.log("Mail selected:", mail);
+    const navigate = useNavigate();
+    const handleSelectMail = async (mail) => {
         setQuery('');
-        // TODO Navigate or show dialog of mail
+        await markMailAsRead(mail, undefined);
+        navigate(`/mails/${mail.id}`, {state: {inboxType}});
     };
 
     const [highlightedIndex, setHighlightedIndex] = useState(-1);

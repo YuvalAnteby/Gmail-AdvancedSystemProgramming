@@ -7,7 +7,7 @@ import SearchBar from "./search/SearchBar";
 import {useProfile} from "../hooks/useProfile";
 import {APP_NAME} from "../../utils/constants";
 
-const TopMenu = ({theme, toggleTheme}) => {
+const TopMenu = ({theme, toggleTheme, inboxType}) => {
     const navigate = useNavigate();
     const menuRef = useRef(null);
     const [showMenu, setShowMenu] = useState(false);
@@ -31,7 +31,7 @@ const TopMenu = ({theme, toggleTheme}) => {
             </button>
 
             <div className="search-container d-flex align-items-center" style={{position: 'relative'}}>
-                <SearchBar theme={theme}/>
+                <SearchBar theme={theme} inboxType={inboxType} />
             </div>
 
             <div className="position-relative" ref={menuRef}>

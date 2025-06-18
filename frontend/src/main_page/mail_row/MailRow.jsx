@@ -2,6 +2,7 @@ import "./MailRow.css"
 import {formatDate} from "../../utils/formatDate";
 import {useNavigate} from "react-router-dom";
 import StarButton from "../../components/StarButton/StarButton";
+import {markMailAsRead} from "../../utils/mailUtils";
 
 
 /**
@@ -16,9 +17,8 @@ const MailRow = ({theme, email, inboxType, isSelected, onSelect, onUpdate}) => {
 
     // handling clicking on a mail to read it
     const navigate = useNavigate();
-    const handleMailOpen = () => {
-        console.log(">> Open Mail Row:", email);
-        /// TODO mark as read
+    const handleMailOpen = async () => {
+        await markMailAsRead(email, onUpdate);
         navigate(`/mails/${email.id}`, {state: {inboxType}});
     }
 
