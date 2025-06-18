@@ -60,4 +60,17 @@ function extractUrls(text) {
     return text.match(urlRegex) || [];
 }
 
-module.exports = {inboxFilters, extractUrls};
+/**
+ * Extracts file names from a mail object.
+ * @param {Object} mail mail object.
+ * @returns {string[]} Array of file names.
+ */
+function getFileNamesFromMail(mail) {
+    if (!mail || !Array.isArray(mail.files)) {
+        return [];
+    }
+    return mail.files.map(file => file.name);
+}
+
+
+module.exports = {inboxFilters, extractUrls, getFileNamesFromMail};

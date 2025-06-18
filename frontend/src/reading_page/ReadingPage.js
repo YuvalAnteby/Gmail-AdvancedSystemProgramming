@@ -7,6 +7,7 @@ import './ReadingPage.css'
 import SenderDetails from "./SenderDetails/SenderDetails";
 import {formatFullTime} from "../utils/formatDate";
 import SkeletonEmail from "../components/loading/SkeletonEmail";
+import FileList from "./Attachments/FileList";
 
 const ReadingPage = () => {
 
@@ -67,6 +68,14 @@ const ReadingPage = () => {
                         {/* main mail's text */}
                         <div className="email-body" dangerouslySetInnerHTML={{__html: email.body}}/>
                         <div className="separator"></div>
+                        {/* Show file attachments if there are any */}
+                        {email.files && email.files.length > 0 && (
+                            <div>
+                                <h6 style={{textAlign: "start", marginBottom: 0}}>Attachments:</h6>
+                                <FileList files={email.files} theme={theme}/>
+                            </div>
+                        )}
+
                         {/* actions related to replying */}
                         <div className="reply-actions">
                             <button className="reply-button primary" title="Reply" onClick={onReplyClick}>
