@@ -1,4 +1,4 @@
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import './ReadingHeader.css'
 import {APP_NAME} from "../../utils/constants";
 import ProfileMenu from "../../main_page/top_menu/profile/ProfileMenu";

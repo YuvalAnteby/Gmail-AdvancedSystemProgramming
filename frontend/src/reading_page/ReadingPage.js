@@ -12,7 +12,6 @@ const ReadingPage = () => {
     const {theme, toggleTheme} = useTheme();
     const [email, setEmail] = useState(null)
 
-    const navigate = useNavigate()
     const location = useLocation();
     const {inboxType} = location.state;
 
