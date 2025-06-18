@@ -130,7 +130,7 @@ exports.deleteFromBlacklist = async (req, res) => {
  * @returns {Promise<*>}
  */
 exports.removeMailFromBlacklist = async (req, res) => {
-    const userId = req.headers['user-id'];
+    const userId = Number(req.user.id);
     if (!userId)
         return res.status(400).json({error: 'No user id'});
     // fetch the mail

@@ -4,6 +4,26 @@ import {MAILS_PER_PAGE} from "../utils/constants";
 const API_BASE = "http://localhost:3001/api";
 
 /**
+ * GET /api/mails/:id
+ * @param {number} emailId id of a mail to fetch
+ * @returns {Promise<any>}
+ */
+export async function fetchEmail(emailId) {
+    const url = `${API_BASE}/mails/${emailId}`;
+    const token = localStorage.getItem('token');
+
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+    });
+    if (!res.ok)
+        throw new Error(`getMails failed: ${res.status}`);
+    return await res.json();
+}
+
+/**
  * GET /api/mails
  * params: { inboxType: string (e.g. "all", "incoming", "sent", "draft", "star", "trash") }
  * Must include the 'user-id' header for auth.
@@ -54,7 +74,7 @@ export async function deleteMail(mail) {
  * @returns {Promise<void>}
  */
 export async function toggleSpamReport(mail) {
-    const url = `${API_BASE}/blacklist`;
+    const url = `${API_BASE}/blacklist/`;
     const token = localStorage.getItem('token');
 
     const res = await fetch(url, {
@@ -140,6 +160,7 @@ export async function restoreMail(mail) {
     if (!res.ok)
         throw new Error(`restore mail: ${res.status}`);
 }
+
 /**
  * GET api/mails/:query
  * @param userId {number|string} user id that makes the search

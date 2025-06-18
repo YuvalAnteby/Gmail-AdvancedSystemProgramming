@@ -12,6 +12,7 @@ export default function EmailSidebar({theme, currentTab, setCurrentTab, onCompos
         {id: 'draft', label: 'Drafts', iconClass: 'bi-file-earmark-text'},
         {id: 'star', label: 'Starred', iconClass: 'bi-star'},
         {id: 'trash', label: 'Trash', iconClass: 'bi-trash-fill'},
+        {id: 'spam', label: 'Spam', iconClass: 'bi-exclamation-octagon'},
     ];
 
     return (

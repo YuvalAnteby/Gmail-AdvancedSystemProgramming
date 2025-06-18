@@ -2,20 +2,24 @@ import "./MailRow.css"
 import {formatDate} from "../../utils/formatDate";
 import {useState} from "react";
 import {toggleMailStar} from "../../api/mailApi";
+import {useNavigate} from "react-router-dom";
 
 
 /**
- * props:
- *   - theme: {String} dark or light according to user preference
- *   - email: {Object} email object
- *   - isSelected: {boolean} (whether this row is currently checked)
- *   - onSelect: function when marking a mail as selected for mass actions on them
+ *  @prop {String} theme dark or light according to user preference
+ *  @prop {Object} email  email object
+ *  @prop {string} inboxType what type of inbox we see this mail from (e.g. spam, trash etc)
+ *  @prop {boolean} isSelected whether this row is currently checked
+ *  @prop {function} onSelect when marking a mail as selected for mass actions on them
  */
-const MailRow = ({theme, email, isSelected, onSelect}) => {
+const MailRow = ({theme, email, inboxType, isSelected, onSelect}) => {
 
+    // handling clicking on a mail to read it
+    const navigate = useNavigate();
     const handleMailOpen = () => {
         console.log(">> Open Mail Row:", email);
-        /// TODO open the mail to read
+        /// TODO mark as read
+        navigate(`/mails/${email.id}`, {state: {inboxType}});
     }
 
     const [isStarred, setIsStarred] = useState(email.isStarred);

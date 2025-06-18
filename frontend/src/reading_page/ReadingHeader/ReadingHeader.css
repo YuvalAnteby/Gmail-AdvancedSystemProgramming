@@ -1,0 +1,68 @@
+/* header main container */
+.email-view-header {
+    height: 56px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.email-view-header.light {
+    background-color: #f1f3f4;
+    color: #000;
+}
+.email-view-header.dark {
+    background-color: var(--dark-bg-page);
+    color: #ffffff;
+}
+
+/* back button */
+.reading-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+.reading-button.light{
+    color: #000;
+}
+.reading-button.light:hover {
+    background-color: #f0f0f0;
+}
+.reading-button.dark{
+    color: #ffffff;
+}
+.reading-button.dark:hover {
+    background-color: rgba(240, 240, 240, 0.15);
+    box-shadow: 0 4px 12px rgba(240, 240, 240, 0.15);
+}
+
+/* text next to logo */
+.logo-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: inherit;
+    user-select: none;
+}
+.logo-text.light {
+    color: #000;
+}
+.logo-text.dark {
+    color: #ffffff;
+}
+
+/* reading mail actions */
+.email-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    margin-right: 16px;
+}

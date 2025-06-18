@@ -5,6 +5,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import MainPage from "./main_page/MainPage";
 import SignupPage from "./first_Page/SignupPage";
 import LoginPage from "./first_Page/LoginPage";
+import ReadingPage from "./reading_page/ReadingPage";
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/inbox" element={<MainPage />} />
+                <Route path="/mails/:id" element={<ReadingPage />} />
             </Routes>
         </div>
     );

@@ -5,6 +5,7 @@ import {useOutsideClick} from "../hooks/useOutsideClick";
 import ProfileMenu from "./profile/ProfileMenu";
 import SearchBar from "./search/SearchBar";
 import {useProfile} from "../hooks/useProfile";
+import {APP_NAME} from "../../utils/constants";
 
 const TopMenu = ({theme, toggleTheme}) => {
     const navigate = useNavigate();
@@ -26,7 +27,7 @@ const TopMenu = ({theme, toggleTheme}) => {
         <div className={`top-menu-wrapper ${theme} px-3`}>
             <button className="btn logo-btn" onClick={onLogoClick}>
                 <img src="/logo192.png" alt="icon" className="logo-img"/>
-                <span className={`logo-text ${theme}`}>Mail ASP</span>
+                <span className={`logo-text ${theme}`}>{APP_NAME}</span>
             </button>
 
             <div className="search-container d-flex align-items-center" style={{position: 'relative'}}>

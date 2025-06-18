@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './MainPage.css';
 import EmailSidebar from "./EmailSideMenu/EmailSideMenu";
 import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
 import TopMenu from "./top_menu/TopMenu";
-import { useLocation } from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import ComposeEmail from "./ComposeEmail/ComposeEmail";
 import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
@@ -25,7 +25,8 @@ const MainPage = () => {
     const [showCompose, setShowCompose] = useState(false);
     const [showSidebar, setShowSidebar] = useState(() => window.innerWidth >= 768);
 
-    const {emails,
+    const {
+        emails,
         total,
         page,
         hasNextPage,
@@ -83,12 +84,13 @@ const MainPage = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    console.log(emails)
     return (
         <div className={`main-page ${theme}`}>
             {/* ---- TOP MENU ---- */}
             <div className="row mb-3">
                 <div className="col-12">
-                    <TopMenu theme={theme} toggleTheme={toggleTheme} />
+                    <TopMenu theme={theme} toggleTheme={toggleTheme}/>
                 </div>
             </div>
 
@@ -128,6 +130,7 @@ const MainPage = () => {
                                 key={email.id}
                                 theme={theme}
                                 email={email}
+                                inboxType={inboxType}
                                 isSelected={[...selectedMails].some(m => m.id === email.id)}
                                 onSelect={handleSelect}
                             />
