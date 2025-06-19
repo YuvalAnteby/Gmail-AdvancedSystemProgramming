@@ -24,27 +24,36 @@ const MailRow = ({theme, email, inboxType, isSelected, onSelect, onUpdate}) => {
 
     return (
         <div className={`mail-row-item ${theme} ${email.isRead ? "read" : "unread"}`}>
-            <input
-                type="checkbox"
-                checked={isSelected}
-                onChange={(e) => onSelect(email, e.target.checked)}
-                onClick={(e) => e.stopPropagation()}
-            />
 
-            <StarButton email={email} theme={theme} onToggle={onUpdate} />
+            <div className="row-top-controls">
+                <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={(e) => onSelect(email, e.target.checked)}
+                    onClick={(e) => e.stopPropagation()}
+                />
+                <StarButton email={email} theme={theme} onToggle={onUpdate}/>
+            </div>
 
-            <div className="email-content" onClick={handleMailOpen}>
-                <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
-                <div className="email-main-line">
-                    <div className="email-title-body">
-                        <div className={`email-subject ${theme}`}>{email.subject}</div>
-                        <div className={`email-preview ${theme}`}>{email.body}</div>
+            <div className="mail-row-metadata">
+                <div className="email-content" onClick={handleMailOpen}>
+                    <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
+                    <div className="email-main-line">
+                        <div className="email-title-body">
+                            <div className={`email-subject ${theme}`}>{email.subject}</div>
+                            <div className={`email-preview ${theme}`}>{email.body}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <i className={`bi bi-clock ${theme}`}/>
-            <div className={`email-time ${theme}`}>{formatDate(email.sentAt || email.createdAt)}</div>
 
+                <div className="d-flex flex-row align-items-center gap-1">
+                    {email.files && email.files.length > 0 && (
+                        <i className={`bi bi-paperclip icon ${theme}`}/>
+                    )}
+                    <i className={`bi bi-clock icon ${theme}`}/>
+                    <div className={`email-time ${theme}`}>{formatDate(email.sentAt || email.createdAt)}</div>
+                </div>
+            </div>
         </div>
     );
 }

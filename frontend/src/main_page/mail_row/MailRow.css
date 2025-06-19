@@ -14,6 +14,16 @@
             box-shadow 0.2s ease,             /* elevate */
             transform 0.15s ease;             /* slide slightly */
 }
+@media (max-width: 768px) {
+    .mail-row-metadata {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}
+
 .mail-row-item.light {
     background-color: var(--light-bg-mail-row);
     border-bottom: 1px solid var(--light-strong-border-mail-row);
@@ -72,6 +82,12 @@
 }
 
 
+.row-top-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
 /* ─── MAIL CONTENT ───────────────────────────────── */
 .email-content {
     flex: 1;
@@ -104,8 +120,12 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px;
     font-weight: 700;
+}
+@media (max-width: 768px) {
+    .email-sender {
+        max-width: 100%;
+    }
 }
 .email-sender.light {
     color: #000000;
@@ -157,9 +177,36 @@
     color: #ffffff;
 }
 
-.bi-clock.light {
+.icon.light {
     color: #666666;
 }
-.bi-clock.dark {
+.icon.dark {
     color: white;
+}
+
+
+@media (max-width: 768px) {
+    .email-time {
+        align-self: flex-end;
+        font-size: 12px;
+    }
+
+    .email-main-line {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}
+
+
+
+
+/* remove icons on very small screens */
+@media (max-width: 576px) {
+    .bi-paperclip {
+        display: none;
+    }
+    .bi-clock {
+        display: none;
+    }
 }
