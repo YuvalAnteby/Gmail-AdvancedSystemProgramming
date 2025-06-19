@@ -15,7 +15,7 @@ const FileList = ({files, theme}) => {
                     className="attachment-thumb"
                 >
                     <i className="bi bi-paperclip" style={{marginRight: '6px'}}></i>
-                    <span className="file-name">{file.name}</span>
+                    <span className="file-name" title={file.name}>{file.name}</span>
                 </a>
             ))}
         </div>

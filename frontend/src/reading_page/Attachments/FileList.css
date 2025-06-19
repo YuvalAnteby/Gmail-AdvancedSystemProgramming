@@ -15,7 +15,9 @@
     font-size: 14px;
     color: #333;
     text-decoration: none;
-
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
     transition: background-color 0.2s ease;
 }
 .attachment-thumb:hover {
@@ -37,4 +39,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 150px;
+}
+
+@media (max-width: 480px) {
+    .file-name {
+        max-width: 100px;
+        font-size: 12px;
+    }
+    .attachment-thumb {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
 }

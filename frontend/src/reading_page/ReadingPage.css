@@ -47,6 +47,13 @@
     border-color: #444;
     color: #f0f0f0;
 }
+@media (max-width: 480px) {
+    .email-view-meta {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+    }
+}
 
 /* time sent */
 .email-date {
@@ -167,3 +174,6 @@
         transform: translateY(0);
     }
 }
+
+
+
