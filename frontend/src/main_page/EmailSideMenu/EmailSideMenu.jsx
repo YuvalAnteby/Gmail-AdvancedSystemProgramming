@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './EmailSideMenu.css'
+import useIsMobile from "../../utils/useIsMobile";
 
 export default function EmailSidebar({theme, currentTab, setCurrentTab, onComposeClick, showSidebar, setShowSidebar}) {
 
@@ -15,29 +16,20 @@ export default function EmailSidebar({theme, currentTab, setCurrentTab, onCompos
         {id: 'spam', label: 'Spam', iconClass: 'bi-exclamation-octagon'},
     ];
 
+    const isMobile = useIsMobile();
+
     const onTabClick = (e, itemId) => {
         e.preventDefault();
-        setCurrentTab('incoming'); // or whatever value
-        if (window.innerWidth < 768) {
+        if (isMobile) {
             setShowSidebar(false); // only on small screens
         }
         setCurrentTab(itemId);
     }
 
-    const [showComposeBtn, setShowComposeBtn] = useState(true);
-    // side menu un/show update
-    useEffect(() => {
-        const handleResize = () => {
-            setShowComposeBtn(window.innerWidth >= 768);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
     return (
         <div className={`sidebar ${theme} ${showSidebar ? 'show' : ''}`}
         >
-            {showComposeBtn && (
+            {!isMobile && (
                 <button
                     onClick={onComposeClick}
                     className={`btn compose-button ${theme}`}

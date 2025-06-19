@@ -14,9 +14,14 @@
             box-shadow 0.2s ease,             /* elevate */
             transform 0.15s ease;             /* slide slightly */
 }
+
+.mail-row-metadata {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+}
 @media (max-width: 768px) {
     .mail-row-metadata {
-        display: flex;
         flex-direction: column;
         flex: 1;
         align-items: flex-start;

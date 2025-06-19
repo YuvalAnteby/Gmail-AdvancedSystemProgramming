@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import "./TopMenu.css";
 import {useNavigate} from "react-router-dom";
 import {useOutsideClick} from "../hooks/useOutsideClick";
@@ -6,6 +6,7 @@ import ProfileMenu from "./profile/ProfileMenu";
 import SearchBar from "./search/SearchBar";
 import {useProfile} from "../hooks/useProfile";
 import {APP_NAME} from "../../utils/constants";
+import useIsMobile from "../../utils/useIsMobile";
 
 const TopMenu = ({theme, toggleTheme, inboxType, setShowSidebar}) => {
     const navigate = useNavigate();
@@ -26,27 +27,20 @@ const TopMenu = ({theme, toggleTheme, inboxType, setShowSidebar}) => {
         setShowSidebar(prev => !prev);
     }
 
-    // side menu un/show logo + name
-    const [showLogoName, setShowLogoName] = useState(true);
-    useEffect(() => {
-        const handleResize = () => {
-            setShowLogoName(window.innerWidth >= 768);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+
+    const isMobile = useIsMobile();
 
     return (
         <div className={`top-menu-wrapper ${theme} px-3`}>
-            {showLogoName && (
+            {!isMobile && (
                 <button className="btn logo-btn" onClick={onLogoClick}>
                     <img src="/logo192.png" alt="icon" className="logo-img"/>
                     <span className={`logo-text ${theme}`}>{APP_NAME}</span>
                 </button>
             )}
-            {!showLogoName && (
+            {isMobile && (
                 <button className="btn logo-btn logo-btn" onClick={onHamburgerClick}>
-                    <i className="bi bi-list" />
+                    <i className={`bi bi-list icon ${theme}`}  />
                 </button>
             )}
 

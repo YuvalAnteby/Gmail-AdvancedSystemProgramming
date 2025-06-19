@@ -12,19 +12,21 @@ import {useMails} from "./hooks/useMails";
 import {useTheme} from "../utils/useTheme";
 import {useRequireAuth} from "../utils/useAutoLogin";
 import SkeletonEmail from "../components/loading/SkeletonEmail";
+import useIsMobile from "../utils/useIsMobile";
 
 
 const MainPage = () => {
     // ensure the user is authenticated before rendering
     useRequireAuth();
 
+    const isMobile = useIsMobile();
     const {theme, toggleTheme} = useTheme('dark');
     const location = useLocation();
 
     // views change hooks
     const [inboxType, setInboxType] = useState(location.state?.inboxType || 'incoming');
     const [showCompose, setShowCompose] = useState(false);
-    const [showSidebar, setShowSidebar] = useState(() => window.innerWidth >= 768);
+    const [showSidebar, setShowSidebar] = useState(() => !isMobile);
 
     const {
         emails,
@@ -79,19 +81,15 @@ const MainPage = () => {
 
     // side menu un/show update
     useEffect(() => {
-        const handleResize = () => {
-            setShowSidebar(window.innerWidth >= 768);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+        setShowSidebar(!isMobile);
+    }, [isMobile]);
 
     // disable mail list scroll when showing side menu on smaller screens
     useEffect(() => {
-        if (window.innerWidth < 768) {
+        if (isMobile) {
             document.body.style.overflow = showSidebar ? 'hidden' : 'auto';
         }
-    }, [showSidebar]);
+    }, [showSidebar, isMobile]);
 
     // regular screen
     return (
@@ -122,7 +120,7 @@ const MainPage = () => {
                     />
                 </div>
                 {/* ---- SIDEBAR BACKDROP FOR SMALL SCREENS ---- */}
-                {showSidebar && window.innerWidth < 768 && (
+                {isMobile && showSidebar && (
                     <div className="sidebar-backdrop" onClick={() => setShowSidebar(false)} />
                 )}
 
@@ -153,7 +151,7 @@ const MainPage = () => {
                                 theme={theme}
                                 email={email}
                                 inboxType={inboxType}
-                                isSelected={[...selectedMails].some(m => m.id === email.id)}
+                                isSelected={selectedMails.has(email.id)}
                                 onSelect={handleSelect}
                                 onUpdate={refreshMails}
                             />

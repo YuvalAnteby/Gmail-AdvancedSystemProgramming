@@ -3,6 +3,7 @@ import {formatDate} from "../../utils/formatDate";
 import {useNavigate} from "react-router-dom";
 import StarButton from "../../components/StarButton/StarButton";
 import {markMailAsRead} from "../../utils/mailUtils";
+import useIsMobile from "../../utils/useIsMobile";
 
 
 /**
@@ -35,8 +36,8 @@ const MailRow = ({theme, email, inboxType, isSelected, onSelect, onUpdate}) => {
                 <StarButton email={email} theme={theme} onToggle={onUpdate}/>
             </div>
 
-            <div className="mail-row-metadata">
-                <div className="email-content" onClick={handleMailOpen}>
+            <div className={`mail-row-metadata`} onClick={handleMailOpen}>
+                <div className="email-content">
                     <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
                     <div className="email-main-line">
                         <div className="email-title-body">

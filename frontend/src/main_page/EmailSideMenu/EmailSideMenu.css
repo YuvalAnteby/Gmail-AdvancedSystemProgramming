@@ -20,10 +20,16 @@
         left: 0;
         width: 260px;
         height: 100vh;
-        background-color: var(--bs-body-bg);
         transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
+        padding-top: 64px;
         z-index: 1050;
+    }
+    .sidebar.light {
+        background-color: #f1f3f4;
+    }
+    .sidebar.dark {
+        background-color: var(--dark-bg-page);
     }
 
     .sidebar.show {
@@ -38,6 +44,15 @@
         bottom: 0;
         background: rgba(0, 0, 0, 0.3);
         z-index: 1049;
+    }
+
+    @media (max-width: 768px) {
+        .compose-button {
+            display: none !important;
+        }
+        .bi-pencil-square {
+            display: none !important;
+        }
     }
 }
 .sidebar-backdrop {
