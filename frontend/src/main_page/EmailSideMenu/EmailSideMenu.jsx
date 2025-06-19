@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './EmailSideMenu.css'
 
-export default function EmailSidebar({theme, currentTab, setCurrentTab, onComposeClick, setShowSidebar}) {
+export default function EmailSidebar({theme, currentTab, setCurrentTab, onComposeClick, showSidebar, setShowSidebar}) {
 
     const sidebarItems = [
         {id: 'all', label: 'All Mail', iconClass: 'bi-envelope'},
@@ -35,9 +35,9 @@ export default function EmailSidebar({theme, currentTab, setCurrentTab, onCompos
     }, []);
 
     return (
-        <div className={`sidebar ${theme}`}
+        <div className={`sidebar ${theme} ${showSidebar ? 'show' : ''}`}
         >
-            {!showComposeBtn && (
+            {showComposeBtn && (
                 <button
                     onClick={onComposeClick}
                     className={`btn compose-button ${theme}`}

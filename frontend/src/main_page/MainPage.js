@@ -86,6 +86,13 @@ const MainPage = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // disable mail list scroll when showing side menu on smaller screens
+    useEffect(() => {
+        if (window.innerWidth < 768) {
+            document.body.style.overflow = showSidebar ? 'hidden' : 'auto';
+        }
+    }, [showSidebar]);
+
     // regular screen
     return (
         <div className={`main-page ${theme}`}>
@@ -104,15 +111,21 @@ const MainPage = () => {
             {/* ---- MAIN LAYOUT ---- */}
             <div className="main-content row g-0">
                 {/* ---- SIDE MENU ---- */}
-                <div className={`col-md-2 p-0 ${showSidebar ? '' : 'd-none'} d-md-block`}>
+                <div className="col-md-2 p-0">
                     <EmailSidebar
                         theme={theme}
                         currentTab={inboxType}
                         setCurrentTab={setInboxType}
                         onComposeClick={handleComposeClick}
+                        showSidebar={showSidebar}
                         setShowSidebar={setShowSidebar}
                     />
                 </div>
+                {/* ---- SIDEBAR BACKDROP FOR SMALL SCREENS ---- */}
+                {showSidebar && window.innerWidth < 768 && (
+                    <div className="sidebar-backdrop" onClick={() => setShowSidebar(false)} />
+                )}
+
 
                 {/* ---- MAIL LIST CONTAINER ---- */}
                 <div className="col-md-10 p-0">
