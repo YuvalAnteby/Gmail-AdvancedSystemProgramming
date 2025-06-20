@@ -5,12 +5,13 @@ import {useOutsideClick} from "../hooks/useOutsideClick";
 import ProfileMenu from "./profile/ProfileMenu";
 import SearchBar from "./search/SearchBar";
 import {useProfile} from "../hooks/useProfile";
+import {APP_NAME} from "../../utils/constants";
+import useIsMobile from "../../utils/useIsMobile";
 
-const TopMenu = ({theme, toggleTheme}) => {
+const TopMenu = ({theme, toggleTheme, inboxType, setShowSidebar}) => {
     const navigate = useNavigate();
     const menuRef = useRef(null);
     const [showMenu, setShowMenu] = useState(false);
-
 
     const {imageUrl, fullName, updateImage} = useProfile();
 
@@ -22,15 +23,29 @@ const TopMenu = ({theme, toggleTheme}) => {
     const onProfileClick = () => setShowMenu(prev => !prev);
     useOutsideClick(menuRef, () => setShowMenu(false), showMenu);
 
+    const onHamburgerClick = () => {
+        setShowSidebar(prev => !prev);
+    }
+
+
+    const isMobile = useIsMobile();
+
     return (
         <div className={`top-menu-wrapper ${theme} px-3`}>
-            <button className="btn logo-btn" onClick={onLogoClick}>
-                <img src="/logo192.png" alt="icon" className="logo-img"/>
-                <span className={`logo-text ${theme}`}>Mail ASP</span>
-            </button>
+            {!isMobile && (
+                <button className="btn logo-btn" onClick={onLogoClick}>
+                    <img src="/logo192.png" alt="icon" className="logo-img"/>
+                    <span className={`logo-text ${theme}`}>{APP_NAME}</span>
+                </button>
+            )}
+            {isMobile && (
+                <button className="btn logo-btn logo-btn" onClick={onHamburgerClick}>
+                    <i className={`bi bi-list icon ${theme}`}  />
+                </button>
+            )}
 
             <div className="search-container d-flex align-items-center" style={{position: 'relative'}}>
-                <SearchBar theme={theme}/>
+                <SearchBar theme={theme} inboxType={inboxType}/>
             </div>
 
             <div className="position-relative" ref={menuRef}>

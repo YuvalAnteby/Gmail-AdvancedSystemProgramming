@@ -1,31 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './MainPage.css';
 import EmailSidebar from "./EmailSideMenu/EmailSideMenu";
 import MailRow from "./mail_row/MailRow";
 import ToolBar from "./toolbar/ToolBar";
 import TopMenu from "./top_menu/TopMenu";
-import { useLocation } from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import ComposeEmail from "./ComposeEmail/ComposeEmail";
 import {useMailToolbarHandlers} from "./hooks/useMailToolbarHandlers";
 import {useMails} from "./hooks/useMails";
 import {useTheme} from "../utils/useTheme";
 import {useRequireAuth} from "../utils/useAutoLogin";
+import SkeletonEmail from "../components/loading/SkeletonEmail";
+import useIsMobile from "../utils/useIsMobile";
 
 
 const MainPage = () => {
     // ensure the user is authenticated before rendering
     useRequireAuth();
 
+    const isMobile = useIsMobile();
     const {theme, toggleTheme} = useTheme('dark');
     const location = useLocation();
 
     // views change hooks
     const [inboxType, setInboxType] = useState(location.state?.inboxType || 'incoming');
     const [showCompose, setShowCompose] = useState(false);
-    const [showSidebar, setShowSidebar] = useState(() => window.innerWidth >= 768);
+    const [showSidebar, setShowSidebar] = useState(() => !isMobile);
 
-    const {emails,
+    const {
+        emails,
         total,
         page,
         hasNextPage,
@@ -33,6 +37,7 @@ const MainPage = () => {
         goToNextPage,
         goToPrevPage,
         refreshMails,
+        loading
     } = useMails(inboxType);
 
     // selected mail ids logic
@@ -76,33 +81,49 @@ const MainPage = () => {
 
     // side menu un/show update
     useEffect(() => {
-        const handleResize = () => {
-            setShowSidebar(window.innerWidth >= 768);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+        setShowSidebar(!isMobile);
+    }, [isMobile]);
 
+    // disable mail list scroll when showing side menu on smaller screens
+    useEffect(() => {
+        if (isMobile) {
+            document.body.style.overflow = showSidebar ? 'hidden' : 'auto';
+        }
+    }, [showSidebar, isMobile]);
+
+    // regular screen
     return (
         <div className={`main-page ${theme}`}>
             {/* ---- TOP MENU ---- */}
             <div className="row mb-3">
                 <div className="col-12">
-                    <TopMenu theme={theme} toggleTheme={toggleTheme} />
+                    <TopMenu
+                        theme={theme}
+                        toggleTheme={toggleTheme}
+                        inboxType={inboxType}
+                        setShowSidebar={setShowSidebar}
+                    />
                 </div>
             </div>
 
             {/* ---- MAIN LAYOUT ---- */}
             <div className="main-content row g-0">
                 {/* ---- SIDE MENU ---- */}
-                <div className={`col-md-2 p-0 ${showSidebar ? '' : 'd-none'} d-md-block`}>
+                <div className="col-md-2 p-0">
                     <EmailSidebar
                         theme={theme}
                         currentTab={inboxType}
                         setCurrentTab={setInboxType}
                         onComposeClick={handleComposeClick}
+                        showSidebar={showSidebar}
+                        setShowSidebar={setShowSidebar}
                     />
                 </div>
+                {/* ---- SIDEBAR BACKDROP FOR SMALL SCREENS ---- */}
+                {isMobile && showSidebar && (
+                    <div className="sidebar-backdrop" onClick={() => setShowSidebar(false)} />
+                )}
+
 
                 {/* ---- MAIL LIST CONTAINER ---- */}
                 <div className="col-md-10 p-0">
@@ -121,15 +142,18 @@ const MainPage = () => {
                             goToNextPage={goToNextPage}
                             goToPrevPage={goToPrevPage}
                         />
-
+                        {/* ---- loading screen ---- */}
+                        {loading && (<SkeletonEmail rows={10}/>)}
                         {/* ---- ACTUAL MAIL ROWS ---- */}
-                        {emails.map(email => (
+                        {!loading && emails.map(email => (
                             <MailRow
                                 key={email.id}
                                 theme={theme}
                                 email={email}
-                                isSelected={[...selectedMails].some(m => m.id === email.id)}
+                                inboxType={inboxType}
+                                isSelected={selectedMails.has(email.id)}
                                 onSelect={handleSelect}
+                                onUpdate={refreshMails}
                             />
                         ))}
                     </div>

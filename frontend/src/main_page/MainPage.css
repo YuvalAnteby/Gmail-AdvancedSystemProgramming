@@ -8,10 +8,11 @@
 }
 .main-page.light {
     background-color: var(--light-bg-page);
+    color: black;
 }
 .main-page.dark {
     background-color: var(--dark-bg-page);
-
+    color: white;
 }
 
 /* ─── SIDE MENU + MAILS LIST ───────────────────────────────── */
@@ -36,4 +37,9 @@
     box-shadow: 0 4px 12px #252525,
     0 1px 2px #555555;
     background-color: var(--dark-bg-unread-mail-row);
+}
+@media (max-width: 768px) {
+    .mail-list-container {
+        padding: 8px;
+    }
 }

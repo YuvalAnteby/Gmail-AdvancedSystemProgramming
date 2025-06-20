@@ -2,8 +2,9 @@ import './SearchResultsDropdown.css';
 import {useOutsideClick} from "../../hooks/useOutsideClick";
 import {useEffect, useRef} from "react";
 import {formatDate} from "../../../utils/formatDate";
+import useIsMobile from "../../../utils/useIsMobile";
 
-const SearchResultsDropdown = ({theme, mails, loading, onSelect, onClose, highlightedIndex }) => {
+const SearchResultsDropdown = ({theme, mails, loading, onSelect, onClose, highlightedIndex}) => {
 
     const dropdownRef = useRef(null);
 
@@ -20,6 +21,7 @@ const SearchResultsDropdown = ({theme, mails, loading, onSelect, onClose, highli
     }, [onClose]);
 
 
+    const isMobile = useIsMobile()
 
     if (!mails.length && !loading)
         return null;
@@ -33,7 +35,8 @@ const SearchResultsDropdown = ({theme, mails, loading, onSelect, onClose, highli
                     className={`search-item ${index === highlightedIndex ? 'highlighted' : ''}`}
                     onClick={() => onSelect(mail)}
                 >
-                    <div className="search-item-subject">{mail.from.mail}</div>
+                    {isMobile && <div className="search-item-subject">{mail.from.fullName}</div>}
+                    {!isMobile && <div className="search-item-subject">{mail.from.mail}</div>}
                     <div className="search-item-content">
                         <div className="search-item-subject">{mail.subject}</div>
                         <div className="search-item-body">{mail.body.slice(0, 50)}...</div>

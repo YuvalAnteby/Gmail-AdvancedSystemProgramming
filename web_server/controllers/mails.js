@@ -14,7 +14,7 @@ const {convertLabelsToIds, labelsToFullElement} = require("../utils/labels");
  */
 const getLastMailsOrdered = (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
     if (!userId)
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
     const inboxType = req.query.inboxType || 'all';
@@ -66,7 +66,12 @@ const getMailById = (req, res) => {
     // ensure the mail belongs to the user
     if (mail.owner != userId)
         return res.status(403).json({error: 'mail do not belong to user'});
-    return res.status(200).json(mail);
+    return res.status(200).json({
+        ...mail,
+        from: usersToFullElement([mail.from])[0],
+        sentTo: usersToFullElement(mail.sentTo || []),
+        labels: labelsToFullElement(userId, mail.labels || [])
+    });
 }
 
 /**

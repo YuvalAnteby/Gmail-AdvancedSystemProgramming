@@ -82,7 +82,7 @@ export const useMailToolbarHandlers = (selectedMails, setSelectedMails, allEmail
         if (selectedMails.size === 0)
             return;
         try {
-            await Promise.all(Array.from(selectedMails).map((mail) => restoreMail(userId, mail)));
+            await Promise.all(Array.from(selectedMails).map((mail) => restoreMail(mail)));
             setSelectedMails(new Set());
             refreshMails();
         } catch (error) {

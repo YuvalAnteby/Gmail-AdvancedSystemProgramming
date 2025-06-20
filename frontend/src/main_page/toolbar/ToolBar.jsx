@@ -1,6 +1,7 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './ToolBar.css'
 import {MAILS_PER_PAGE} from "../../utils/constants";
+import useIsMobile from "../../utils/useIsMobile";
 
 const ToolBar = ({
                      theme,
@@ -24,10 +25,12 @@ const ToolBar = ({
         }
     }, [allSelected, anySelected]);
 
+    const isMobile = useIsMobile();
+
     return (
         <div className="toolbar-container">
             {/* SELECT ALL - always shown */}
-            <div className={`select-all ${theme}`} style={{marginRight: '12px'}}>
+            <div className={`select-all toolbar-text ${theme}`}>
                 <input
                     ref={selectAllRef}
                     type="checkbox"
@@ -77,14 +80,14 @@ const ToolBar = ({
                     {inboxType === 'trash' && (
                         <div className="d-flex flex-row">
                             <button
-                                className="btn btn-sm"
+                                className={`btn btn-sm toolbar-text ${theme}`}
                                 title="delete forever"
                                 onClick={btnHandlers.handleDelete}
                             >
                                 Delete forever
                             </button>
                             <button
-                                className="btn btn-sm"
+                                className={`btn btn-sm toolbar-text ${theme}`}
                                 title="restore mail"
                                 onClick={btnHandlers.handleRestore}
                             >
@@ -98,16 +101,19 @@ const ToolBar = ({
             <div
                 className={`paging-container`}
             >
-                <p
-                    className={`paging-text ${theme}`}
-                >
-                    Showing {(page-1) * MAILS_PER_PAGE + MAILS_PER_PAGE}–{Math.min(page * MAILS_PER_PAGE, total)} of {total}
-                </p>
+                {!isMobile && (
+                    <p
+                        className={`paging-text ${theme}`}
+                    >
+                        Showing {(page - 1) * MAILS_PER_PAGE + MAILS_PER_PAGE}–{Math.min(page * MAILS_PER_PAGE, total)} of {total}
+                    </p>
+                )}
+
                 <i
                     className={`btn bi bi-arrow-left icon ${theme} ${!hasPrevPage ? 'disabled-icon' : ''}`}
                     title="previous page"
                     onClick={hasPrevPage ? goToPrevPage : undefined}
-                   />
+                />
                 <i
                     className={`btn bi bi-arrow-right icon ${theme} ${!hasNextPage ? 'disabled-icon' : ''} me-2`}
                     title="next page"

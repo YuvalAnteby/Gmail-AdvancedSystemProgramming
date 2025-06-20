@@ -11,3 +11,10 @@ export function convertToBase64 (file) {
         reader.readAsDataURL(file);
     });
 }
+
+export function getFileNamesFromMail(mail) {
+    if (!mail || !Array.isArray(mail.files)) {
+        return [];
+    }
+    return mail.files.map(file => file.name);
+}
