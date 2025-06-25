@@ -1,21 +1,58 @@
 "use client";
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { sendMail } from "../../api/mailApi";
+import { searchUsers } from "../../api/userApi";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ComposeEmail.css';
 
 export default function ComposeEmail({ onCancel, onSend }) {
-    const [to, setTo] = useState('');
+    const [toQuery, setToQuery] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
 
-    const handleSend = () => {
-        onSend({ to, subject, body });
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (toQuery.length >= 2 && !selectedUser) {
+                searchUsers(toQuery).then(setSuggestions);
+            } else {
+                setSuggestions([]);
+            }
+        }, 300);
+        return () => clearTimeout(timeout);
+    }, [toQuery, selectedUser]);
+
+    const handleSend = async () => {
+        const toEmail = toQuery.trim();
+        if (!selectedUser && !toEmail) {
+            alert("Please select or type a valid recipient.");
+            return;
+        }
+
+        try {
+            const sentTo = selectedUser
+                ? [selectedUser.mail]
+                : [toEmail];
+
+
+
+            const newMail = await sendMail({
+                subject,
+                body,
+                sentTo
+            });
+
+            console.log("Mail sent:", newMail);
+            if (onSend) onSend(); // optional callback
+        } catch (err) {
+            console.error("Failed to send mail:", err);
+            alert("Failed to send mail: " + err.message);
+        }
     };
 
     return (
         <div className="compose-email">
-            {/* Header with title and controls */}
             <div className="compose-header">
                 <span className="compose-title">New Message</span>
                 <div className="compose-controls">
@@ -31,18 +68,39 @@ export default function ComposeEmail({ onCancel, onSend }) {
                 </div>
             </div>
 
-            {/* Body with “To”, “Subject” and formatting toolbar */}
             <div className="compose-body">
-                <div className="compose-field">
+                <div className="compose-field" style={{ position: 'relative' }}>
                     <span className="field-label">To</span>
                     <input
-                        type="email"
-                        value={to}
-                        onChange={e => setTo(e.target.value)}
+                        type="text"
+                        value={ selectedUser ? selectedUser.mail : toQuery }
+
+                        onChange={e => {
+                            setToQuery(e.target.value);
+                            setSelectedUser(null);
+                        }}
                         className="field-input"
-                        placeholder="recipient@example.com"
+                        placeholder="Type a name or email"
                     />
+                    {suggestions.length > 0 && !selectedUser && (
+                        <ul className="suggestions-list">
+                            {suggestions.map(user => (
+                                <li
+                                    key={user.id}
+                                    onClick={() => {
+                                        setSelectedUser(user);
+                                        setToQuery(user.mail);
+                                        setSuggestions([]);
+                                    }}
+
+                                >
+                                    {user.mail}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
+
                 <div className="compose-field">
                     <span className="field-label">Subject</span>
                     <input
@@ -71,7 +129,6 @@ export default function ComposeEmail({ onCancel, onSend }) {
                 />
             </div>
 
-            {/* Footer with attach, send and discard buttons */}
             <div className="compose-footer">
                 <div className="footer-left">
                     <button className="attach-btn" title="Attach files">

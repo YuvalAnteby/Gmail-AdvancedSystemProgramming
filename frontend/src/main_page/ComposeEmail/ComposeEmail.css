@@ -157,3 +157,32 @@
 .discard-btn:hover {
     color: #d93025;
 }
+/* Autocomplete suggestion dropdown for "To" field */
+.suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 64px; /* aligns with input field after label */
+    width: calc(100% - 64px); /* align with field-input width */
+    max-height: 150px;
+    overflow-y: auto;
+    margin-top: 2px;
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(60,64,67,0.15);
+    z-index: 1100;
+    font-size: 14px;
+    list-style: none;
+    padding: 0;
+}
+
+.suggestions-list li {
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #202124;
+}
+
+.suggestions-list li:hover {
+    background-color: #f1f3f4;
+}
+
