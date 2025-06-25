@@ -181,3 +181,24 @@ export const searchMails = async (userId, query) => {
         throw new Error(`Search failed ${res.status}`);
     return res.json();
 };
+
+/**
+ * POST /api/mails
+ * @param {{ subject: string, body: string, sentTo: string[] }} mailData
+ */
+export async function sendMail({ subject, body, sentTo }) {
+    const url   = `${API_BASE}/mails`;
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(url, {
+        method:  "POST",
+        headers: {
+            "Authorization":  `Bearer ${token}`,
+            "Content-Type":   "application/json",
+        },
+        body: JSON.stringify({ subject, body, sentTo })
+    });
+
+    if (!res.ok) throw new Error(`sendMail failed: ${res.status}`);
+    return await res.json();
+}
