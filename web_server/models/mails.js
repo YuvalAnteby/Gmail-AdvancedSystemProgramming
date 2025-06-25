@@ -268,7 +268,7 @@ const sendNewMail = (userId, subject, body, sentToIds) => {
             isTrashed: false,
             isSpam: false,
         };
-        mails.push(atOwner);
+        //mails.push(atOwner);
         // create the mails for the recipients and save each one
         for (const uid of sentToIds) {
             const mail = {
