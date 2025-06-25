@@ -59,3 +59,25 @@ export async function loginWithJwt(mail, password) {
         return 500;
     }
 }
+export async function searchUsers(query) {
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:3001/api/users/search?q=${encodeURIComponent(query)}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) {
+            console.error("Search failed:", await res.text());
+            return [];
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error("Error searching users:", error);
+        return [];
+    }
+}
+
+
