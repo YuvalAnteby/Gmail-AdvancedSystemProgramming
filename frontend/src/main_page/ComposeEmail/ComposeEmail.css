@@ -2,9 +2,11 @@
 
 .compose-email {
     position: fixed;
-    bottom: 0;
-    right: 24px;
-    width: 580px;
+    bottom: 2vh;
+    right: 2vw;
+    width: 35vw;
+    max-width: 500px;
+    max-height: 75vh;
     background: #fff;
     border: 1px solid #dadce0;
     border-radius: 8px 8px 0 0;
@@ -12,23 +14,39 @@
     0 2px 6px rgba(60,64,67,0.15);
     display: flex;
     flex-direction: column;
-    max-height: 80vh;
     font-family: 'Roboto', sans-serif;
     z-index: 1000;
+    color: #202124; /* default text color */
+}
+
+.compose-email.minimized .compose-body,
+.compose-email.minimized .compose-footer {
+    display: none;
+}
+
+.compose-email.maximized {
+    top: 10vh !important;
+    bottom: 10vh !important;
+    left: 10vw !important;
+    right: 10vw !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 8px !important;
 }
 
 .compose-header {
     background: #f1f3f4;
-    padding: 8px 12px;
+    padding: 0.5em 1em;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #dadce0;
-    border-radius: 8px 8px 0 0;
 }
 
 .compose-title {
-    font-size: 14px;
+    font-size: 1em;
     font-weight: 500;
     color: #202124;
 }
@@ -36,8 +54,8 @@
 .compose-controls .control-btn {
     background: transparent;
     border: none;
-    margin-left: 4px;
-    padding: 4px;
+    margin-left: 0.5em;
+    padding: 0.4em;
     cursor: pointer;
     color: #5f6368;
     border-radius: 4px;
@@ -49,30 +67,74 @@
 }
 
 .compose-body {
-    padding: 8px 12px;
+    padding: 0.5em 1em;
     overflow-y: auto;
+    flex: 1;
 }
 
 .compose-field {
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 0.5em;
+    position: relative;
+}
+
+/* Recipients chips */
+.recipient-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    flex: 1;
+}
+
+.recipient-chip {
+    background: #e8f0fe;
+    border: 1px solid #aecbfa;
+    border-radius: 12px;
+    padding: 2px 8px;
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    color: #202124;
+}
+
+.recipient-chip button {
+    background: transparent;
+    border: none;
+    margin-left: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    color: #5f6368;
+}
+
+/* Input for new recipient */
+.to-input {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.4em;
+    border: none;
+    outline: none;
+    color: inherit;
 }
 
 .field-label {
-    width: 64px;
-    font-size: 13px;
+    width: 10%;
+    min-width: 4em;
+    font-size: 0.9em;
     color: #5f6368;
 }
 
 .field-input {
     flex: 1;
-    padding: 6px 8px;
+    padding: 0.5em;
     border: none;
     border-bottom: 1px solid #dadce0;
-    font-size: 14px;
+    font-size: 1em;
     outline: none;
     transition: border-color 0.2s;
+    color: inherit;
+    background: transparent;
 }
 
 .field-input:focus {
@@ -81,48 +143,90 @@
 
 .compose-toolbar {
     display: flex;
-    gap: 12px;
-    padding: 4px 0 8px;
-    color: #5f6368;
-    font-size: 16px;
+    gap: 0.75em;
+    padding: 0.5em 0;
+    font-size: 1em;
 }
 
-.compose-toolbar i:hover {
-    color: #202124;
-    cursor: pointer;
-}
-
-.compose-textarea {
-    width: 100%;
+.compose-toolbar button,
+.compose-toolbar select {
+    background: transparent;
     border: none;
+    color: #5f6368;
+    cursor: pointer;
+    padding: 0.4em;
+    font-size: 1em;
+    transition: color 0.2s, background 0.2s;
+}
+
+.compose-toolbar button:hover,
+.compose-toolbar select:hover {
+    color: #202124;
+    background: rgba(95,99,104,0.08);
+    border-radius: 4px;
+}
+
+.font-size-select {
+    appearance: none;
+}
+
+.compose-editor {
+    width: 100%;
+    min-height: 40vh;
+    padding: 0.75em;
+    border: none;
+    border-bottom: 1px solid #dadce0;
     outline: none;
-    resize: none;
-    font-size: 14px;
+    font-size: 1em;
     line-height: 1.4;
-    min-height: 200px;
+    transition: border-bottom-color 0.2s;
+    direction: ltr;
+    text-align: left;
+    color: inherit;
+    background: transparent;
+}
+
+.compose-editor:focus {
+    border-bottom-color: #1a73e8;
+}
+
+.attachment-list {
+    list-style: none;
+    padding: 0.5em 1em;
+    margin: 0;
+}
+
+.attachment-list li {
+    font-size: 0.9em;
+    color: #202124;
 }
 
 .compose-footer {
-    padding: 8px 12px;
+    padding: 0.5em 1em;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid #dadce0;
     background: #f1f3f4;
-    border-radius: 0 0 8px 8px;
 }
 
-.footer-left .attach-btn {
+.footer-attach-btn {
     background: transparent;
     border: none;
-    font-size: 18px;
+    font-size: 1.2em;
     color: #5f6368;
     cursor: pointer;
+    padding: 0.4em;
+    transition: color 0.2s;
+}
+
+.footer-attach-btn:hover {
+    color: #202124;
 }
 
 .footer-right {
     display: flex;
-    gap: 8px;
+    gap: 0.5em;
 }
 
 .send-btn {
@@ -130,12 +234,12 @@
     color: #fff;
     border: none;
     border-radius: 4px;
-    padding: 6px 20px;
-    font-size: 14px;
+    padding: 0.5em 1.5em;
+    font-size: 0.9em;
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 0.4em;
     box-shadow: 0 1px 1px rgba(60,64,67,0.3);
     cursor: pointer;
     transition: background 0.2s;
@@ -149,7 +253,7 @@
     background: transparent;
     border: none;
     color: #5f6368;
-    font-size: 14px;
+    font-size: 0.9em;
     cursor: pointer;
     transition: color 0.2s;
 }
@@ -157,27 +261,27 @@
 .discard-btn:hover {
     color: #d93025;
 }
-/* Autocomplete suggestion dropdown for "To" field */
+
 .suggestions-list {
     position: absolute;
     top: 100%;
-    left: 64px; /* aligns with input field after label */
-    width: calc(100% - 64px); /* align with field-input width */
-    max-height: 150px;
+    left: 10%;
+    width: 90%;
+    max-height: 30vh;
     overflow-y: auto;
-    margin-top: 2px;
-    background: white;
+    margin-top: 0.2em;
+    background: #fff;
     border: 1px solid #dadce0;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(60,64,67,0.15);
     z-index: 1100;
-    font-size: 14px;
+    font-size: 0.9em;
     list-style: none;
     padding: 0;
 }
 
 .suggestions-list li {
-    padding: 8px 12px;
+    padding: 0.5em 0.75em;
     cursor: pointer;
     color: #202124;
 }
@@ -186,3 +290,81 @@
     background-color: #f1f3f4;
 }
 
+/* Dark mode overrides */
+.compose-email.dark {
+    background: #202124;
+    border-color: #5f6368;
+    color: #e8eaed;
+}
+
+.compose-email.dark .compose-header,
+.compose-email.dark .compose-footer {
+    background: #171717;
+    border-color: #5f6368;
+}
+
+.compose-email.dark .recipient-chip {
+    background: #3c4043;
+    border-color: #5f6368;
+    color: #e8eaed;
+}
+
+.compose-email.dark .field-label {
+    color: #e8eaed;
+}
+
+.compose-email.dark .field-input,
+.compose-email.dark .to-input {
+    background: #303134;
+    color: #e8eaed;
+    border-bottom-color: #5f6368;
+}
+
+.compose-email.dark .field-input::placeholder,
+.compose-email.dark .to-input::placeholder {
+    color: #9aa0a6;
+}
+
+.compose-email.dark .compose-editor {
+    background: #303134;
+    color: #e8eaed;
+    border-bottom-color: #5f6368;
+}
+
+.compose-email.dark .compose-editor:focus {
+    border-bottom-color: #8ab4f8;
+}
+
+.compose-email.dark .compose-toolbar button,
+.compose-email.dark .font-size-select {
+    color: #e8eaed;
+}
+
+.compose-email.dark .compose-toolbar button:hover {
+    background: rgba(232,234,237,0.1);
+}
+
+.compose-email.dark .send-btn {
+    background-color: #8ab4f8;
+}
+
+.compose-email.dark .send-btn:hover {
+    background-color: #669df6;
+}
+
+.compose-email.dark .suggestions-list {
+    background: #303134;
+    border-color: #5f6368;
+}
+
+.compose-email.dark .suggestions-list li {
+    color: #e8eaed;
+}
+
+.compose-email.dark .suggestions-list li:hover {
+    background-color: #3c4043;
+}
+
+.compose-email.dark .attachment-list li {
+    color: #e8eaed;
+}
