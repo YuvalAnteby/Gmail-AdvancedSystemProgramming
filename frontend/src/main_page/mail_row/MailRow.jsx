@@ -7,33 +7,45 @@ import useIsMobile from "../../utils/useIsMobile";
 
 
 /**
- *  @prop {String} theme dark or light according to user preference
- *  @prop {Object} email  email object
- *  @prop {string} inboxType what type of inbox we see this mail from (e.g. spam, trash etc)
- *  @prop {boolean} isSelected whether this row is currently checked
- *  @prop {function} onSelect when marking a mail as selected for mass actions on them
- *  @prop {function} onUpdate when updating a mail object this function will trigger
+ *  @prop {String}   theme       dark or light according to user preference
+ *  @prop {Object}   email       email object
+ *  @prop {string}   inboxType   what type of inbox we see this mail from (e.g. spam, trash etc)
+ *  @prop {boolean}  isSelected  whether this row is currently checked
+ *  @prop {function} onSelect    when marking a mail as selected for mass actions on them
+ *  @prop {function} onUpdate    when updating a mail object this function will trigger
+ *  @prop {function} onOpenDraft when clicking a draft row, open it in compose window
  */
-const MailRow = ({theme, email, inboxType, isSelected, onSelect, onUpdate}) => {
+const MailRow = ({
+                     theme,
+                     email,
+                     inboxType,
+                     isSelected,
+                     onSelect,
+                     onUpdate,
+                     onOpenDraft        // ADDED
+                 }) => {
+    const navigate = useNavigate()
 
-    // handling clicking on a mail to read it
-    const navigate = useNavigate();
     const handleMailOpen = async () => {
-        await markMailAsRead(email, onUpdate);
-        navigate(`/mails/${email.id}`, {state: {inboxType}});
+        await markMailAsRead(email, onUpdate)
+        if (inboxType === 'draft' && onOpenDraft) {
+            // if this is a draft, open in compose instead of detail view
+            onOpenDraft(email)
+        } else {
+            navigate(`/mails/${email.id}`, { state: { inboxType } })
+        }
     }
 
     return (
         <div className={`mail-row-item ${theme} ${email.isRead ? "read" : "unread"}`}>
-
             <div className="row-top-controls">
                 <input
                     type="checkbox"
                     checked={isSelected}
-                    onChange={(e) => onSelect(email, e.target.checked)}
-                    onClick={(e) => e.stopPropagation()}
+                    onChange={e => onSelect(email, e.target.checked)}
+                    onClick={e => e.stopPropagation()}
                 />
-                <StarButton email={email} theme={theme} onToggle={onUpdate}/>
+                <StarButton email={email} theme={theme} onToggle={onUpdate} />
             </div>
 
             <div className={`mail-row-metadata`} onClick={handleMailOpen}>
@@ -49,10 +61,12 @@ const MailRow = ({theme, email, inboxType, isSelected, onSelect, onUpdate}) => {
 
                 <div className="d-flex flex-row align-items-center gap-1">
                     {email.files && email.files.length > 0 && (
-                        <i className={`bi bi-paperclip icon ${theme}`}/>
+                        <i className={`bi bi-paperclip icon ${theme}`} />
                     )}
-                    <i className={`bi bi-clock icon ${theme}`}/>
-                    <div className={`email-time ${theme}`}>{formatDate(email.sentAt || email.createdAt)}</div>
+                    <i className={`bi bi-clock icon ${theme}`} />
+                    <div className={`email-time ${theme}`}>
+                        {formatDate(email.sentAt || email.createdAt)}
+                    </div>
                 </div>
             </div>
         </div>
