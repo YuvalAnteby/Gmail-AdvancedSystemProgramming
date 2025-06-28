@@ -62,36 +62,42 @@ const MainPage = () => {
         });
     };
 
-    // checks inbox type change
-    useEffect(() => {
-        if (location.state?.inboxType) {
-            setInboxType(location.state.inboxType);
-        }
-    }, [location.state?.inboxType]);
+    // clicking the Compose button
+    const handleComposeClick = () => {
+        setComposes((cs) => {
+            if (cs.length >= 2) return cs // max 2 windows
+            return [...cs, { id: Date.now(), offset: cs.length }]
+        })
+    }
 
-    // handlers for mail compose
-    const handleComposeClick = () => setShowCompose(true);
-    const handleCancelCompose = () => setShowCompose(false);
-    const handleSendCompose = mail => {
-        // TODO: call your send-mail API
-        // then close and refresh:
-        setShowCompose(false);
-        refreshMails();
-    };
+    // remove a compose window by id
+    const handleCloseCompose = (id) => {
+        setComposes((cs) =>
+            cs
+                .filter((c) => c.id !== id)
+                .map((c, i) => ({ ...c, offset: i })) // reassign offsets
+        )
+        refreshMails()
+    }
 
     // side menu un/show update
     useEffect(() => {
         setShowSidebar(!isMobile);
     }, [isMobile]);
 
-    // disable mail list scroll when showing side menu on smaller screens
     useEffect(() => {
         if (isMobile) {
-            document.body.style.overflow = showSidebar ? 'hidden' : 'auto';
+            document.body.style.overflow = showSidebar ? "hidden" : "auto"
         }
-    }, [showSidebar, isMobile]);
+    }, [showSidebar, isMobile])
 
-    // regular screen
+    // handle URL/state changes
+    useEffect(() => {
+        if (location.state?.inboxType) {
+            setInboxType(location.state.inboxType)
+        }
+    }, [location.state?.inboxType])
+
     return (
         <div className={`main-page ${theme}`}>
             {/* ---- TOP MENU ---- */}
@@ -119,16 +125,13 @@ const MainPage = () => {
                         setShowSidebar={setShowSidebar}
                     />
                 </div>
-                {/* ---- SIDEBAR BACKDROP FOR SMALL SCREENS ---- */}
                 {isMobile && showSidebar && (
                     <div className="sidebar-backdrop" onClick={() => setShowSidebar(false)} />
                 )}
 
-
-                {/* ---- MAIL LIST CONTAINER ---- */}
+                {/* ---- MAIL LIST ---- */}
                 <div className="col-md-10 p-0">
                     <div className={`mail-list-container ${theme}`}>
-                        {/* ---- TOOLBAR ---- */}
                         <ToolBar
                             theme={theme}
                             inboxType={inboxType}
@@ -142,33 +145,37 @@ const MainPage = () => {
                             goToNextPage={goToNextPage}
                             goToPrevPage={goToPrevPage}
                         />
-                        {/* ---- loading screen ---- */}
-                        {loading && (<SkeletonEmail rows={10}/>)}
-                        {/* ---- ACTUAL MAIL ROWS ---- */}
-                        {!loading && emails.map(email => (
-                            <MailRow
-                                key={email.id}
-                                theme={theme}
-                                email={email}
-                                inboxType={inboxType}
-                                isSelected={selectedMails.has(email.id)}
-                                onSelect={handleSelect}
-                                onUpdate={refreshMails}
-                            />
-                        ))}
+                        {loading && <SkeletonEmail rows={10} />}
+                        {!loading &&
+                            emails.map((email) => (
+                                <MailRow
+                                    key={email.id}
+                                    theme={theme}
+                                    email={email}
+                                    inboxType={inboxType}
+                                    isSelected={selectedMails.has(email.id)}
+                                    onSelect={handleSelect}
+                                    onUpdate={refreshMails}
+                                    onOpenDraft={handleOpenDraft} // pass draft-opener
+                                />
+                            ))}
                     </div>
                 </div>
             </div>
 
-            {/* ---- COMPOSE WINDOW ---- */}
-            {showCompose && (
+            {/* ---- COMPOSE WINDOWS (up to 2 side by side) ---- */}
+            {composes.map((c) => (
                 <ComposeEmail
-                    onCancel={handleCancelCompose}
-                    onSend={handleSendCompose}
+                    key={c.id}
+                    theme={theme}           // pass theme here
+                    offset={c.offset}       // horizontal stacking
+                    draftMail={c.draftMail} // undefined for new compose
+                    onCancel={() => handleCloseCompose(c.id)}
+                    onSend={() => handleCloseCompose(c.id)}
                 />
-            )}
+            ))}
         </div>
-    );
-};
+    )
+}
 
-export default MainPage;
+export default MainPage
