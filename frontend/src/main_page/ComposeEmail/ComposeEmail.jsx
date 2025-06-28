@@ -5,145 +5,251 @@ import { searchUsers } from "../../api/userApi";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ComposeEmail.css';
 
-export default function ComposeEmail({ onCancel, onSend }) {
-    const [toQuery, setToQuery] = useState('');
-    const [suggestions, setSuggestions] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [subject, setSubject] = useState('');
-    const [body, setBody] = useState('');
+import {
+    execCommand,
+    insertInlineImage,
+    handleFileAttachments
+} from '../../utils/composeUtils'
 
+export default function ComposeEmail({
+                                         onCancel,
+                                         onSend,
+                                         offset = 0,
+                                         draftMail = null
+                                     }) {
+    // get current theme (adds "dark" or "light" class)
+    const { theme } = useTheme()
+
+    const [toQuery, setToQuery]         = useState('')
+    const [suggestions, setSuggestions] = useState([])
+    const [recipients, setRecipients]   = useState([])
+    const [subject, setSubject]         = useState('')
+    const [attachments, setAttachments] = useState([])
+    const [view, setView]               = useState('normal')
+
+    const editorRef      = useRef(null)
+    const inlineImageRef = useRef(null)
+    const attachRef      = useRef(null)
+
+    // prefill when editing
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            if (toQuery.length >= 2 && !selectedUser) {
-                searchUsers(toQuery).then(setSuggestions);
-            } else {
-                setSuggestions([]);
-            }
-        }, 300);
-        return () => clearTimeout(timeout);
-    }, [toQuery, selectedUser]);
-
-    const handleSend = async () => {
-        const toEmail = toQuery.trim();
-        if (!selectedUser && !toEmail) {
-            alert("Please select or type a valid recipient.");
-            return;
+        if (!draftMail) return
+        setRecipients(draftMail.sentTo.map(u => u.mail))
+        setSubject(draftMail.subject || '')
+        if (editorRef.current) {
+            editorRef.current.innerHTML = draftMail.body || ''
         }
+        setAttachments(draftMail.attachments || [])
+        setToQuery('')
+        setSuggestions([])
+    }, [draftMail])
 
-        try {
-            const sentTo = selectedUser
-                ? [selectedUser.mail]
-                : [toEmail];
+    // autocomplete
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (toQuery.length >= 1) {
+                searchUsers(toQuery).then(setSuggestions)
+            } else {
+                setSuggestions([])
+            }
+        }, 300)
+        return () => clearTimeout(timer)
+    }, [toQuery])
 
+    const addRecipient = email => {
+        const e = email.trim()
+        if (e && !recipients.includes(e)) {
+            setRecipients(prev => [...prev, e])
+        }
+        setToQuery('')
+        setSuggestions([])
+    }
+    const removeRecipient = email => {
+        setRecipients(prev => prev.filter(e => e !== email))
+    }
+    const handleKeyDown = e => {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault()
+            addRecipient(toQuery)
+        }
+    }
 
+    // send / draft
+    const postMail = async saveAsDraft => {
+        if (!recipients.length) {
+            alert('Add at least one recipient.')
+            return
+        }
+        const body = editorRef.current.innerHTML
 
-            const newMail = await sendMail({
+        if (draftMail?.id) {
+            await updateMail(draftMail.id, {
                 subject,
                 body,
-                sentTo
-            });
-
-            console.log("Mail sent:", newMail);
-            if (onSend) onSend(); // optional callback
-        } catch (err) {
-            console.error("Failed to send mail:", err);
-            alert("Failed to send mail: " + err.message);
+                sentTo: recipients,
+                saveAsDraft
+            })
+        } else {
+            await sendMail({
+                subject,
+                body,
+                sentTo: recipients,
+                attachments,
+                saveAsDraft
+            })
         }
-    };
+    }
+
+    const handleSend     = async () => { await postMail(false); onSend?.() }
+    const handleClose    = async () => { await postMail(true);  onCancel() }
+    const toggleMinimize = () => setView(v => v==='minimized' ? 'normal' : 'minimized')
+    const toggleMaximize = () => setView(v => v==='maximized' ? 'normal' : 'maximized')
+
+    const rightOffset = `calc(2vw + ${offset * 36}vw)`
 
     return (
-        <div className="compose-email">
+        <div
+            className={`compose-email ${view} ${theme}`}
+            dir="ltr"
+            style={{ right: rightOffset }}
+        >
             <div className="compose-header">
-                <span className="compose-title">New Message</span>
+        <span className="compose-title">
+          {draftMail ? 'Edit Draft' : 'New Message'}
+        </span>
                 <div className="compose-controls">
-                    <button className="control-btn" title="Minimize">
+                    <button className="control-btn" onClick={toggleMinimize}>
                         <i className="bi bi-dash"></i>
                     </button>
-                    <button className="control-btn" title="Expand">
+                    <button className="control-btn" onClick={toggleMaximize}>
                         <i className="bi bi-fullscreen"></i>
                     </button>
-                    <button className="control-btn" onClick={onCancel} title="Close">
+                    <button className="control-btn" onClick={handleClose}>
                         <i className="bi bi-x-lg"></i>
                     </button>
                 </div>
             </div>
 
-            <div className="compose-body">
-                <div className="compose-field" style={{ position: 'relative' }}>
-                    <span className="field-label">To</span>
-                    <input
-                        type="text"
-                        value={ selectedUser ? selectedUser.mail : toQuery }
+            {view !== 'minimized' && (
+                <>
+                    <div className="compose-body">
+                        {/* To */}
+                        <div className="compose-field" style={{ flexWrap: 'wrap' }}>
+                            <span className="field-label">To</span>
+                            <div className="recipient-input-container">
+                                {recipients.map(email => (
+                                    <span key={email} className="recipient-chip">
+                    {email}
+                                        <button onClick={() => removeRecipient(email)}>×</button>
+                  </span>
+                                ))}
+                                <input
+                                    type="text"
+                                    className="field-input to-input"
+                                    placeholder="Type a name or email"
+                                    value={toQuery}
+                                    onChange={e => setToQuery(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                />
+                            </div>
+                            {suggestions.length > 0 && (
+                                <ul className="suggestions-list">
+                                    {suggestions.map(u => (
+                                        <li key={u.id} onClick={() => addRecipient(u.mail)}>
+                                            {u.mail}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
 
-                        onChange={e => {
-                            setToQuery(e.target.value);
-                            setSelectedUser(null);
-                        }}
-                        className="field-input"
-                        placeholder="Type a name or email"
-                    />
-                    {suggestions.length > 0 && !selectedUser && (
-                        <ul className="suggestions-list">
-                            {suggestions.map(user => (
-                                <li
-                                    key={user.id}
-                                    onClick={() => {
-                                        setSelectedUser(user);
-                                        setToQuery(user.mail);
-                                        setSuggestions([]);
-                                    }}
+                        {/* Subject */}
+                        <div className="compose-field">
+                            <span className="field-label">Subject</span>
+                            <input
+                                type="text"
+                                className="field-input"
+                                placeholder="Subject"
+                                value={subject}
+                                onChange={e => setSubject(e.target.value)}
+                            />
+                        </div>
 
-                                >
-                                    {user.mail}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
+                        {/* Toolbar */}
+                        <div className="compose-toolbar">
+                            <button onClick={() => execCommand(editorRef, 'bold')}><b>B</b></button>
+                            <button onClick={() => execCommand(editorRef, 'italic')}><i>I</i></button>
+                            <button onClick={() => execCommand(editorRef, 'underline')}><u>U</u></button>
+                            <button onClick={() => {
+                                const url = prompt('Enter URL:')
+                                if (url) execCommand(editorRef, 'createLink', url)
+                            }}>
+                                <i className="bi bi-link-45deg"></i>
+                            </button>
 
-                <div className="compose-field">
-                    <span className="field-label">Subject</span>
-                    <input
-                        type="text"
-                        value={subject}
-                        onChange={e => setSubject(e.target.value)}
-                        className="field-input"
-                        placeholder="Subject"
-                    />
-                </div>
+                            <select
+                                className="font-size-select"
+                                defaultValue="3"
+                                onChange={e => execCommand(editorRef, 'fontSize', e.target.value)}
+                            >
+                                <option value="2">Small</option>
+                                <option value="3">Normal</option>
+                                <option value="4">Medium</option>
+                                <option value="5">Large</option>
+                            </select>
 
-                <div className="compose-toolbar">
-                    <i className="bi bi-type-bold"></i>
-                    <i className="bi bi-type-italic"></i>
-                    <i className="bi bi-type-underline"></i>
-                    <i className="bi bi-link-45deg"></i>
-                    <i className="bi bi-image"></i>
-                    <i className="bi bi-list-ul"></i>
-                </div>
+                            <button onClick={() => inlineImageRef.current.click()}>
+                                <i className="bi bi-image"></i>
+                            </button>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                ref={inlineImageRef}
+                                style={{ display: 'none' }}
+                                onChange={e => insertInlineImage(editorRef, e)}
+                            />
+                        </div>
 
-                <textarea
-                    value={body}
-                    onChange={e => setBody(e.target.value)}
-                    className="compose-textarea"
-                    placeholder="Compose your email..."
-                />
-            </div>
+                        {/* Editor */}
+                        <div
+                            ref={editorRef}
+                            className="compose-editor"
+                            contentEditable
+                            suppressContentEditableWarning
+                        />
 
-            <div className="compose-footer">
-                <div className="footer-left">
-                    <button className="attach-btn" title="Attach files">
-                        <i className="bi bi-paperclip"></i>
-                    </button>
-                </div>
-                <div className="footer-right">
-                    <button className="send-btn" onClick={handleSend}>
-                        Send <i className="bi bi-send-fill"></i>
-                    </button>
-                    <button className="discard-btn" onClick={onCancel}>
-                        Discard
-                    </button>
-                </div>
-            </div>
+                        {/* Attachments */}
+                        {attachments.length > 0 && (
+                            <ul className="attachment-list">
+                                {attachments.map((att,i) => <li key={i}>{att.name}</li>)}
+                            </ul>
+                        )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="compose-footer">
+                        <button className="footer-attach-btn" onClick={() => attachRef.current.click()}>
+                            <i className="bi bi-paperclip"></i>
+                        </button>
+                        <input
+                            type="file"
+                            multiple
+                            ref={attachRef}
+                            style={{ display: 'none' }}
+                            onChange={e => handleFileAttachments(setAttachments, e)}
+                        />
+
+                        <div className="footer-right">
+                            <button className="send-btn" onClick={handleSend}>
+                                Send <i className="bi bi-send-fill"></i>
+                            </button>
+                            <button className="discard-btn" onClick={handleClose}>
+                                Discard
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
-    );
+    )
 }
