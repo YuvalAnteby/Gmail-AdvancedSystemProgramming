@@ -264,3 +264,26 @@ export async function updateMail(mailId, {
     if (!res.ok) throw new Error(`updateMail failed: ${res.status}`);
     return res.json();
 }
+/**
+ * Fetch mails under a specific label.
+ * Backend must support filtering by ?label=<name>.
+ *
+ * @param {string} labelName
+ * @param {number} page
+ * @returns {Promise<{ mails: any[], total: number }>}
+ */
+export async function getMailsByLabel(labelName, page = 1) {
+    const token = localStorage.getItem("token");
+    // note: backend endpoint is the same, just pass label=...
+    const url = `${API_BASE}/mails?label=${encodeURIComponent(labelName)}&page=${page}&limit=50`;
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+    if (!res.ok) {
+        throw new Error(`getMailsByLabel failed: ${res.status}`);
+    }
+    return res.json();
+}
