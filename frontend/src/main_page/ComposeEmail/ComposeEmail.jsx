@@ -13,11 +13,11 @@ import {
 } from '../../utils/composeUtils';
 
 /**
- * ComposeEmail component
- * @param {function} onCancel - called when closing the compose window
- * @param {function} onSend - called when sending a mail
- * @param {number} offset - for stacking multiple compose windows
- * @param {object|null} draftMail - draft email data if editing a draft
+ * ComposeEmail component: Handles sending or saving emails and drafts
+ * @param {function} onCancel - Called when closing or discarding the window
+ * @param {function} onSend   - Called after successfully sending
+ * @param {number} offset     - How far to offset the window (for stacking)
+ * @param {object|null} draftMail - If present, editing a draft
  */
 export default function ComposeEmail({
                                          onCancel,
@@ -27,36 +27,41 @@ export default function ComposeEmail({
                                      }) {
     const { theme } = useTheme();
 
-    // State for To field autocomplete and recipient list
+    // States for fields
     const [toQuery, setToQuery] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [recipients, setRecipients] = useState([]);
     const [subject, setSubject] = useState('');
     const [attachments, setAttachments] = useState([]);
-    const [view, setView] = useState('normal');
+    const [view, setView] = useState('normal'); // minimized, maximized, normal
 
+    // Store the current editor text in state so it survives minimize/maximize
+    const [editorHtml, setEditorHtml] = useState('');
     const editorRef = useRef(null);
     const inlineImageRef = useRef(null);
     const attachRef = useRef(null);
 
-    /**
-     * If a draft is provided (editing), fill fields with draft's content
-     */
+    // On editing a draft, prefill all fields only when draftMail changes
     useEffect(() => {
         if (!draftMail) return;
         setRecipients(draftMail.sentTo.map(u => u.mail));
         setSubject(draftMail.subject || '');
-        if (editorRef.current) {
-            editorRef.current.innerHTML = draftMail.body || '';
-        }
+        setEditorHtml(draftMail.body || ''); // Only set state!
         setAttachments(draftMail.attachments || []);
         setToQuery('');
         setSuggestions([]);
     }, [draftMail]);
 
-    /**
-     * Autocomplete suggestions for To field, triggered by input
-     */
+    // When the editor is mounted or draftMail/view changes, set initial value only once
+    useEffect(() => {
+        if (editorRef.current) {
+            editorRef.current.innerHTML = editorHtml;
+        }
+        // Do not update when editorHtml changes! Only on draft/view switch.
+        // eslint-disable-next-line
+    }, [draftMail, view]);
+
+    // Autocomplete for "To" field
     useEffect(() => {
         const timer = setTimeout(() => {
             if (toQuery.length >= 1) {
@@ -68,9 +73,7 @@ export default function ComposeEmail({
         return () => clearTimeout(timer);
     }, [toQuery]);
 
-    /**
-     * Add a recipient to the list (if not already there)
-     */
+    // Add recipient if not already present
     const addRecipient = email => {
         const e = email.trim();
         if (e && !recipients.includes(e)) {
@@ -79,17 +82,9 @@ export default function ComposeEmail({
         setToQuery('');
         setSuggestions([]);
     };
-
-    /**
-     * Remove a recipient from the list
-     */
     const removeRecipient = email => {
         setRecipients(prev => prev.filter(e => e !== email));
     };
-
-    /**
-     * Handle keyboard entry for recipient (Enter or comma)
-     */
     const handleKeyDown = e => {
         if (e.key === 'Enter' || e.key === ',') {
             e.preventDefault();
@@ -97,17 +92,13 @@ export default function ComposeEmail({
         }
     };
 
-    /**
-     * Actually send or save the mail (to backend)
-     * @param {boolean} saveAsDraft - true to save as draft, false to send
-     */
+    // Send or save as draft (uses state for editorHtml)
     const postMail = async saveAsDraft => {
-        // For sending, must have at least one recipient
         if (!saveAsDraft && !recipients.length) {
             alert('Add at least one recipient.');
             return;
         }
-        const body = editorRef.current.innerHTML;
+        const body = editorHtml;
         if (draftMail?.id) {
             await updateMail(draftMail.id, {
                 subject,
@@ -126,17 +117,11 @@ export default function ComposeEmail({
         }
     };
 
-    /**
-     * Handle "Send" button - will only work if recipients exist
-     */
+    // Handlers for the toolbar and window controls
     const handleSend = async () => {
         await postMail(false);
         onSend?.();
     };
-
-    /**
-     * Handle "Close" (X icon) - saves as draft only if there are recipients
-     */
     const handleClose = async () => {
         // Only save draft if there is at least one recipient
         if (recipients.length > 0) {
@@ -144,15 +129,9 @@ export default function ComposeEmail({
         }
         onCancel();
     };
-
-    /**
-     * Handle "Discard" button - does not save anything, just closes
-     */
     const handleDiscard = () => {
         onCancel();
     };
-
-    // Window size controls
     const toggleMinimize = () => setView(v => v === 'minimized' ? 'normal' : 'minimized');
     const toggleMaximize = () => setView(v => v === 'maximized' ? 'normal' : 'maximized');
     const rightOffset = `calc(2vw + ${offset * 36}vw)`;
@@ -160,7 +139,6 @@ export default function ComposeEmail({
     return (
         <div
             className={`compose-email ${view} ${theme}`}
-            dir="ltr"
             style={{ right: rightOffset }}
         >
             <div className="compose-header">
@@ -183,7 +161,7 @@ export default function ComposeEmail({
             {view !== 'minimized' && (
                 <>
                     <div className="compose-body">
-                        {/* To field with autocomplete */}
+                        {/* To: field with recipient chips and autocomplete */}
                         <div className="compose-field" style={{ flexWrap: 'wrap' }}>
                             <span className="field-label">To</span>
                             <div className="recipient-input-container">
@@ -225,7 +203,7 @@ export default function ComposeEmail({
                             />
                         </div>
 
-                        {/* Formatting toolbar */}
+                        {/* Rich text formatting toolbar */}
                         <div className="compose-toolbar">
                             <button onClick={() => execCommand(editorRef, 'bold')}><b>B</b></button>
                             <button onClick={() => execCommand(editorRef, 'italic')}><i>I</i></button>
@@ -258,15 +236,17 @@ export default function ComposeEmail({
                             />
                         </div>
 
-                        {/* Rich text editor for the mail body */}
+                        {/* Editable email body. Use onInput to track the text in state for persistence. */}
                         <div
                             ref={editorRef}
                             className="compose-editor"
                             contentEditable
                             suppressContentEditableWarning
+                            onInput={e => setEditorHtml(e.currentTarget.innerHTML)}
+                            dir="ltr" // Force left-to-right typing only in the editor!
                         />
 
-                        {/* Show attachments list if any */}
+                        {/* Attachments (if any) */}
                         {attachments.length > 0 && (
                             <ul className="attachment-list">
                                 {attachments.map((att, i) => <li key={i}>{att.name}</li>)}
@@ -274,7 +254,7 @@ export default function ComposeEmail({
                         )}
                     </div>
 
-                    {/* Footer with attach, send and discard */}
+                    {/* Footer: attach, send, discard */}
                     <div className="compose-footer">
                         <button className="footer-attach-btn" onClick={() => attachRef.current.click()}>
                             <i className="bi bi-paperclip"></i>
