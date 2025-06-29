@@ -1,11 +1,11 @@
-// src/main_page/EmailSideMenu/EmailSideMenu.jsx
-
 import React, { useState, useEffect } from 'react';
+// Import Bootstrap and icon styles for consistent UI
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './EmailSideMenu.css';
 import useIsMobile from "../../utils/useIsMobile";
 
+// Import API functions for label CRUD and sublabel
 import {
     fetchLabels,
     createLabel,
@@ -14,6 +14,7 @@ import {
     createLabelUnderParent,
 } from '../../api/labelsApi';
 
+// Define the static mailbox/folder items (Inbox, Sent, etc.)
 const mailboxItems = [
     { id: 'all',     label: 'All Mail', icon: 'bi-envelope' },
     { id: 'incoming',label: 'Inbox',    icon: 'bi-inbox' },
@@ -24,32 +25,33 @@ const mailboxItems = [
     { id: 'spam',    label: 'Spam',     icon: 'bi-exclamation-octagon' },
 ];
 
+// Main sidebar component
 export default function EmailSidebar({
-                                         theme,
-                                         currentTab,
-                                         setCurrentTab,
-                                         onComposeClick,
-                                         showSidebar,
-                                         setShowSidebar
+                                         theme,            // "light" or "dark"
+                                         currentTab,       // Which tab/label is currently selected
+                                         setCurrentTab,    // Callback to change tab
+                                         onComposeClick,   // Callback for "Compose" button
+                                         showSidebar,      // Boolean: is sidebar open (mobile)
+                                         setShowSidebar    // Callback to toggle sidebar (mobile)
                                      }) {
     const isMobile = useIsMobile();
-    const [labels, setLabels] = useState([]);
+    const [labels, setLabels] = useState([]); // Flat list of all labels (from backend)
 
-    // For expand/collapse of sublabels
+    // Object to track which parent labels are expanded: { [id]: true/false }
     const [expandedLabels, setExpandedLabels] = useState({});
 
-    // Context menu state
+    // State for context menu (edit/delete/add sublabel)
     const [ctx, setCtx] = useState({ open: false, x: 0, y: 0, label: null });
 
-    // Load labels once
+    // Fetch labels from API on mount
     useEffect(() => {
         fetchLabels().then(setLabels);
     }, []);
 
-    // Helper to reload label list
+    // Helper to reload labels after changes
     const reload = async () => setLabels(await fetchLabels());
 
-    // Add label
+    // Add new label at root
     const handleAddLabel = async () => {
         const name = prompt("New label name:");
         if (!name) return;
@@ -57,7 +59,7 @@ export default function EmailSidebar({
         await reload();
     };
 
-    // Edit label
+    // Rename label
     const handleEditLabel = async lab => {
         const name = prompt("Rename label:", lab.name);
         if (!name || name === lab.name) return;
@@ -65,14 +67,14 @@ export default function EmailSidebar({
         await reload();
     };
 
-    // Remove label
+    // Delete label with confirmation
     const handleRemoveLabel = async lab => {
         if (!window.confirm(`Delete "${lab.name}"?`)) return;
         await deleteLabel(lab.id);
         await reload();
     };
 
-    // Add sublabel
+    // Add sublabel under parent
     const handleAddSublabel = async lab => {
         const name = prompt(`Sublabel name under "${lab.name}":`);
         if (!name) return;
@@ -80,26 +82,31 @@ export default function EmailSidebar({
         await reload();
     };
 
-    // Context menu
+    // Open the context menu at the position of the clicked label
     const openCtx = (e, lab) => {
         e.stopPropagation();
         const rect = e.currentTarget.getBoundingClientRect();
         setCtx({ open: true, x: rect.right + 4, y: rect.top, label: lab });
     };
+    // Close the context menu
     const closeCtx = () => setCtx(c => ({ ...c, open: false }));
 
-    // Tab navigation
+    // Navigate to mailbox tab or label tab
     const onClickTab = id => {
         setCurrentTab(id);
         if (isMobile) setShowSidebar(false);
     };
 
-    // Expand/collapse toggler
+    // Expand/collapse label for sublabels
     const toggleLabel = id => {
         setExpandedLabels(e => ({ ...e, [id]: !e[id] }));
     };
 
-    // Build label tree from flat list
+    /**
+     * Convert flat label list to tree structure:
+     * - Each label can have children (if sublabel)
+     * - Roots have parent == null/undefined/0
+     */
     function buildLabelTree(labels) {
         const map = {};
         labels.forEach(lab => map[lab.id] = { ...lab, children: [] });
@@ -111,7 +118,11 @@ export default function EmailSidebar({
         return roots;
     }
 
-    // Recursive label renderer
+    /**
+     * Render a single label and its children recursively
+     * @param {object} lab - label object
+     * @param {number} level - depth (indent)
+     */
     function renderLabel(lab, level = 0) {
         const isParent = lab.children && lab.children.length > 0;
         const isExpanded = expandedLabels[lab.id];
@@ -121,6 +132,7 @@ export default function EmailSidebar({
             <React.Fragment key={lab.id}>
                 <li className="nav-item d-flex align-items-center label-li"
                     style={{ paddingLeft: 16 + level * 18 }}>
+                    {/* Expand/collapse caret for parent labels */}
                     {isParent && (
                         <button
                             className="label-expand-btn"
@@ -136,18 +148,22 @@ export default function EmailSidebar({
                             <i className={`bi bi-caret-${isExpanded ? "down" : "right"}-fill`} />
                         </button>
                     )}
+                    {/* Spaceholder if not parent */}
                     {!isParent && <span style={{ width: 20, display: "inline-block" }} />}
+                    {/* Label name, navigates on click */}
                     <a
                         href="#"
                         className={`nav-link flex-grow-1 ${currentTab === tabId ? 'active-tab' : ''}`}
                         onClick={e => { e.preventDefault(); onClickTab(tabId) }}
                     >{lab.name}</a>
+                    {/* Context menu button (three dots) */}
                     <i
                         className="bi bi-three-dots-vertical ms-2"
                         style={{ cursor: 'pointer' }}
                         onClick={e => openCtx(e, lab)}
                     />
                 </li>
+                {/* Recursively render sublabels if expanded */}
                 {isParent && isExpanded && lab.children.map(child =>
                     renderLabel(child, level + 1)
                 )}
@@ -155,16 +171,17 @@ export default function EmailSidebar({
         );
     }
 
+    // Render sidebar
     return (
         <div className={`sidebar ${theme} ${showSidebar ? 'show' : ''}`}>
-            {/* Compose button */}
+            {/* Compose button (desktop only) */}
             {!isMobile && (
                 <button className={`btn compose-button ${theme}`} onClick={onComposeClick}>
                     <i className="bi bi-pencil-square me-2" /> Compose
                 </button>
             )}
 
-            {/* Folders */}
+            {/* Folders (Inbox, Sent, etc.) */}
             <ul className="nav nav-pills flex-column">
                 {mailboxItems.map(it => (
                     <li key={it.id} className="nav-item">
@@ -179,18 +196,18 @@ export default function EmailSidebar({
                 ))}
             </ul>
 
-            {/* Labels header */}
+            {/* Labels header and add button */}
             <div className="labels-header d-flex align-items-center px-3 mt-4">
                 <strong className="me-auto">Labels</strong>
                 <i className="bi bi-plus-circle" style={{ cursor: 'pointer' }} onClick={handleAddLabel} />
             </div>
 
-            {/* Labels as expandable tree */}
+            {/* Labels tree, supports sublabels and indentation */}
             <ul className="nav nav-pills flex-column mt-1">
                 {buildLabelTree(labels).map(lab => renderLabel(lab))}
             </ul>
 
-            {/* Context menu for label actions */}
+            {/* Context menu for editing/removing/adding sublabels */}
             {ctx.open && (
                 <ul
                     className="label-context-menu list-unstyled p-2 shadow"

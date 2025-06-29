@@ -1,6 +1,6 @@
 /* src/main_page/EmailSideMenu/EmailSideMenu.css */
 
-/* Base sidebar */
+/* Layout and base colors for sidebar */
 .sidebar {
     display: flex;
     flex-direction: column;
@@ -9,37 +9,35 @@
     overflow-y: auto;
 }
 
+/* Light/dark color schemes */
 .sidebar.light {
     background: #fff;
     color: #000;
     border-right: 1px solid #dee2e6;
 }
-
 .sidebar.dark {
     background: #202124;
     color: #e8eaed;
     border-right: 1px solid #5f6368;
 }
 
-/* Compose button */
+/* Compose button at top */
 .compose-button {
     margin-bottom: 1rem;
     width: 100%;
 }
-
 .compose-button.light {
     background-color: #1a73e8;
     color: #fff;
     border: 1px solid #1a73e8;
 }
-
 .compose-button.dark {
     background: transparent;
     color: #e8eaed;
     border: 1px solid #e8eaed;
 }
 
-/* Mail folder links */
+/* Mail folder links (Inbox, Sent, etc.) */
 .nav-link {
     display: flex;
     align-items: center;
@@ -47,12 +45,14 @@
     border-radius: 0.5rem;
     transition: background-color 0.2s, color 0.2s;
 }
+/* Hover state for mail links */
 .nav-link:hover {
     background-color: rgba(0,0,0,0.05);
 }
 .sidebar.dark .nav-link:hover {
     background-color: rgba(255,255,255,0.1);
 }
+/* Active tab coloring */
 .sidebar.light .nav-link.active-tab {
     background-color: #1a73e8;
     color: #fff;
@@ -62,7 +62,7 @@
     color: #fff;
 }
 
-/* Labels section */
+/* Header for Labels section */
 .labels-header {
     font-size: 0.85rem;
     font-weight: 500;
@@ -70,7 +70,7 @@
     color: inherit;
 }
 
-/* Context menu */
+/* Context menu for label actions */
 .label-context-menu {
     list-style: none;
     padding: 0;
@@ -80,7 +80,7 @@
     background-color: rgba(0,0,0,0.05);
 }
 
-/* Expand/collapse icon/button */
+/* Expand/collapse button for parent labels (the caret) */
 .label-expand-btn {
     width: 20px;
     height: 20px;
@@ -92,11 +92,12 @@
     color: inherit;
 }
 
-/* Label list item for consistent height/indent */
+/* Each label line: set consistent height and allow indentation */
 .label-li {
     min-height: 32px;
 }
 
+/* Style for label text and ellipsis if long */
 .label-li .nav-link {
     min-width: 0;
     flex: 1 1 auto;
@@ -106,11 +107,12 @@
     padding-left: 0.5rem;
 }
 
+/* Right-align three-dots menu for label */
 .label-li .bi-three-dots-vertical {
     margin-left: auto;
 }
 
-/* Mobile behavior */
+/* Sidebar slide-in for mobile */
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
