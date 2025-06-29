@@ -1,86 +1,43 @@
-/**
- * label object structure:
- *  id - positive number now
- *  owner - user id of the label's owner
- *  name - label's name
- */
-const labels = [
-    {
-        id: 1,
-        name: 'work',
-        owner: 1,
-    },
-    {
-        id: 2,
-        name: 'friends',
-        owner: 2,
-    }
+let labels = [
+    { id:1, name:'work',    owner:1, parent:null },
+    { id:2, name:'friends', owner:1, parent:null },
 ];
-let labelId = labels ? labels.length : 0;
+let nextId = labels.length + 1;
 
-/**
- * Returns all labels saved
- * @returns {*[]} all labels saved
- */
-const getAllLabels = () => labels
-
-/**
- * Creates a new label
- * @param owner user id of the label's owner
- * @param name name of the label
- * @returns {{id: number, name, owner}|null} null if input is invalid, otherwise the label object
- */
-const createNewLabel = (owner, name) => {
-    if (!name)
-        return null;
-    const newLabel = {
-        id: ++labelId,
-        name: name,
-        owner: owner,
+function getAllLabels()    { return labels; }
+function getLabelById(id)  { return labels.find(l=>l.id===id); }
+function createNewLabel(owner, name) {
+    const lab = {id: nextId++, owner, name, parent: null};
+    labels.push(lab);
+    return lab;
+}
+    function createSublabel(owner, parent, name) {
+        // check parent exists:
+        if (!labels.find(l => l.id === parent)) return null;
+        const newLabel = {
+            id: labels.length ? labels[labels.length - 1].id + 1 : 1,
+            name,
+            owner,
+            parent,
+        };
+        labels.push(newLabel);
+        return newLabel;
     }
-    labels.push(newLabel);
-    return newLabel;
+function editLabelById(id, name) {
+    const lab = getLabelById(id);
+    if (!lab) return null;
+    lab.name = name;
+    return lab;
 }
-
-/**
- *
- * @param id id of a label
- * @returns {*} label object with the same id
- */
-const getLabelById = (id) => labels.find(label => label.id == id);
-
-const getLabelByName = (userId, name) => {
-    return labels.find(label => label.owner == userId && label.name === name);
-}
-
-/**
- * Edits the label with new info
- * @param labelId id of a label to edit
- * @param name new name of the label
- * @returns {*|null} if invalid or not found null, otherwise the updated label object
- */
-const editLabel = (labelId, name) => {
- //   if (!labelId || !name)
- //       return null;
-    // search the label with the index
-    const index = labels.findIndex(label => label.id === labelId);
-    if (index === -1)
-        return null;
-    labels[index].name = name;
-    return labels[index];
-}
-
-/**
- * Deletes a label by id
- * @param labelId id of a label to delete
- * @returns {boolean} true if deleted, otherwise false
- */
-const deleteLabel = (labelId) => {
-    const index = labels.findIndex(label => label.id === labelId);
-    if (index === -1)
-        return false;
-    labels.splice(index, 1);
+function deleteLabelById(id) {
+    const idx = labels.findIndex(l=>l.id===id);
+    if (idx<0) return false;
+    labels.splice(idx,1);
     return true;
 }
 
-module.exports = {getAllLabels, createNewLabel, getLabelById, getLabelByName, editLabel, deleteLabel}
+module.exports = {
+    getAllLabels, getLabelById,
+    createNewLabel, createSublabel,
+    editLabelById, deleteLabelById
+};
