@@ -149,9 +149,13 @@ const MainPage = () => {
                     offset={c.offset}
                     draftMail={c.draftMail}
                     onCancel={() => handleCloseCompose(c.id)}
-                    onSend={()   => handleCloseCompose(c.id)}
+                    onSend={() => {
+                        handleCloseCompose(c.id);
+                        refreshMails();
+                    }}
                 />
             ))}
+
         </div>
     );
 };
