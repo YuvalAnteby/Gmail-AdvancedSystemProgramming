@@ -340,6 +340,15 @@ const updateDraft = (mailId, subject, body, sentToId, files) => {
 
 /**
  * Edits an existing mail with allowed fields
+ * @param {number} mailId id of a mail to edit
+ * @param {boolean|null} isRead true if mail was read, otherwise false
+ * @param {boolean|null} isStarred true if the mail is marked with a star, otherwise false
+ * @param {boolean|null} isTrashed true if the mail is in the trash, otherwise false
+ * @param {boolean|null} isSpam true if marked as spam by a user, otherwise false
+ * @param {number[]|null} labels id array of new labels for the mail
+ * @returns
+ * - the new mail object if successfully edited
+ * - code 404 if no such email was found
  */
 const editSentMail = (mailId, isRead, isStarred, isTrashed, isSpam, labels) => {
     const index = mails.findIndex(mail => mail.id === mailId);
@@ -362,23 +371,37 @@ const editSentMail = (mailId, isRead, isStarred, isTrashed, isSpam, labels) => {
  * Deletes a mail
  * - If already in trash or is a draft, deletes it from array.
  * - Otherwise, moves to trash.
+ * @param userId id of the user that wants to remove the mail
+ * @param mailId id of a mail to delete
+ * @returns {Number}
+ * - 204 if deleted successfully
+ * - 400 if user has no access to it
+ * - 404 if mail not found
  */
 const deleteMail = (userId, mailId) => {
+    // find the index of the wanted mail
     const index = mails.findIndex(mail => mail.id === mailId);
+    // make sure the mail was found
     if (index === -1)
         return 404
+    // make sure the user has access to the mail
     if (mails[index].owner !== userId)
         return 400;
+    // if the mail is a draft no need to send to trash bin, if it's already in the trash - remove it
     if (mails[index].isDraft || mails[index].isTrashed) {
         mails.splice(index, 1);
     } else if (!mails[index].isTrashed) {
         mails[index].isTrashed = true;
     }
+    // return matching code either way
     return 204;
 }
 
 /**
  * Searches in inbox for a query
+ * @param query value to be searched in inbox
+ * @param userId the user's id - to search only in their mails
+ * @returns {*[]} mails objects with the query value in an attribute
  */
 const searchInInbox = (query, userId) => {
     const lowerCased = query.toString().toLowerCase();
@@ -388,18 +411,25 @@ const searchInInbox = (query, userId) => {
             // Only search user's own mails
             if (mail.owner !== userId)
                 return false;
+            // check if query in the subject/ body texts
             if (mail.subject.toLowerCase().includes(lowerCased) || mail.body.toLowerCase().includes(lowerCased))
                 return true;
+            // check if the query is a time (in the format YYYY-MM-DD only)
             const time = (mail.sentAt && mail.sentAt !== "") ? mail.sentAt : mail.createdAt;
             if (time && time.toISOString().includes(lowerCased))
                 return true;
+            // check if the query is a user's name or mail address
             if (mailUserFields(mail).some(field => field.includes(lowerCased)))
                 return true;
+            // check if the query is a label's name
             if (isNum && mail.labels && mailLabelNames(userId, mail).some(name => name.includes(lowerCased)))
                 return true;
+            // check files names
             const fileNames = getFileNamesFromMail(mail);
-            return !!(mail.files && fileNames.some(name => name.toLowerCase().includes(lowerCased)));
-
+            if (mail.files && fileNames.some(name => name.toLowerCase().includes(lowerCased)))
+                return true;
+            // not found
+            return false;
         });
 }
 
