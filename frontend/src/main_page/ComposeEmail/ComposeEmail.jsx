@@ -210,11 +210,16 @@ export default function ComposeEmail({
                             <button onClick={() => execCommand(editorRef, 'italic')}><i>I</i></button>
                             <button onClick={() => execCommand(editorRef, 'underline')}><u>U</u></button>
                             <button onClick={() => {
-                                const url = prompt('Enter URL:');
+                                let url = prompt('Enter URL:');
+                                // If url exists and does not start with http:// or https://, prepend https://
+                                if (url && !/^https?:\/\//i.test(url)) {
+                                    url = 'https://' + url;
+                                }
                                 if (url) execCommand(editorRef, 'createLink', url);
                             }}>
                                 <i className="bi bi-link-45deg"></i>
                             </button>
+
                             <select
                                 className="font-size-select"
                                 defaultValue="3"
