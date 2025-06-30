@@ -215,8 +215,14 @@ const getUserMails = (userId, limit = 50, inboxType, page = 1) => {
 /**
  * Creates a new mail as a draft.
  * Lets the user to not include all attributes, marks it accordingly and avoid sending it.
+ * @param {Number} userId id of the draft's owner
+ * @param {String} subject mail's subject content, replaced by empty string if not provided
+ * @param {String} body mail's body content, replaced by empty string if not provided
+ * @param {Number[]} sentToIds list of recipients ids
+ * @param {Object[]} files list of files containing the name, type and data
+ * @returns {{id: number, owner: number, from: number, sentTo: *[], subject: string, body: string, createdAt: string, sentAt: string, labels: *[], isDraft: boolean, isRead: boolean, isStarred: boolean, isTrashed: boolean, isSpam: boolean}}
  */
-const saveDraft = (userId, subject, body, sentToIds) => {
+const saveDraft = (userId, subject, body, sentToIds, files) => {
     const draft = {
         id: ++mailId,
         owner: Number(userId),
@@ -232,6 +238,7 @@ const saveDraft = (userId, subject, body, sentToIds) => {
         isStarred: false,
         isTrashed: false,
         isSpam: false,
+        files: files || []
     };
     mails.push(draft);
     return draft;
@@ -242,12 +249,13 @@ const saveDraft = (userId, subject, body, sentToIds) => {
  * IMPORTANT: If the sender sends to himself, only one mail is created.
  * The mail will appear both in "sent" and "inbox" queries.
  * @param {number} userId of the sender
- * @param {string} subject
- * @param {string} body
- * @param {number[]} sentToIds
+ * @param {String} subject mail's subject content, replaced by empty string if not provided
+ * @param {string} body mail's body content, replaced by empty string if not provided
+ * @param {number[]} sentToIds list of recipients ids
  * @returns {object|boolean} the sender's mail object, or false on error
+ * @param {Object[]} files list of files containing the name, type and data
  */
-const sendNewMail = (userId, subject, body, sentToIds) => {
+const sendNewMail = (userId, subject, body, sentToIds, files = []) => {
     try {
         // First, create the mail object for the sender (in "Sent" folder)
         const atOwner = {
@@ -265,6 +273,7 @@ const sendNewMail = (userId, subject, body, sentToIds) => {
             isStarred: false,
             isTrashed: false,
             isSpam: false,
+            files: files
         };
         mails.push(atOwner);
 
@@ -288,6 +297,7 @@ const sendNewMail = (userId, subject, body, sentToIds) => {
                 isStarred: false,
                 isTrashed: false,
                 isSpam: false,
+                files: files
             }
             mails.push(mail);
         }
@@ -305,8 +315,14 @@ const getMail = (mailId) => mails.find(mail => mail.id === mailId);
 
 /**
  * Updates a draft by optionally changing existing attributes with new values
+ * @param {Number} mailId id of the draft
+ * @param {String} subject mail's subject content, replaced by empty string if not provided
+ * @param {String} body mail's body content, replaced by empty string if not provided
+ * @param {Number[]} sentToId list of recipients ids
+ * @param {Object[]} files list of files containing the name, type and data
+ * @returns {{id: number, owner: number, from: number, sentTo: *[], subject: string, body: string, createdAt: string, sentAt: string, labels: *[], isDraft: boolean, isRead: boolean, isStarred: boolean, isTrashed: boolean, isSpam: boolean}}
  */
-const updateDraft = (mailId, subject, body, sentToIds) => {
+const updateDraft = (mailId, subject, body, sentToId, files) => {
     const index = mails.findIndex(mail => mail.id === mailId);
     // Only allow updating if mail is a draft
     if (mails[index] < 0 || !mails[index].isDraft)
@@ -317,6 +333,8 @@ const updateDraft = (mailId, subject, body, sentToIds) => {
         mails[index].body = body;
     if (sentToIds !== undefined)
         mails[index].sentTo = sentToIds;
+    if (files !== undefined)
+        mails[index].files = files;
     return mails[index];
 }
 

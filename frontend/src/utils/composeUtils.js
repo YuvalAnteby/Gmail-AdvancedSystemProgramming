@@ -1,4 +1,4 @@
-import { convertToBase64, convertToBase64Attachment } from './files'
+import { convertToBase64 } from './files'
 
 /**
  * Wrap document.execCommand and re-focus the editor
@@ -21,14 +21,33 @@ export async function insertInlineImage(editorRef, e) {
 }
 
 /**
- * Read multiple files as attachments and push into state
+ * Handles file input and updates attachments list by using base64.
+ * Rejects files larger than 5MB.
+ *
+ * @param {(attList: any[]) => void} setAttachments
+ * @param {React.ChangeEvent<HTMLInputElement>} e
  */
 export async function handleFileAttachments(setAttachments, e) {
-    const files = Array.from(e.target.files)
-    if (!files.length) return
-    const converted = await Promise.all(
-        files.map(f => convertToBase64Attachment(f))
-    )
-    setAttachments(prev => [...prev, ...converted])
-    e.target.value = ''
+    const files = Array.from(e.target.files || []);
+    const MAX_SIZE_MB = 5;
+    const validFiles = files.filter(f => f.size <= MAX_SIZE_MB * 1024 * 1024);
+
+    const newAttachments = await Promise.all(
+        validFiles.map(async file => {
+            const base64 = await convertToBase64(file);
+            return {
+              name: file.name,
+              data: base64
+            };
+        })
+    );
+
+    setAttachments(prev => [...prev, ...newAttachments]);
+
+    const rejected = files.length - validFiles.length;
+    if (rejected > 0) {
+        alert(`${rejected} max file size is 5MB`);
+    }
+    // Optional: reset file input so same file can be re-attached if removed
+    e.target.value = '';
 }

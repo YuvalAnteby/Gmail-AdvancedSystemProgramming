@@ -193,16 +193,56 @@
     border-bottom-color: #1a73e8;
 }
 
-.attachment-list {
-    list-style: none;
-    padding: 0.5em 1em;
-    margin: 0;
-}
 
-.attachment-list li {
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
     font-size: 0.9em;
     color: #202124;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
+
+.attachment-item .bi-paperclip {
+    flex-shrink: 0;
+}
+
+.attachment-item .file-name {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attachment-item .remove-btn {
+    background: transparent;
+    border: none;
+    color: #5f6368;
+    font-size: 1em;
+    cursor: pointer;
+    padding: 2px 6px;
+    margin-left: 4px;
+    transition: color 0.2s;
+}
+
+.attachment-item .remove-btn:hover {
+    color: #d93025;
+}
+
+/* Optional: dark mode tweaks */
+.compose-email.dark .attachment-item {
+    color: #e8eaed;
+}
+.compose-email.dark .remove-btn {
+    color: #9aa0a6;
+}
+.compose-email.dark .remove-btn:hover {
+    color: #f28b82;
+}
+
 
 .compose-footer {
     padding: 0.5em 1em;

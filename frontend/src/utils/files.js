@@ -15,30 +15,6 @@ export function convertToBase64(file) {
 }
 
 /**
- * Convert a File into an attachment descriptor for your mail API:
- *   { name, type, data }
- * where `data` is the raw Base64 (no data:*;base64, prefix).
-*
-* @param {File} file
-* @returns {Promise<{name:string,type:string,data:string}>}
-*/
-export function convertToBase64Attachment(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const [ , base64 ] = reader.result.split(',');
-            resolve({
-                name: file.name,
-                type: file.type,
-                data: base64
-            });
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-/**
  * Given a mail object with mail attachments array,
  * return just the original filenames.
  *

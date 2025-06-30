@@ -104,15 +104,16 @@ export default function ComposeEmail({
                 subject,
                 body,
                 sentTo: recipients,
-                saveAsDraft
+                saveAsDraft,
+                files: attachments
             });
         } else {
             await sendMail({
                 subject,
                 body,
                 sentTo: recipients,
-                attachments,
-                saveAsDraft
+                saveAsDraft,
+                files: attachments
             });
         }
     };
@@ -249,7 +250,18 @@ export default function ComposeEmail({
                         {/* Attachments (if any) */}
                         {attachments.length > 0 && (
                             <ul className="attachment-list">
-                                {attachments.map((att, i) => <li key={i}>{att.name}</li>)}
+                                {attachments.map((file, index) => (
+                                    <li key={index} className="attachment-item">
+                                        <i className="bi bi-paperclip"></i>
+                                        <span className="file-name" title={file.name}>{file.name}</span>
+                                        <button
+                                            className="remove-btn"
+                                            onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))}
+                                        >
+                                            ×
+                                        </button>
+                                    </li>
+                                ))}
                             </ul>
                         )}
                     </div>
@@ -263,7 +275,7 @@ export default function ComposeEmail({
                             type="file"
                             multiple
                             ref={attachRef}
-                            style={{ display: 'none' }}
+                            style={{display: 'none' }}
                             onChange={e => handleFileAttachments(setAttachments, e)}
                         />
 

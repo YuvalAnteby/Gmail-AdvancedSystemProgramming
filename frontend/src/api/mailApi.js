@@ -9,7 +9,7 @@ const API_BASE = "http://localhost:3001/api";
  * @returns {Promise<any>}
  */
 export async function fetchEmail(emailId) {
-    const url   = `${API_BASE}/mails/${emailId}`;
+    const url = `${API_BASE}/mails/${emailId}`;
     const token = localStorage.getItem('token');
 
     const res = await fetch(url, {
@@ -55,7 +55,7 @@ export async function getMailsByType(inboxType = "all", page = 1) {
  * @returns {Promise<void>}
  */
 export async function deleteMail(mail) {
-    const url   = `${API_BASE}/mails/${mail.id}`;
+    const url = `${API_BASE}/mails/${mail.id}`;
     const token = localStorage.getItem('token');
 
     const res = await fetch(url, {
@@ -99,7 +99,7 @@ export async function toggleSpamReport(mail) {
  * @returns {Promise<void>}
  */
 export async function markAsRead(mailId) {
-    const url   = `${API_BASE}/mails/${mailId}`;
+    const url = `${API_BASE}/mails/${mailId}`;
     const token = localStorage.getItem('token');
 
     const res = await fetch(url, {
@@ -122,7 +122,7 @@ export async function markAsRead(mailId) {
  * @returns {Promise<void>}
  */
 export async function toggleMailStar(mail) {
-    const url   = `${API_BASE}/mails/${mail.id}`;
+    const url = `${API_BASE}/mails/${mail.id}`;
     const token = localStorage.getItem('token');
     const res = await fetch(url, {
         method: 'PATCH',
@@ -145,7 +145,7 @@ export async function toggleMailStar(mail) {
  * @returns {Promise<void>}
  */
 export async function restoreMail(mail) {
-    const url   = `${API_BASE}/mails/${mail.id}`;
+    const url = `${API_BASE}/mails/${mail.id}`;
     const token = localStorage.getItem('token');
 
     const res = await fetch(url, {
@@ -169,7 +169,7 @@ export async function restoreMail(mail) {
  * @returns {Promise<any>}
  */
 export const searchMails = async (userId, query) => {
-    const url   = `${API_BASE}/mails/search/${encodeURIComponent(query)}`;
+    const url = `${API_BASE}/mails/search/${encodeURIComponent(query)}`;
     const token = localStorage.getItem('token');
 
     const res = await fetch(url, {
@@ -189,21 +189,17 @@ export const searchMails = async (userId, query) => {
  * @param { {
  *   subject: string,
  *   body: string,
- *   sentTo: string[],
- *   saveAsDraft?: boolean
+ *   sentTo: String[],
+ *   saveAsDraft?: boolean,
+ *   files: Object[]
  * } } mailData
  *  - subject: email subject
  *  - body: HTML or plain text body
  *  - sentTo: list of recipient email addresses
  *  - saveAsDraft: true to save in Drafts, false to actually send
  */
-export async function sendMail({
-                                   subject,
-                                   body,
-                                   sentTo,
-                                   saveAsDraft = false
-                               }) {
-    const url   = `${API_BASE}/mails`;
+export async function sendMail({subject, body, sentTo, saveAsDraft = false, files = []}) {
+    const url = `${API_BASE}/mails`;
     const token = localStorage.getItem("token");
 
     // Comments: what we send in the request body
@@ -215,14 +211,16 @@ export async function sendMail({
         subject,
         body,
         sentTo,
-        saveAsDraft
+        saveAsDraft,
+        files
     };
+    console.log(payload);
 
     const res = await fetch(url, {
-        method:  "POST",
+        method: "POST",
         headers: {
             "Authorization": `Bearer ${token}`,
-            "Content-Type":  "application/json"
+            "Content-Type": "application/json"
         },
         body: JSON.stringify(payload)
     });
@@ -233,6 +231,7 @@ export async function sendMail({
 
     return res.json();
 }
+
 /**
  * PATCH /api/mails/:id
  * @param {number} mailId
@@ -249,21 +248,22 @@ export async function updateMail(mailId, {
     sentTo,
     saveAsDraft = true
 }) {
-    const url   = `${API_BASE}/mails/${mailId}`;
+    const url = `${API_BASE}/mails/${mailId}`;
     const token = localStorage.getItem("token");
 
     const res = await fetch(url, {
-        method:  "PATCH",
+        method: "PATCH",
         headers: {
             "Authorization": `Bearer ${token}`,
-            "Content-Type":  "application/json"
+            "Content-Type": "application/json"
         },
-        body: JSON.stringify({ subject, body, sentTo, saveAsDraft })
+        body: JSON.stringify({subject, body, sentTo, saveAsDraft})
     });
 
     if (!res.ok) throw new Error(`updateMail failed: ${res.status}`);
     return res.json();
 }
+
 /**
  * Fetch mails under a specific label.
  * Backend must support filtering by ?label=<name>.

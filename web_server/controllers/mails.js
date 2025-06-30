@@ -93,11 +93,11 @@ const createNewMail = async (req, res) => {
         return res.status(400).json({error: 'User not authenticated - failed creating a new mail'});
     try {
         // Fetch the mail object's attributes from the request, for later use
-        const {subject, body, sentTo = [], saveAsDraft = false} = req.body;
+        const {subject, body, sentTo = [], saveAsDraft = false, files = []} = req.body;
         const sentToIds = convertMailsToIds(sentTo);
         // handle this as a draft
         if (saveAsDraft) {
-            const draftMail = Mails.saveDraft(userId, subject, body, sentToIds)
+            const draftMail = Mails.saveDraft(userId, subject, body, sentToIds, files)
             return res.status(201).location(`/mails/${draftMail.id}`).json(draftMail);
         }
         // handle this as sending a mail
@@ -107,7 +107,7 @@ const createNewMail = async (req, res) => {
         if (blacklisted)
             return res.status(403).json({error: 'Mail contains blacklisted URLs - failed creating a new mail'});
         // No blacklisted URLs found, send the new mail
-        const newMail = Mails.sendNewMail(userId, subject, body, sentToIds);
+        const newMail = Mails.sendNewMail(userId, subject, body, sentToIds, files);
         if (newMail === false)
             return res.status(500).json({error: 'Failed to create new mail'});
         return res.status(201).location(`/mails/${newMail.id}`).json(newMail);
