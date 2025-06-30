@@ -2,7 +2,7 @@ import "./MailRow.css";
 import { formatDate } from "../../utils/formatDate";
 import { useNavigate } from "react-router-dom";
 import StarButton from "../../components/StarButton/StarButton";
-import { markMailAsRead } from "../../utils/mailUtils";
+import {markMailAsRead, stripHtml} from "../../utils/mailUtils";
 //import useIsMobile from "../../utils/useIsMobile";
 
 /**
@@ -51,7 +51,7 @@ const MailRow = ({
                     <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
                     <div className="email-title-body">
                         <div className={`email-subject ${theme}`}>{email.subject}</div>
-                        <div className={`email-preview ${theme}`}>{email.body}</div>
+                        <div className={`email-preview ${theme}`}>{stripHtml(email.body)}</div>
                     </div>
                 </div>
                 <div className="d-flex flex-row align-items-center gap-1">

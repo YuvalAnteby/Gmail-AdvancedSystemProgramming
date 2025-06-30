@@ -17,3 +17,14 @@ export const markMailAsRead = async (mail, onUpdate) => {
         console.error("Failed to mark mail as read:", err);
     }
 };
+
+/**
+ * Removes HTML tags from a text
+ * @param html string containing HTML tags
+ * @returns {string|string} a string without any HTML tags or code
+ */
+export const stripHtml = (html) => {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || "";
+};
