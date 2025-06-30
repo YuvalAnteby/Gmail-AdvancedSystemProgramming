@@ -5,6 +5,9 @@
     height: 100%;
     margin: 0;
     padding: 1px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 .main-page.light {
     background-color: var(--light-bg-page);
@@ -20,6 +23,7 @@
     display: flex;
     flex: 1;
     overflow: hidden;
+    min-height: 0;
 }
 
 /* ─── MAILS LIST CONTAINER ───────────────────────────────── */
