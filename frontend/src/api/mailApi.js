@@ -214,7 +214,6 @@ export async function sendMail({subject, body, sentTo, saveAsDraft = false, file
         saveAsDraft,
         files
     };
-    console.log(payload);
 
     const res = await fetch(url, {
         method: "POST",
