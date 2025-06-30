@@ -62,7 +62,7 @@ export async function loginWithJwt(mail, password) {
 export async function searchUsers(query) {
     try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`http://localhost:3001/api/users/search?q=${encodeURIComponent(query)}`, {
+        const res = await fetch(`${API_BASE}/users/search?q=${encodeURIComponent(query)}`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
