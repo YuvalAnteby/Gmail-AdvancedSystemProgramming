@@ -266,16 +266,15 @@ export async function updateMail(mailId, {
 
 /**
  * Fetch mails under a specific label.
- * Backend must support filtering by ?label=<name>.
  *
- * @param {string} labelName
+ * @param {Number} labelId label's id
  * @param {number} page
  * @returns {Promise<{ mails: any[], total: number }>}
  */
-export async function getMailsByLabel(labelName, page = 1) {
+export async function getMailsByLabel(labelId, page = 1) {
     const token = localStorage.getItem("token");
     // note: backend endpoint is the same, just pass label=...
-    const url = `${API_BASE}/mails?label=${encodeURIComponent(labelName)}&page=${page}&limit=50`;
+    const url = `${API_BASE}/mails?label=${encodeURIComponent(labelId)}&page=${page}&limit=50`;
     const res = await fetch(url, {
         method: "GET",
         headers: {

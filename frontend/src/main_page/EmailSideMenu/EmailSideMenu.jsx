@@ -126,7 +126,7 @@ export default function EmailSidebar({
     function renderLabel(lab, level = 0) {
         const isParent = lab.children && lab.children.length > 0;
         const isExpanded = expandedLabels[lab.id];
-        const tabId = `label:${lab.name}`;
+        const tabId = `label:${lab.id}`;
 
         return (
             <React.Fragment key={lab.id}>

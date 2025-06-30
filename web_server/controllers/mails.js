@@ -2,7 +2,7 @@ const Mails = require('../models/mails');
 const Blacklist = require('../models/blacklist');
 const {extractUrls} = require("../utils/mails");
 const {convertMailsToIds, usersToFullElement} = require("../utils/users");
-const {convertLabelsToIds, labelsToFullElement} = require("../utils/labels");
+const {convertLabelsToIds, labelsToFullElement, mailLabelNames} = require("../utils/labels");
 
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
@@ -19,9 +19,17 @@ const getLastMailsOrdered = (req, res) => {
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
     const inboxType = req.query.inboxType || 'all';
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 50;
-    // limit is 50 according to instructions
-    const {paged, total} = Mails.getUserMails(userId, limit, inboxType, page);
+    const limit = Number(req.query.limit) || 50; // limit is 50 according to instructions
+
+    const labelIdFilter = Number(req.query.label);
+    let {paged, total} = Mails.getUserMails(userId, limit, inboxType, page);
+
+    // Filter by label id if provided
+    if (!isNaN(labelIdFilter)) {
+        paged = paged.filter(mail => mail.labels?.includes(labelIdFilter));
+        total = paged.length;
+    }
+
     // replace in the mails the user ids and labels ids with user and label elements so we can show names and emails
     const fullMails = paged.map(m => {
         return {
