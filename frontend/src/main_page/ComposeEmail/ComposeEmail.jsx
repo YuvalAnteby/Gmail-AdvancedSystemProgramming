@@ -55,9 +55,8 @@ export default function ComposeEmail({
         if (editorRef.current) {
             editorRef.current.innerHTML = editorHtml;
         }
-        // Do not update when editorHtml changes! Only on draft/view switch.
-        // eslint-disable-next-line
-    }, [draftMail, view]);
+
+    }, [draftMail, view,editorHtml]);
 
     // Autocomplete for "To" field
     useEffect(() => {
