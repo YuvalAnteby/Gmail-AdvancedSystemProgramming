@@ -8,7 +8,6 @@ import './ComposeEmail.css';
 
 import {
     execCommand,
-    insertInlineImage,
     handleFileAttachments
 } from '../../utils/composeUtils';
 
@@ -38,7 +37,6 @@ export default function ComposeEmail({
     // Store the current editor text in state so it survives minimize/maximize
     const [editorHtml, setEditorHtml] = useState('');
     const editorRef = useRef(null);
-    const inlineImageRef = useRef(null);
     const attachRef = useRef(null);
 
     // On editing a draft, prefill all fields only when draftMail changes
@@ -219,7 +217,6 @@ export default function ComposeEmail({
                             }}>
                                 <i className="bi bi-link-45deg"></i>
                             </button>
-
                             <select
                                 className="font-size-select"
                                 defaultValue="3"
@@ -230,16 +227,6 @@ export default function ComposeEmail({
                                 <option value="4">Medium</option>
                                 <option value="5">Large</option>
                             </select>
-                            <button onClick={() => inlineImageRef.current.click()}>
-                                <i className="bi bi-image"></i>
-                            </button>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                ref={inlineImageRef}
-                                style={{ display: 'none' }}
-                                onChange={e => insertInlineImage(editorRef, e)}
-                            />
                         </div>
 
                         {/* Editable email body. Use onInput to track the text in state for persistence. */}
