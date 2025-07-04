@@ -39,24 +39,36 @@ export default function ComposeEmail({
     const editorRef = useRef(null);
     const attachRef = useRef(null);
 
-    // On editing a draft, prefill all fields only when draftMail changes
+    /**
+     * On editing a draft, prefill all fields only when draftMail changes.
+     * Also **initialize** the editor’s innerHTML here **once**.
+     */
     useEffect(() => {
         if (!draftMail) return;
+
         setRecipients(draftMail.sentTo.map(u => u.mail));
         setSubject(draftMail.subject || '');
-        setEditorHtml(draftMail.body || ''); // Only set state!
+
+        // initialize the editor only once here
+        const initial = draftMail.body || '';
+        setEditorHtml(initial);
+        if (editorRef.current) {
+            editorRef.current.innerHTML = initial;
+        }
+
         setAttachments(draftMail.attachments || []);
         setToQuery('');
         setSuggestions([]);
     }, [draftMail]);
 
-    // When the editor is mounted or draftMail/view changes, set initial value only once
-    useEffect(() => {
-        if (editorRef.current) {
-            editorRef.current.innerHTML = editorHtml;
-        }
 
-    }, [draftMail, view,editorHtml]);
+
+    // useEffect(() => {
+    //     if (editorRef.current) {
+    //         editorRef.current.innerHTML = editorHtml;
+    //     }
+    // }, [draftMail, view, editorHtml]);
+
 
     // Autocomplete for "To" field
     useEffect(() => {
@@ -89,7 +101,10 @@ export default function ComposeEmail({
         }
     };
 
-    // Send or save as draft (uses state for editorHtml)
+    /**
+     * Send or save as draft (uses state for editorHtml).
+     * If draftMail.id exists, update; otherwise create.
+     */
     const postMail = async saveAsDraft => {
         if (!saveAsDraft && !recipients.length) {
             alert('Add at least one recipient.');
@@ -130,8 +145,10 @@ export default function ComposeEmail({
     const handleDiscard = () => {
         onCancel();
     };
-    const toggleMinimize = () => setView(v => v === 'minimized' ? 'normal' : 'minimized');
-    const toggleMaximize = () => setView(v => v === 'maximized' ? 'normal' : 'maximized');
+    const toggleMinimize = () =>
+        setView(v => (v === 'minimized' ? 'normal' : 'minimized'));
+    const toggleMaximize = () =>
+        setView(v => (v === 'maximized' ? 'normal' : 'maximized'));
     const rightOffset = `calc(2vw + ${offset * 36}vw)`;
 
     return (
@@ -145,13 +162,13 @@ export default function ComposeEmail({
                 </span>
                 <div className="compose-controls">
                     <button className="control-btn" onClick={toggleMinimize}>
-                        <i className="bi bi-dash"></i>
+                        <i className="bi bi-dash" />
                     </button>
                     <button className="control-btn" onClick={toggleMaximize}>
-                        <i className="bi bi-fullscreen"></i>
+                        <i className="bi bi-fullscreen" />
                     </button>
                     <button className="control-btn" onClick={handleClose}>
-                        <i className="bi bi-x-lg"></i>
+                        <i className="bi bi-x-lg" />
                     </button>
                 </div>
             </div>
@@ -166,7 +183,9 @@ export default function ComposeEmail({
                                 {recipients.map(email => (
                                     <span key={email} className="recipient-chip">
                                         {email}
-                                        <button onClick={() => removeRecipient(email)}>×</button>
+                                        <button onClick={() => removeRecipient(email)}>
+                                            ×
+                                        </button>
                                     </span>
                                 ))}
                                 <input
@@ -203,23 +222,32 @@ export default function ComposeEmail({
 
                         {/* Rich text formatting toolbar */}
                         <div className="compose-toolbar">
-                            <button onClick={() => execCommand(editorRef, 'bold')}><b>B</b></button>
-                            <button onClick={() => execCommand(editorRef, 'italic')}><i>I</i></button>
-                            <button onClick={() => execCommand(editorRef, 'underline')}><u>U</u></button>
-                            <button onClick={() => {
-                                let url = prompt('Enter URL:');
-                                // If url exists and does not start with http:// or https://, prepend https://
-                                if (url && !/^https?:\/\//i.test(url)) {
-                                    url = 'https://' + url;
-                                }
-                                if (url) execCommand(editorRef, 'createLink', url);
-                            }}>
-                                <i className="bi bi-link-45deg"></i>
+                            <button onClick={() => execCommand(editorRef, 'bold')}>
+                                <b>B</b>
+                            </button>
+                            <button onClick={() => execCommand(editorRef, 'italic')}>
+                                <i>I</i>
+                            </button>
+                            <button onClick={() => execCommand(editorRef, 'underline')}>
+                                <u>U</u>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    let url = prompt('Enter URL:');
+                                    if (url && !/^https?:\/\//i.test(url)) {
+                                        url = 'https://' + url;
+                                    }
+                                    if (url) execCommand(editorRef, 'createLink', url);
+                                }}
+                            >
+                                <i className="bi bi-link-45deg" />
                             </button>
                             <select
                                 className="font-size-select"
                                 defaultValue="3"
-                                onChange={e => execCommand(editorRef, 'fontSize', e.target.value)}
+                                onChange={e =>
+                                    execCommand(editorRef, 'fontSize', e.target.value)
+                                }
                             >
                                 <option value="2">Small</option>
                                 <option value="3">Normal</option>
@@ -243,11 +271,17 @@ export default function ComposeEmail({
                             <ul className="attachment-list">
                                 {attachments.map((file, index) => (
                                     <li key={index} className="attachment-item">
-                                        <i className="bi bi-paperclip"></i>
-                                        <span className="file-name" title={file.name}>{file.name}</span>
+                                        <i className="bi bi-paperclip" />
+                                        <span className="file-name" title={file.name}>
+                                            {file.name}
+                                        </span>
                                         <button
                                             className="remove-btn"
-                                            onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))}
+                                            onClick={() =>
+                                                setAttachments(prev =>
+                                                    prev.filter((_, i) => i !== index)
+                                                )
+                                            }
                                         >
                                             ×
                                         </button>
@@ -259,20 +293,23 @@ export default function ComposeEmail({
 
                     {/* Footer: attach, send, discard */}
                     <div className="compose-footer">
-                        <button className="footer-attach-btn" onClick={() => attachRef.current.click()}>
-                            <i className="bi bi-paperclip"></i>
+                        <button
+                            className="footer-attach-btn"
+                            onClick={() => attachRef.current.click()}
+                        >
+                            <i className="bi bi-paperclip" />
                         </button>
                         <input
                             type="file"
                             multiple
                             ref={attachRef}
-                            style={{display: 'none' }}
+                            style={{ display: 'none' }}
                             onChange={e => handleFileAttachments(setAttachments, e)}
                         />
 
                         <div className="footer-right">
                             <button className="send-btn" onClick={handleSend}>
-                                Send <i className="bi bi-send-fill"></i>
+                                Send <i className="bi bi-send-fill" />
                             </button>
                             <button className="discard-btn" onClick={handleDiscard}>
                                 Discard
