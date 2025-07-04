@@ -318,14 +318,14 @@ const getMail = (mailId) => mails.find(mail => mail.id === mailId);
  * @param {Number} mailId id of the draft
  * @param {String} subject mail's subject content, replaced by empty string if not provided
  * @param {String} body mail's body content, replaced by empty string if not provided
- * @param {Number[]} sentToId list of recipients ids
+ * @param {Number[]} sentToIds list of recipients ids
  * @param {Object[]} files list of files containing the name, type and data
  * @returns {{id: number, owner: number, from: number, sentTo: *[], subject: string, body: string, createdAt: string, sentAt: string, labels: *[], isDraft: boolean, isRead: boolean, isStarred: boolean, isTrashed: boolean, isSpam: boolean}}
  */
-const updateDraft = (mailId, subject, body, sentToId, files) => {
+const updateDraft = (mailId, subject, body, sentToIds, files) => {
     const index = mails.findIndex(mail => mail.id === mailId);
     // Only allow updating if mail is a draft
-    if (mails[index] < 0 || !mails[index].isDraft)
+    if (index < 0 || !mails[index].isDraft)
         return null;
     if (subject !== undefined)
         mails[index].subject = subject;
