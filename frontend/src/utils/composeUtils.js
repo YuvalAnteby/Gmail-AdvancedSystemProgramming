@@ -10,7 +10,7 @@ export function execCommand(editorRef, cmd, arg = null) {
 
 /**
  * Read a file as dataURL and insert into editor
- */
+
 export async function insertInlineImage(editorRef, e) {
     const file = e.target.files[0]
     if (!file) return
@@ -19,7 +19,7 @@ export async function insertInlineImage(editorRef, e) {
     editorRef.current.focus()
     e.target.value = ''
 }
-
+ */
 /**
  * Handles file input and updates attachments list by using base64.
  * Rejects files larger than 5MB.
