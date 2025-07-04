@@ -8,7 +8,8 @@ import SenderDetails from "./SenderDetails/SenderDetails";
 import {formatFullTime} from "../utils/formatDate";
 import SkeletonEmail from "../components/loading/SkeletonEmail";
 import FileList from "./Attachments/FileList";
-import { addBlankToLinks } from "../utils/htmlUtils";
+import {addBlankToLinks} from "../utils/htmlUtils";
+import ComposeEmail from "../main_page/ComposeEmail/ComposeEmail";
 
 const ReadingPage = () => {
 
@@ -17,7 +18,8 @@ const ReadingPage = () => {
     const {theme, toggleTheme} = useTheme();
     const [email, setEmail] = useState(null);
     const [loading, setLoading] = useState(true);
-
+    // Compose window for reply/forward
+    const [composeProps, setComposeProps] = useState(null);
     // Read inboxType from location state
     const location = useLocation();
     const { inboxType } = location.state || {};
@@ -37,14 +39,32 @@ const ReadingPage = () => {
         loadEmail();
     }, [id]);
 
-    // Dummy reply handler (not implemented)
+    // Handle reply: open ComposeEmail pre-filled with reply format
     const onReplyClick = () => {
-        alert("reply");
+        if (!email) return;
+        setComposeProps({
+            recipients: [email.from?.mail || ''],
+            subject: email.subject ? "Re: " + email.subject : "",
+            body: `<br><br>On ${formatFullTime(email.sentAt || email.createdAt)}, ${email.from?.mail || ''} wrote:<br>${email.body}`,
+            attachments: [],
+            isReply: true
+        });
     };
 
-    // Dummy forward handler (not implemented)
+    // Handle forward: open ComposeEmail pre-filled with forward format
     const onForwardClick = () => {
-        alert("forward");
+        if (!email) return;
+        setComposeProps({
+            recipients: [],
+            subject: email.subject ? "Fwd: " + email.subject : "",
+            body: `<br><br>---------- Forwarded message ----------<br>
+<b>From:</b> ${email.from?.mail || ''}<br>
+<b>Date:</b> ${formatFullTime(email.sentAt || email.createdAt)}<br>
+<b>Subject:</b> ${email.subject}<br><br>
+${email.body}`,
+            attachments: email.files || [],
+            isForward: true
+        });
     };
 
     // Allow updating the "starred" state locally
@@ -92,6 +112,21 @@ const ReadingPage = () => {
                         </button>
                     </div>
                 </div>
+            )}
+
+            {/* Compose window for reply/forward */}
+            {composeProps && (
+                <ComposeEmail
+                    onCancel={() => setComposeProps(null)}
+                    onSend={() => setComposeProps(null)}
+                    offset={0}
+                    draftMail={{
+                        sentTo: composeProps.recipients.map(mail => ({ mail })),
+                        subject: composeProps.subject,
+                        body: composeProps.body,
+                        attachments: composeProps.attachments
+                    }}
+                />
             )}
         </div>
     );
