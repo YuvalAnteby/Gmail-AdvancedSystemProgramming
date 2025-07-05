@@ -309,7 +309,8 @@ const sendNewMail = (userId, subject, body, sentToIds, files = []) => {
 }
 
 /**
- * Finds a mail object by its ID
+ *  @param mailId id of a mail to find
+ * @returns {*} mail object with the same id
  */
 const getMail = (mailId) => mails.find(mail => mail.id === mailId);
 

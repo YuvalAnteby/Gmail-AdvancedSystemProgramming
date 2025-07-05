@@ -41,7 +41,7 @@ export default function ComposeEmail({
 
     /**
      * On editing a draft, prefill all fields only when draftMail changes.
-     * Also **initialize** the editor’s innerHTML here **once**.
+     * And initialize the editor’s innerHTML here once
      */
     useEffect(() => {
         if (!draftMail) return;
@@ -60,14 +60,6 @@ export default function ComposeEmail({
         setToQuery('');
         setSuggestions([]);
     }, [draftMail]);
-
-
-
-    // useEffect(() => {
-    //     if (editorRef.current) {
-    //         editorRef.current.innerHTML = editorHtml;
-    //     }
-    // }, [draftMail, view, editorHtml]);
 
 
     // Autocomplete for "To" field
