@@ -1,86 +1,92 @@
-/**
- * label object structure:
- *  id - positive number now
- *  owner - user id of the label's owner
- *  name - label's name
- */
-const labels = [
-    {
-        id: 1,
-        name: 'work',
-        owner: 1,
-    },
-    {
-        id: 2,
-        name: 'friends',
-        owner: 2,
-    }
+// Initial example labels
+let labels = [
+    { id: 1, name: 'work',    owner: 1, parent: null },
+    { id: 2, name: 'friends', owner: 1, parent: null },
 ];
-let labelId = labels ? labels.length : 0;
+
+// Simple incrementing ID
+let nextId = labels.length + 1;
 
 /**
- * Returns all labels saved
- * @returns {*[]} all labels saved
+ * Get all labels (no user filter; in a real app, should filter by user)
+ * @returns {Array} All label objects
  */
-const getAllLabels = () => labels
+function getAllLabels() {
+    return labels;
+}
 
 /**
- * Creates a new label
- * @param owner user id of the label's owner
- * @param name name of the label
- * @returns {{id: number, name, owner}|null} null if input is invalid, otherwise the label object
+ * Find a label by its ID
+ * @param {number} id
+ * @returns {object|null} Label object or null if not found
  */
-const createNewLabel = (owner, name) => {
-    if (!name)
-        return null;
+function getLabelById(id) {
+    return labels.find(l => l.id === id);
+}
+
+/**
+ * Create a new top-level label (parent is null)
+ * @param {number} owner - User ID
+ * @param {string} name  - Label name
+ * @returns {object} The created label
+ */
+function createNewLabel(owner, name) {
+    const lab = { id: nextId++, owner, name, parent: null };
+    labels.push(lab);
+    return lab;
+}
+
+/**
+ * Create a sublabel under an existing label
+ * @param {number} owner    - User ID
+ * @param {number} parent   - Parent label ID
+ * @param {string} name     - Sublabel name
+ * @returns {object|null} New label, or null if parent not found
+ */
+function createSublabel(owner, parent, name) {
+    // Check parent exists (could also check ownership)
+    if (!labels.find(l => l.id === parent)) return null;
     const newLabel = {
-        id: ++labelId,
-        name: name,
-        owner: owner,
-    }
+        id: nextId++,     // Use global nextId for unique ID
+        name,
+        owner,
+        parent,           // Link to parent label by id
+    };
     labels.push(newLabel);
     return newLabel;
 }
 
 /**
- *
- * @param id id of a label
- * @returns {*} label object with the same id
+ * Rename a label by ID
+ * @param {number} id
+ * @param {string} name
+ * @returns {object|null} Updated label or null if not found
  */
-const getLabelById = (id) => labels.find(label => label.id == id);
-
-const getLabelByName = (userId, name) => {
-    return labels.find(label => label.owner == userId && label.name === name);
+function editLabelById(id, name) {
+    const lab = getLabelById(id);
+    if (!lab) return null;
+    lab.name = name;
+    return lab;
 }
 
 /**
- * Edits the label with new info
- * @param labelId id of a label to edit
- * @param name new name of the label
- * @returns {*|null} if invalid or not found null, otherwise the updated label object
+ * Delete a label by ID (does not cascade to sublabels)
+ * @param {number} id
+ * @returns {boolean} True if deleted, false if not found
  */
-const editLabel = (labelId, name) => {
- //   if (!labelId || !name)
- //       return null;
-    // search the label with the index
-    const index = labels.findIndex(label => label.id === labelId);
-    if (index === -1)
-        return null;
-    labels[index].name = name;
-    return labels[index];
-}
-
-/**
- * Deletes a label by id
- * @param labelId id of a label to delete
- * @returns {boolean} true if deleted, otherwise false
- */
-const deleteLabel = (labelId) => {
-    const index = labels.findIndex(label => label.id === labelId);
-    if (index === -1)
-        return false;
-    labels.splice(index, 1);
+function deleteLabelById(id) {
+    const idx = labels.findIndex(l => l.id === id);
+    if (idx < 0) return false;
+    labels.splice(idx, 1);
     return true;
 }
 
-module.exports = {getAllLabels, createNewLabel, getLabelById, getLabelByName, editLabel, deleteLabel}
+// Export all functions
+module.exports = {
+    getAllLabels,
+    getLabelById,
+    createNewLabel,
+    createSublabel,
+    editLabelById,
+    deleteLabelById
+};

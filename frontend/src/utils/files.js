@@ -1,20 +1,27 @@
+// frontend/src/utils/files.js
+
 /**
- * Converts a file to base64 encoded string in order to upload and store in the backend.
- * @param {File} file file to convert
- * @returns {Promise<string>} Base64-encoded data URL (e.g. `"data:image/jpeg;base64,..."`)
+ * Convert any File into a Base64 data URL.
+ * @param {File} file
+ * @returns {Promise<string>} e.g. "data:image/png;base64,iVBORw0KG…"
  */
-export function convertToBase64 (file) {
+export function convertToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => resolve(reader.result); // this is the base64 string
+        reader.onload  = () => resolve(reader.result);
         reader.onerror = reject;
         reader.readAsDataURL(file);
     });
 }
 
-export function getFileNamesFromMail(mail) {
-    if (!mail || !Array.isArray(mail.files)) {
-        return [];
-    }
-    return mail.files.map(file => file.name);
+/**
+ * Given a mail object with mail attachments array,
+ * return just the original filenames.
+ *
+ * @param {{attachments?: Array<{originalName?:string,name?:string}>}} mail
+ * @returns {string[]}
+ */
+export function getFilenamesFromMail(mail) {
+    if (!mail || !Array.isArray(mail.attachments)) return [];
+    return mail.attachments.map(att => att.originalName || att.name);
 }

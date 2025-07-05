@@ -56,9 +56,22 @@ const inboxFilters = {
  */
 function extractUrls(text) {
     if (!text) return [];
-    const urlRegex = /(http?:\/\/[^\s]+|www\.[^\s]+)/g;
-    return text.match(urlRegex) || [];
+    const urls = new Set();
+
+    // Remove data:image/... base64 content before processing
+    const cleanedText = text.replace(/data:image\/[a-zA-Z]+;base64,[^\s"']+/g, '');
+
+
+    const plainUrlRegex = /www\.[^\s<>"']+\.(com|net|org|edu|gov|co|il)/gi;
+    const plainMatches = cleanedText.match(plainUrlRegex) || [];
+
+    plainMatches.forEach(url => {
+        urls.add(url.replace(/[.,;!?]+$/, "")); // remove commas, questions marks etc.
+    });
+
+    return [...urls];
 }
+
 
 /**
  * Extracts file names from a mail object.

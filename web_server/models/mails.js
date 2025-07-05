@@ -31,7 +31,7 @@ const mails = [
         body: "Here’s what we changed in v2.0...",
         createdAt: new Date('2025-06-03T20:27:11.000Z'),
         sentAt: new Date('2025-06-04T14:08:36.000Z'),
-        labels: [],
+        labels: [1],
         isDraft: false,
         isRead: true,
         isStarred: false,
@@ -48,7 +48,7 @@ const mails = [
         body: "Here’s what we changed in v2.0...",
         createdAt: new Date('2025-06-03T20:27:11.000Z'),
         sentAt: new Date('2025-06-04T14:08:36.000Z'),
-        labels: [],
+        labels: [2],
         isDraft: false,
         isRead: false,
         isStarred: false,
@@ -82,7 +82,7 @@ const mails = [
         body: "Don’t forget the team meeting at 9AM tomorrow.",
         createdAt: new Date('2025-06-03T03:15:27.000Z'),
         sentAt: new Date('2025-06-03T11:42:53.000Z'),
-        labels: [1],
+        labels: [1,2],
         isDraft: false,
         isRead: false,
         isStarred: true,
@@ -186,6 +186,7 @@ const mails = [
         ]
     }
 ];
+// Mail ID counter initialization. If mails array exists, set to its length, else 0.
 let mailId = mails ? mails.length : 0;
 
 /**
@@ -197,14 +198,14 @@ let mailId = mails ? mails.length : 0;
  * @returns {Object} list of ordered mails objects from the most recent to less recent and total mails amount
  */
 const getUserMails = (userId, limit = 50, inboxType, page = 1) => {
-    // Default to 'all' if inboxType is invalid or missing
+    // Select inbox type and its filtering/sorting logic
     const lowerCasedKey = (typeof inboxType === 'string' && inboxType.toLowerCase()) || 'all';
     const key = inboxFilters.hasOwnProperty(lowerCasedKey) ? lowerCasedKey : 'all';
     const {predicate, sortKey} = inboxFilters[key];
-    // Fetch the mails with the chosen predicate and sort key
+    // Filter mails for this user and inbox type, then sort
     const filtered = mails.filter((mail) => predicate(mail, userId));
     const sorted = filtered.sort((a, b) => sortKey(b) - sortKey(a));
-    // calculate what mails to get according to the page
+    // Slice for pagination
     const total = sorted.length;
     const startIdx = (page - 1) * limit;
     const paged = sorted.slice(startIdx, startIdx + limit);
@@ -214,13 +215,14 @@ const getUserMails = (userId, limit = 50, inboxType, page = 1) => {
 /**
  * Creates a new mail as a draft.
  * Lets the user to not include all attributes, marks it accordingly and avoid sending it.
- * @param {number} userId
- * @param {string} subject
- * @param {string} body
- * @param {number[]} sentToIds
- * @returns {{id: number, owner: number, from: number, sentTo: (number[]|*[]), subject: (string|string), body: (string|string), createdAt: string, sentAt: string, labels: *[], isDraft: boolean, isRead: boolean, isStarred: boolean, isTrashed: boolean, isSpam: boolean}}
+ * @param {Number} userId id of the draft's owner
+ * @param {String} subject mail's subject content, replaced by empty string if not provided
+ * @param {String} body mail's body content, replaced by empty string if not provided
+ * @param {Number[]} sentToIds list of recipients ids
+ * @param {Object[]} files list of files containing the name, type and data
+ * @returns {{id: number, owner: number, from: number, sentTo: *[], subject: string, body: string, createdAt: string, sentAt: string, labels: *[], isDraft: boolean, isRead: boolean, isStarred: boolean, isTrashed: boolean, isSpam: boolean}}
  */
-const saveDraft = (userId, subject, body, sentToIds) => {
+const saveDraft = (userId, subject, body, sentToIds, files) => {
     const draft = {
         id: ++mailId,
         owner: Number(userId),
@@ -236,22 +238,26 @@ const saveDraft = (userId, subject, body, sentToIds) => {
         isStarred: false,
         isTrashed: false,
         isSpam: false,
+        files: files || []
     };
     mails.push(draft);
     return draft;
 }
 
 /**
- * Sends a new mail to all the recipients
+ * Sends a new mail to all the recipients.
+ * IMPORTANT: If the sender sends to himself, only one mail is created.
+ * The mail will appear both in "sent" and "inbox" queries.
  * @param {number} userId of the sender
- * @param {string} subject
- * @param {string} body
- * @param {number[]} sentToIds
- * @returns {{id: number, owner: number, from: number, sentTo, subject: string, body: string, createdAt: string, sentAt: string, labels: *[], isDraft: boolean, isRead: boolean, isStarred: boolean, isTrashed: boolean, isSpam: boolean}|boolean}
+ * @param {String} subject mail's subject content, replaced by empty string if not provided
+ * @param {string} body mail's body content, replaced by empty string if not provided
+ * @param {number[]} sentToIds list of recipients ids
+ * @returns {object|boolean} the sender's mail object, or false on error
+ * @param {Object[]} files list of files containing the name, type and data
  */
-const sendNewMail = (userId, subject, body, sentToIds) => {
+const sendNewMail = (userId, subject, body, sentToIds, files = []) => {
     try {
-        // create the mail for the sender and save it
+        // First, create the mail object for the sender (in "Sent" folder)
         const atOwner = {
             id: ++mailId,
             owner: Number(userId),
@@ -267,10 +273,15 @@ const sendNewMail = (userId, subject, body, sentToIds) => {
             isStarred: false,
             isTrashed: false,
             isSpam: false,
+            files: files
         };
         mails.push(atOwner);
-        // create the mails for the recipients and save each one
+
+        // Then, for each recipient, create a separate mail only if recipient is not the sender.
+        // This prevents duplicate mail when someone sends to himself.
         for (const uid of sentToIds) {
+            // If the sender sends to himself, skip (mail already created above)
+            if (uid === userId) continue;
             const mail = {
                 id: ++mailId,
                 owner: Number(uid),
@@ -286,6 +297,7 @@ const sendNewMail = (userId, subject, body, sentToIds) => {
                 isStarred: false,
                 isTrashed: false,
                 isSpam: false,
+                files: files
             }
             mails.push(mail);
         }
@@ -297,31 +309,33 @@ const sendNewMail = (userId, subject, body, sentToIds) => {
 }
 
 /**
- *
- * @param mailId id of a mail to find
+ *  @param mailId id of a mail to find
  * @returns {*} mail object with the same id
  */
 const getMail = (mailId) => mails.find(mail => mail.id === mailId);
 
 /**
- * Updates a draft by optional changing existing attributes with new values
- * @param {number} mailId id of the draft
- * @param {string} subject
- * @param {string} body
- * @param {number[]} sentToIds
- * @returns {*|null} null if the mail isn't found or isn't a draft, otherwise returns the new draft mail object
+ * Updates a draft by optionally changing existing attributes with new values
+ * @param {Number} mailId id of the draft
+ * @param {String} subject mail's subject content, replaced by empty string if not provided
+ * @param {String} body mail's body content, replaced by empty string if not provided
+ * @param {Number[]} sentToIds list of recipients ids
+ * @param {Object[]} files list of files containing the name, type and data
+ * @returns {{id: number, owner: number, from: number, sentTo: *[], subject: string, body: string, createdAt: string, sentAt: string, labels: *[], isDraft: boolean, isRead: boolean, isStarred: boolean, isTrashed: boolean, isSpam: boolean}}
  */
-const updateDraft = (mailId, subject, body, sentToIds) => {
+const updateDraft = (mailId, subject, body, sentToIds, files) => {
     const index = mails.findIndex(mail => mail.id === mailId);
-    if (mails[index] < 0 || !mails[index].isDraft)
+    // Only allow updating if mail is a draft
+    if (index < 0 || !mails[index].isDraft)
         return null;
-    // attempt to update the allowed attributes of a draft
     if (subject !== undefined)
         mails[index].subject = subject;
     if (body !== undefined)
         mails[index].body = body;
     if (sentToIds !== undefined)
         mails[index].sentTo = sentToIds;
+    if (files !== undefined)
+        mails[index].files = files;
     return mails[index];
 }
 
@@ -338,12 +352,9 @@ const updateDraft = (mailId, subject, body, sentToIds) => {
  * - code 404 if no such email was found
  */
 const editSentMail = (mailId, isRead, isStarred, isTrashed, isSpam, labels) => {
-    // find the index of the wanted mail
     const index = mails.findIndex(mail => mail.id === mailId);
-    // make sure the mail was found
     if (index === -1)
         return 404;
-    // check each input, if it's valid edit them in the mail
     if (typeof isRead === 'boolean')
         mails[index].isRead = isRead;
     if (typeof isStarred === 'boolean')
@@ -354,12 +365,13 @@ const editSentMail = (mailId, isRead, isStarred, isTrashed, isSpam, labels) => {
         mails[index].isSpam = isSpam;
     if (Array.isArray(labels))
         mails[index].labels = labels;
-    // return updated mail
     return mails[index];
 }
 
 /**
  * Deletes a mail
+ * - If already in trash or is a draft, deletes it from array.
+ * - Otherwise, moves to trash.
  * @param userId id of the user that wants to remove the mail
  * @param mailId id of a mail to delete
  * @returns {Number}
@@ -374,7 +386,7 @@ const deleteMail = (userId, mailId) => {
     if (index === -1)
         return 404
     // make sure the user has access to the mail
-    if (mails[index].owner != userId)
+    if (mails[index].owner !== userId)
         return 400;
     // if the mail is a draft no need to send to trash bin, if it's already in the trash - remove it
     if (mails[index].isDraft || mails[index].isTrashed) {
@@ -397,8 +409,8 @@ const searchInInbox = (query, userId) => {
     const isNum = !isNaN(Number(query));
     return mails
         .filter(mail => {
-            // ensure the user owns the mail
-            if (mail.owner != userId)
+            // Only search user's own mails
+            if (mail.owner !== userId)
                 return false;
             // check if query in the subject/ body texts
             if (mail.subject.toLowerCase().includes(lowerCased) || mail.body.toLowerCase().includes(lowerCased))

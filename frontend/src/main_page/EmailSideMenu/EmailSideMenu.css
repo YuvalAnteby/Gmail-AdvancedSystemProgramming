@@ -1,179 +1,131 @@
+/* src/main_page/EmailSideMenu/EmailSideMenu.css */
+
+/* Layout and base colors for sidebar */
 .sidebar {
     display: flex;
     flex-direction: column;
     padding: 1rem;
     height: 100vh;
+    overflow-y: auto;
 }
-.sidebar.light{
-    color: var(--bs-light-rgb);
-    border-right: 1px solid var(--bs-border-color);
+
+/* Light/dark color schemes */
+.sidebar.light {
+    background: #fff;
+    color: #000;
+    border-right: 1px solid #dee2e6;
 }
-.sidebar.dark{
-    color: var(--bs-dark-rgb);
-    border-right: 1px solid var(--bs-border-color, #dee2e6);
+.sidebar.dark {
+    background: #202124;
+    color: #e8eaed;
+    border-right: 1px solid #5f6368;
 }
-/* Responsive & animated sidebar */
+
+/* Compose button at top */
+.compose-button {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+.compose-button.light {
+    background-color: #1a73e8;
+    color: #fff;
+    border: 1px solid #1a73e8;
+}
+.compose-button.dark {
+    background: transparent;
+    color: #e8eaed;
+    border: 1px solid #e8eaed;
+}
+
+/* Mail folder links (Inbox, Sent, etc.) */
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+/* Hover state for mail links */
+.nav-link:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+.sidebar.dark .nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+/* Active tab coloring */
+.sidebar.light .nav-link.active-tab {
+    background-color: #1a73e8;
+    color: #fff;
+}
+.sidebar.dark .nav-link.active-tab {
+    background-color: #5f6368;
+    color: #fff;
+}
+
+/* Header for Labels section */
+.labels-header {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: inherit;
+}
+
+/* Context menu for label actions */
+.label-context-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.label-context-menu li:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+/* Expand/collapse button for parent labels (the caret) */
+.label-expand-btn {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin-left: -5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+}
+
+/* Each label line: set consistent height and allow indentation */
+.label-li {
+    min-height: 32px;
+}
+
+/* Style for label text and ellipsis if long */
+.label-li .nav-link {
+    min-width: 0;
+    flex: 1 1 auto;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-left: 0.5rem;
+}
+
+/* Right-align three-dots menu for label */
+.label-li .bi-three-dots-vertical {
+    margin-left: auto;
+}
+
+/* Sidebar slide-in for mobile */
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
         top: 0;
         left: 0;
         width: 260px;
-        height: 100vh;
         transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
-        padding-top: 64px;
         z-index: 1050;
+        padding-top: 5rem;
     }
-    .sidebar.light {
-        background-color: #f1f3f4;
-    }
-    .sidebar.dark {
-        background-color: var(--dark-bg-page);
-    }
-
     .sidebar.show {
         transform: translateX(0);
     }
 
-    .sidebar-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.3);
-        z-index: 1049;
-    }
-
-    @media (max-width: 768px) {
-        .compose-button {
-            display: none !important;
-        }
-        .bi-pencil-square {
-            display: none !important;
-        }
-    }
-}
-.sidebar-backdrop {
-    opacity: 0;
-    animation: fadeInBackdrop 0.25s ease-in forwards;
-}
-
-@keyframes fadeInBackdrop {
-    to {
-        opacity: 1;
-    }
-}
-
-.compose-button {
-    margin-bottom: 1rem;
-}
-.compose-button.light {
-    background-color: var(--bs-primary);
-    color: #fff;
-    border: 1px solid var(--bs-primary);
-}
-.compose-button.dark {
-    background-color: transparent;
-    color: #f8f9fa; /* Bootstrap's light */
-    border: 1px solid #f8f9fa;
-}
-
-.sidebar .nav-link {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    text-align: left;
-    align-items: center;
-    justify-content: space-between;
-    transition: background-color 0.2s, color 0.2s;
-}
-/* Inactive appearance */
-.sidebar.light .nav-link {
-    background-color: transparent;
-    color: #000;
-}
-.sidebar.dark .nav-link {
-    background-color: transparent;
-    color: #f8f9fa;
-}
-/* Active appearance */
-.sidebar.light .nav-link.active-tab {
-    background-color: var(--bs-primary);
-    color: white;
-}
-.sidebar.dark .nav-link.active-tab {
-    background-color: var(--bs-secondary);
-    color: white;
-}
-/* Hover effects */
-.sidebar .nav-link:hover {
-    background-color: rgba(0,0,0,0.05);
-}
-.sidebar.dark .nav-link:hover {
-    background-color: rgba(255,255,255,0.1);
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
-    border-radius: 24px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #333333;
-    text-decoration: none;
-    transition: all 0.2s;
-    margin-bottom: 4px;
-    user-select: none;
-}
-.nav-item.active {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    font-weight: 500;
-}
-.nav-icon {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-}
-
-.nav-label {
-    flex: 1;
-}
-
-.nav-item-count {
-    margin-left: auto;
-    font-size: 12px;
-    color: #666666;
-    background-color: #f0f0f0;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 18px;
-    text-align: center;
-}
-
-.nav-item.active .nav-item-count {
-    background-color: rgba(25, 118, 210, 0.1);
-    color: #1976d2;
-}
-
-/* Scrollbar Styling */
-.sidebar-nav::-webkit-scrollbar {
-    width: 6px;
-}
-
-.sidebar-nav::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebar-nav::-webkit-scrollbar-thumb {
-    background: #e0e0e0;
-    border-radius: 3px;
-}
-
-.sidebar-nav::-webkit-scrollbar-thumb:hover {
-    background: #bdbdbd;
 }

@@ -2,7 +2,7 @@ const Mails = require('../models/mails');
 const Blacklist = require('../models/blacklist');
 const {extractUrls} = require("../utils/mails");
 const {convertMailsToIds, usersToFullElement} = require("../utils/users");
-const {convertLabelsToIds, labelsToFullElement} = require("../utils/labels");
+const {convertLabelsToIds, labelsToFullElement, mailLabelNames} = require("../utils/labels");
 
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
@@ -19,9 +19,17 @@ const getLastMailsOrdered = (req, res) => {
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
     const inboxType = req.query.inboxType || 'all';
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 50;
-    // limit is 50 according to instructions
-    const {paged, total} = Mails.getUserMails(userId, limit, inboxType, page);
+    const limit = Number(req.query.limit) || 50; // limit is 50 according to instructions
+
+    const labelIdFilter = Number(req.query.label);
+    let {paged, total} = Mails.getUserMails(userId, limit, inboxType, page);
+
+    // Filter by label id if provided
+    if (!isNaN(labelIdFilter)) {
+        paged = paged.filter(mail => mail.labels?.includes(labelIdFilter));
+        total = paged.length;
+    }
+
     // replace in the mails the user ids and labels ids with user and label elements so we can show names and emails
     const fullMails = paged.map(m => {
         return {
@@ -93,11 +101,11 @@ const createNewMail = async (req, res) => {
         return res.status(400).json({error: 'User not authenticated - failed creating a new mail'});
     try {
         // Fetch the mail object's attributes from the request, for later use
-        const {subject, body, sentTo = [], saveAsDraft = false} = req.body;
+        const {subject, body, sentTo = [], saveAsDraft = false, files = []} = req.body;
         const sentToIds = convertMailsToIds(sentTo);
         // handle this as a draft
         if (saveAsDraft) {
-            const draftMail = Mails.saveDraft(userId, subject, body, sentToIds)
+            const draftMail = Mails.saveDraft(userId, subject, body, sentToIds, files)
             return res.status(201).location(`/mails/${draftMail.id}`).json(draftMail);
         }
         // handle this as sending a mail
@@ -107,7 +115,7 @@ const createNewMail = async (req, res) => {
         if (blacklisted)
             return res.status(403).json({error: 'Mail contains blacklisted URLs - failed creating a new mail'});
         // No blacklisted URLs found, send the new mail
-        const newMail = Mails.sendNewMail(userId, subject, body, sentToIds);
+        const newMail = Mails.sendNewMail(userId, subject, body, sentToIds, files);
         if (newMail === false)
             return res.status(500).json({error: 'Failed to create new mail'});
         return res.status(201).location(`/mails/${newMail.id}`).json(newMail);

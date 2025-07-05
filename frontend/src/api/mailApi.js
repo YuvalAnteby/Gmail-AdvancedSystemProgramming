@@ -63,9 +63,11 @@ export async function deleteMail(mail) {
         headers: {
             'Authorization': `Bearer ${token}`,
         }
-    })
-    if (!res.ok)
-        throw new Error(`getMails failed: ${res.status}`);
+    });
+
+    if (!res.ok) {
+        throw new Error(`deleteMail failed: ${res.status}`);
+    }
 }
 
 /**
@@ -180,4 +182,106 @@ export const searchMails = async (userId, query) => {
     if (!res.ok)
         throw new Error(`Search failed ${res.status}`);
     return res.json();
-};
+}
+
+/**
+ * Send a new mail or save as draft.
+ * @param { {
+ *   subject: string,
+ *   body: string,
+ *   sentTo: String[],
+ *   saveAsDraft?: boolean,
+ *   files: Object[]
+ * } } mailData
+ *  - subject: email subject
+ *  - body: HTML or plain text body
+ *  - sentTo: list of recipient email addresses
+ *  - saveAsDraft: true to save in Drafts, false to actually send
+ */
+export async function sendMail({subject, body, sentTo, saveAsDraft = false, files = []}) {
+    const url = `${API_BASE}/mails`;
+    const token = localStorage.getItem("token");
+
+    // Comments: what we send in the request body
+    // subject: the mail's subject line
+    // body: the mail's content (HTML)
+    // sentTo: array of recipient emails
+    // saveAsDraft: boolean flag—true = save to Draft folder
+    const payload = {
+        subject,
+        body,
+        sentTo,
+        saveAsDraft,
+        files
+    };
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+        throw new Error(`sendMail failed: ${res.status}`);
+    }
+
+    return res.json();
+}
+
+/**
+ * PATCH /api/mails/:id
+ * @param {number} mailId
+ * @param {{
+ *   subject?: string,
+ *   body?: string,
+ *   sentTo?: string[],
+ *   saveAsDraft?: boolean
+ * }} data
+ */
+export async function updateMail(mailId, {
+    subject,
+    body,
+    sentTo,
+    saveAsDraft = true
+}) {
+    const url = `${API_BASE}/mails/${mailId}`;
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({subject, body, sentTo, saveAsDraft})
+    });
+
+    if (!res.ok) throw new Error(`updateMail failed: ${res.status}`);
+    return res.json();
+}
+
+/**
+ * Fetch mails under a specific label.
+ *
+ * @param {Number} labelId label's id
+ * @param {number} page
+ * @returns {Promise<{ mails: any[], total: number }>}
+ */
+export async function getMailsByLabel(labelId, page = 1) {
+    const token = localStorage.getItem("token");
+    // note: backend endpoint is the same, just pass label=...
+    const url = `${API_BASE}/mails?label=${encodeURIComponent(labelId)}&page=${page}&limit=50`;
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+    if (!res.ok) {
+        throw new Error(`getMailsByLabel failed: ${res.status}`);
+    }
+    return res.json();
+}

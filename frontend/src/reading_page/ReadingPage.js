@@ -8,6 +8,8 @@ import SenderDetails from "./SenderDetails/SenderDetails";
 import {formatFullTime} from "../utils/formatDate";
 import SkeletonEmail from "../components/loading/SkeletonEmail";
 import FileList from "./Attachments/FileList";
+import {addBlankToLinks} from "../utils/htmlUtils";
+import ComposeEmail from "../main_page/ComposeEmail/ComposeEmail";
 
 const ReadingPage = () => {
 
@@ -16,11 +18,13 @@ const ReadingPage = () => {
     const {theme, toggleTheme} = useTheme();
     const [email, setEmail] = useState(null);
     const [loading, setLoading] = useState(true);
-
+    // Compose window for reply/forward
+    const [composeProps, setComposeProps] = useState(null);
+    // Read inboxType from location state
     const location = useLocation();
-    const {inboxType} = location.state;
+    const { inboxType } = location.state || {};
 
-    // update the mail shown
+    // Load the mail when ID changes
     useEffect(() => {
         const loadEmail = async () => {
             try {
@@ -32,63 +36,98 @@ const ReadingPage = () => {
                 console.error("Error fetching email: ", error)
             }
         }
-        loadEmail().then();
-    }, [id])
+        loadEmail();
+    }, [id]);
 
+    // Handle reply: open ComposeEmail pre-filled with reply format
     const onReplyClick = () => {
-        /// TODO reply to mail
-        alert("reply");
-    }
+        if (!email) return;
+        setComposeProps({
+            recipients: [email.from?.mail || ''],
+            subject: email.subject ? "Re: " + email.subject : "",
+            body: `<br><br>On ${formatFullTime(email.sentAt || email.createdAt)}, ${email.from?.mail || ''} wrote:<br>${email.body}`,
+            attachments: [],
+            isReply: true
+        });
+    };
 
+    // Handle forward: open ComposeEmail pre-filled with forward format
     const onForwardClick = () => {
-        /// TODO forward mail to someone
-        alert("forward");
-    }
+        if (!email) return;
+        setComposeProps({
+            recipients: [],
+            subject: email.subject ? "Fwd: " + email.subject : "",
+            body: `<br><br>---------- Forwarded message ----------<br>
+<b>From:</b> ${email.from?.mail || ''}<br>
+<b>Date:</b> ${formatFullTime(email.sentAt || email.createdAt)}<br>
+<b>Subject:</b> ${email.subject}<br><br>
+${email.body}`,
+            attachments: email.files || [],
+            isForward: true
+        });
+    };
 
+    // Allow updating the "starred" state locally
     const handleStarToggle = (newStarValue) => {
-        setEmail(prev => ({...prev, isStarred: newStarValue}));
+        setEmail(prev => ({ ...prev, isStarred: newStarValue }));
     };
 
     return (
         <div className={`email-view ${theme}`}>
             {/* Header */}
             <ReadingHeader theme={theme} toggleTheme={toggleTheme} email={email} inboxType={inboxType}/>
-            {/* content */}
+            {/* Main content */}
             {loading ? (
-                    <SkeletonEmail/>
-                ) :
-                (
-                    <div className="email-view-content">
-                        <h1 className="email-view-title">{email.subject}</h1>
-                        {/* sender's info */}
-                        <div className={`email-view-meta ${theme}`}>
-                            <SenderDetails email={email} theme={theme} onUpdate={handleStarToggle}/>
-                            <div className="email-date">{formatFullTime(email.sentAt || email.createdAt)}</div>
-                        </div>
-                        {/* main mail's text */}
-                        <div className="email-body" dangerouslySetInnerHTML={{__html: email.body}}/>
-                        <div className="separator"></div>
-                        {/* Show file attachments if there are any */}
-                        {email.files && email.files.length > 0 && (
-                            <div>
-                                <h6 style={{textAlign: "start", marginBottom: 0}}>Attachments:</h6>
-                                <FileList files={email.files} theme={theme}/>
-                            </div>
-                        )}
-
-                        {/* actions related to replying */}
-                        <div className="reply-actions">
-                            <button className="reply-button primary" title="Reply" onClick={onReplyClick}>
-                                <i className="bi bi-reply"/>
-                                Reply
-                            </button>
-                            <button className="reply-button secondary" title="forward" onClick={onForwardClick}>
-                                <i className="bi bi-arrow-90deg-right"></i>
-                                Forward
-                            </button>
-                        </div>
+                <SkeletonEmail />
+            ) : (
+                <div className="email-view-content">
+                    <h1 className="email-view-title">{email.subject}</h1>
+                    {/* Sender info and date */}
+                    <div className={`email-view-meta ${theme}`}>
+                        <SenderDetails email={email} theme={theme} onUpdate={handleStarToggle}/>
+                        <div className="email-date">{formatFullTime(email.sentAt || email.createdAt)}</div>
                     </div>
-                )}
+                    {/* Email body with safe links */}
+                    <div
+                        className="email-body"
+                        dangerouslySetInnerHTML={{ __html: addBlankToLinks(email.body) }}
+                    />
+                    <div className="separator"></div>
+                    {/* Attachments if any */}
+                    {email.files && email.files.length > 0 && (
+                        <div>
+                            <h6 style={{ textAlign: "start", marginBottom: 0 }}>Attachments:</h6>
+                            <FileList files={email.files} theme={theme}/>
+                        </div>
+                    )}
+                    {/* Reply/forward buttons */}
+                    <div className="reply-actions">
+                        <button className="reply-button primary" title="Reply" onClick={onReplyClick}>
+                            <i className="bi bi-reply"/>
+                            Reply
+                        </button>
+                        <button className="reply-button secondary" title="forward" onClick={onForwardClick}>
+                            <i className="bi bi-arrow-90deg-right"></i>
+                            Forward
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Compose window for reply/forward */}
+            {composeProps && (
+                <ComposeEmail
+                    onCancel={() => setComposeProps(null)}
+                    onSend={() => setComposeProps(null)}
+                    offset={0}
+                    draftMail={{
+                        sentTo: composeProps.recipients.map(mail => ({ mail })),
+                        subject: composeProps.subject,
+                        body: composeProps.body,
+                        attachments: composeProps.attachments
+                    }}
+                />
+            )}
         </div>
     );
 }
