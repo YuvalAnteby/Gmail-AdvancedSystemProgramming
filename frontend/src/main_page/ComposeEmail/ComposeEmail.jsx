@@ -153,13 +153,16 @@ export default function ComposeEmail({
                     {draftMail ? 'Edit Draft' : 'New Message'}
                 </span>
                 <div className="compose-controls">
-                    <button className="control-btn" onClick={toggleMinimize}>
+                    {/* Minimize button with tooltip */}
+                    <button className="control-btn" title="Minimize" onClick={toggleMinimize}>
                         <i className="bi bi-dash" />
                     </button>
-                    <button className="control-btn" onClick={toggleMaximize}>
+                    {/* Maximize/Restore button with tooltip */}
+                    <button className="control-btn" title="Maximize" onClick={toggleMaximize}>
                         <i className="bi bi-fullscreen" />
                     </button>
-                    <button className="control-btn" onClick={handleClose}>
+                    {/* Close (save draft) button with tooltip */}
+                    <button className="control-btn" title="Close" onClick={handleClose}>
                         <i className="bi bi-x-lg" />
                     </button>
                 </div>
