@@ -1,6 +1,6 @@
 import "./MailRow.css";
-import { formatDate } from "../../utils/formatDate";
-import { useNavigate } from "react-router-dom";
+import {formatDate} from "../../utils/formatDate";
+import {useNavigate} from "react-router-dom";
 import StarButton from "../../components/StarButton/StarButton";
 import {markMailAsRead, stripHtml} from "../../utils/mailUtils";
 //import useIsMobile from "../../utils/useIsMobile";
@@ -51,6 +51,14 @@ const MailRow = ({
                     <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
                     <div className="email-title-body">
                         <div className={`email-subject ${theme}`}>{email.subject}</div>
+                        <div className="mail-labels">
+                            {email.labels?.map(label => (
+                                <span key={label.id} className="badge rounded-pill bg-secondary me-1"
+                                >
+                                {label.name}
+                            </span>
+                            ))}
+                        </div>
                         <div className={`email-preview ${theme}`}>{stripHtml(email.body)}</div>
                     </div>
                 </div>
@@ -67,4 +75,4 @@ const MailRow = ({
         </div>
     );
 }
-    export default MailRow;
+export default MailRow;
