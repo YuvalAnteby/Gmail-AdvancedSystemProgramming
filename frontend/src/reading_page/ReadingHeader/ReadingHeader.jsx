@@ -4,8 +4,10 @@ import {APP_NAME, DEFAULT_AVATAR} from "../../utils/constants";
 import ProfileMenu from "../../main_page/top_menu/profile/ProfileMenu";
 import {useProfile} from "../../main_page/hooks/useProfile";
 import {useOutsideClick} from "../../main_page/hooks/useOutsideClick";
-import {useRef, useState} from "react";
-import {deleteMail, restoreMail, toggleSpamReport} from "../../api/mailApi";
+import React, {useEffect, useRef, useState} from "react";
+import {applyLabelsToMail, deleteMail, restoreMail, toggleSpamReport} from "../../api/mailApi";
+import {Dropdown} from "react-bootstrap";
+import {fetchLabels} from "../../api/labelsApi";
 
 const ReadingHeader = ({theme, toggleTheme, email, inboxType}) => {
     const navigate = useNavigate()
@@ -36,6 +38,48 @@ const ReadingHeader = ({theme, toggleTheme, email, inboxType}) => {
     const onBackClick = () => {
         navigate('/inbox', {state: {inboxType: inboxType}});
     }
+
+    // labels
+    const [labels, setLabels] = useState([]);
+    const [showLabelMenu, setShowLabelMenu] = useState(false);
+    // fetches labels
+    useEffect(() => {
+        const loadLabels = async () => {
+            try {
+                const response = await fetchLabels();
+                setLabels(response);
+            } catch (e) {
+                console.error("Failed to fetch labels", e);
+            }
+        };
+        loadLabels();
+    }, []);
+
+    // Apply label toggle for a single mail object
+    const handleLabelToggle = async (label) => {
+        try {
+            const hasLabel = Array.isArray(email.labels) && email.labels.some(l => l.id === label.id);
+            let newLabels;
+
+            if (hasLabel) {
+                // Remove label
+                newLabels = email.labels.filter(l => l.id !== label.id);
+            } else {
+                // Add label without duplicates
+                const labelMap = new Map(email.labels.map(l => [l.id, l]));
+                labelMap.set(label.id, label);
+                newLabels = Array.from(labelMap.values());
+            }
+            // Update UI
+            email.labels = newLabels;
+            // Apply to backend
+            await applyLabelsToMail(email.id, newLabels);
+            setShowLabelMenu(false);
+        } catch (e) {
+            console.error("Failed to update label:", e);
+        }
+    };
+
 
     return (
         <header className={`email-view-header ${theme}`}>
@@ -82,6 +126,31 @@ const ReadingHeader = ({theme, toggleTheme, email, inboxType}) => {
                         Restore mail
                     </button>
                 )}
+                {/* label picker for current mail */}
+                <Dropdown show={showLabelMenu} onToggle={setShowLabelMenu}>
+                    <Dropdown.Toggle
+                        className={`btn bi bi-tag icon ${theme} border-0 p-2`}
+                        title="Manage Labels"
+                        variant="outline-secondary"
+                        id="dropdown-labels"
+                    />
+                    <Dropdown.Menu className={`p-2 labels-dropdown ${theme}`}>
+                        {labels.map(label => (
+                            <div key={label.id} className="form-check">
+                                <input
+                                    className={`form-check-input ${theme}`}
+                                    type="checkbox"
+                                    id={`label-check-${label.id}`}
+                                    checked={Array.isArray(email.labels) && email.labels.some(l => l.id === label.id)}
+                                    onChange={() => handleLabelToggle(label)}
+                                />
+                                <label className="form-check-label" htmlFor={`label-check-${label.id}`}>
+                                    {label.name}
+                                </label>
+                            </div>
+                        ))}
+                    </Dropdown.Menu>
+                </Dropdown>
             </div>
 
             {/* profile and profile menu for more actions */}
