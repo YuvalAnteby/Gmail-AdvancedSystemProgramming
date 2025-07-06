@@ -61,14 +61,12 @@ const MainPage = () => {
     } = useMails(inboxType);
 
     const [selectedMails, setSelectedMails] = useState(new Set());
-    const allSelected = selectedMails.size === emails.length;
-    const anySelected = selectedMails.size > 0;
 
     const handlers = useMailToolbarHandlers(
         selectedMails,
         setSelectedMails,
         emails,
-        refreshMails
+        refreshMails,
     );
 
     const handleSelect = (mail, checked) => {
@@ -85,9 +83,10 @@ const MainPage = () => {
     useEffect(() => {
         if (location.state?.inboxType) {
             setInboxType(location.state.inboxType);
+            setSelectedMails(new Set());
         }
     }, [location.state?.inboxType]);
-    console.log('mails', emails);
+
     return (
         <div className={`main-page ${theme}`}>
             <TopMenu
@@ -106,6 +105,7 @@ const MainPage = () => {
                         onComposeClick={handleComposeClick}
                         showSidebar={showSidebar}
                         setShowSidebar={setShowSidebar}
+                        clearSelection={handlers.clearSelection}
                     />
                 </div>
 
@@ -113,9 +113,8 @@ const MainPage = () => {
                     <ToolBar
                         theme={theme}
                         inboxType={inboxType}
-                        allSelected={allSelected}
+                        mailsAmount={emails.length}
                         selectedMails={selectedMails}
-                        anySelected={anySelected}
                         btnHandlers={handlers}
                         total={total}
                         page={page}

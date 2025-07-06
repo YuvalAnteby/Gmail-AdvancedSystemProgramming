@@ -32,7 +32,8 @@ export default function EmailSidebar({
                                          setCurrentTab,    // Callback to change tab
                                          onComposeClick,   // Callback for "Compose" button
                                          showSidebar,      // Boolean: is sidebar open (mobile)
-                                         setShowSidebar    // Callback to toggle sidebar (mobile)
+                                         setShowSidebar,   // Callback to toggle sidebar (mobile)
+                                         clearSelection
                                      }) {
     const isMobile = useIsMobile();
     const [labels, setLabels] = useState([]); // Flat list of all labels (from backend)
@@ -94,6 +95,7 @@ export default function EmailSidebar({
     // Navigate to mailbox tab or label tab
     const onClickTab = id => {
         setCurrentTab(id);
+        clearSelection();
         if (isMobile) setShowSidebar(false);
     };
 

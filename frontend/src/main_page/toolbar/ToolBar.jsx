@@ -9,9 +9,8 @@ import {Dropdown} from "react-bootstrap";
 const ToolBar = ({
                      theme,
                      inboxType,
-                     allSelected,
+                     mailsAmount,
                      selectedMails,
-                     anySelected,
                      btnHandlers,
                      total,
                      page,
@@ -19,24 +18,17 @@ const ToolBar = ({
                      hasPrevPage,
                      goToNextPage,
                      goToPrevPage,
-                     refreshMails,
                  }) => {
 
     // checks if mobile UI or desktop
     const isMobile = useIsMobile();
 
-    // for cases where not all mails were selected but some do
-    const selectAllRef = useRef(null);
-    useEffect(() => {
-        if (selectAllRef.current) {
-            selectAllRef.current.indeterminate = !allSelected && selectedMails.length > 0;
-        }
-    }, [allSelected, selectedMails]);
+    let isAllSelected = selectedMails.size === mailsAmount;
+    let isIndeterminate = selectedMails.size > 0 && selectedMails.size < mailsAmount;
 
     // labels
     const [labels, setLabels] = useState([]);
     const [showLabelMenu, setShowLabelMenu] = useState(false);
-    const [selectedLabelId, setSelectedLabelId] = useState(null);
     // fetches labels
     useEffect(() => {
         const loadLabels = async () => {
@@ -58,24 +50,35 @@ const ToolBar = ({
                 let newLabels;
 
                 if (hasLabel) {
-                    newLabels = mail.labels.filter(l => l.id !== label.id); // Remove label
+                    // Remove label
+                    newLabels = mail.labels.filter(l => l.id !== label.id);
                 } else {
-                    newLabels = [...mail.labels, label]; // Add label
+                    // add label - no duplicates
+                    const labelMap = new Map(mail.labels.map(l => [l.id, l]));
+                    labelMap.set(label.id, label);
+                    newLabels = Array.from(labelMap.values());
                 }
                 // update UI
                 mail.labels = newLabels;
                 // Send new label list to backend
                 await applyLabelsToMail(mail.id, newLabels);
-                console.log(mail.id);
-                console.log(newLabels);
+
             }));
-            await refreshMails();
+            isAllSelected = false;
+            setShowLabelMenu(false);
+            btnHandlers.clearSelection();
         } catch (e) {
             console.error("Failed to update label:", e);
         }
     };
 
-
+    // for cases where not all mails were selected but some do
+    const selectAllRef = useRef(null);
+    useEffect(() => {
+        if (selectAllRef.current) {
+            selectAllRef.current.indeterminate = isIndeterminate;
+        }
+    }, [isIndeterminate]);
 
     return (
         <div className="toolbar-container">
@@ -84,7 +87,7 @@ const ToolBar = ({
                 <input
                     ref={selectAllRef}
                     type="checkbox"
-                    checked={allSelected}
+                    checked={isAllSelected}
                     onChange={btnHandlers.handleSelectAll}
                 />
                 select all
@@ -96,7 +99,7 @@ const ToolBar = ({
                 onClick={btnHandlers.handleRefresh}
             />
             {/* additional buttons - shown when mails selected */}
-            {anySelected && (
+            {selectedMails.size > 0 && (
                 <div className="d-flex flex-row">
                     {/* mark read button */}
                     <i
@@ -148,20 +151,21 @@ const ToolBar = ({
                     {/* label picker for selected mails */}
                     <Dropdown show={showLabelMenu} onToggle={setShowLabelMenu}>
                         <Dropdown.Toggle
-                            className="btn bi bi-tag icon"
+                            className={`btn bi bi-tag icon ${theme} border-0 p-2`}
                             title="Manage Labels"
                             variant="outline-secondary"
                             id="dropdown-labels"
                         />
-                        <Dropdown.Menu className="p-2" style={{ maxHeight: 250, overflowY: 'auto' }}>
+                        <Dropdown.Menu className={`p-2 labels-dropdown ${theme}`}>
                             {labels.map(label => (
                                 <div key={label.id} className="form-check">
                                     <input
-                                        className="form-check-input"
+                                        className={`form-check-input ${theme}`}
                                         type="checkbox"
                                         id={`label-check-${label.id}`}
                                         checked={Array.from(selectedMails).every(mail =>
-                                            mail.labels?.some(l => l.id === label.id)
+                                            Array.isArray(mail.labels) &&
+                                            mail.labels.some(l => l.id === label.id)
                                         )}
                                         onChange={() => handleLabelToggle(label)}
                                     />

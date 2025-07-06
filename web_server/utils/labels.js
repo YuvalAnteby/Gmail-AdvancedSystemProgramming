@@ -2,16 +2,15 @@ const Labels = require("../models/labels");
 
 /**
  * Converts an array of label names to their ids
- * @param userId owner of the label
- * @param labelsObjects array of labels' objects
+ * @param {string} userId owner of the label
+ * @param {Array} labelsObjects array of labels' objects
  * @returns {number[]} array of labels ids
  */
 function convertLabelsToIds(userId, labelsObjects) {
     if (!labelsObjects)
         return [];
-    return labelsObjects.map(label => {
-        return label.id;
-    })
+    const ids = labelsObjects.map(label => label.id);
+    return [...new Set(ids)];
 }
 
 /**
@@ -21,9 +20,10 @@ function convertLabelsToIds(userId, labelsObjects) {
  * @returns {*} array of labels elements
  */
 function labelsToFullElement(userId, labelsIds) {
-    return labelsIds.map(label => {
-        return Labels.getLabelById(userId, label);
-    })
+    if (!labelsIds)
+        return [];
+    const objects = labelsIds.map(id => Labels.getLabelById(id));
+    return [...new Set(objects)];
 }
 
 /**
