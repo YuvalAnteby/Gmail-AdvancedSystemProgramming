@@ -3,14 +3,14 @@ const Labels = require("../models/labels");
 /**
  * Converts an array of label names to their ids
  * @param userId owner of the label
- * @param labelsByNames array of labels' names
+ * @param labelsObjects array of labels' objects
  * @returns {number[]} array of labels ids
  */
-function convertLabelsToIds(userId, labelsByNames) {
-    if (!labelsByNames)
+function convertLabelsToIds(userId, labelsObjects) {
+    if (!labelsObjects)
         return [];
-    return labelsByNames.map(label => {
-        return Labels.getLabelByName(userId, label).id;
+    return labelsObjects.map(label => {
+        return label.id;
     })
 }
 
@@ -33,7 +33,7 @@ function labelsToFullElement(userId, labelsIds) {
  */
 const mailLabelNames = (userId, mail) => {
     return (mail.labels || [])
-        .map(labelId => Labels.getLabelById(userId, labelId).name)
+        .map(labelId => Labels.getLabelById(labelId).name)
         .filter(Boolean)
         .map(name => name.toLowerCase());
 };

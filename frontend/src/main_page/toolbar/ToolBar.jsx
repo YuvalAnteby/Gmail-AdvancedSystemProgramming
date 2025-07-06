@@ -2,11 +2,15 @@ import React, {useEffect, useRef, useState} from "react";
 import './ToolBar.css'
 import {MAILS_PER_PAGE} from "../../utils/constants";
 import useIsMobile from "../../utils/useIsMobile";
+import {fetchLabels} from "../../api/labelsApi";
+import {applyLabelsToMail} from "../../api/mailApi";
+import {Dropdown} from "react-bootstrap";
 
 const ToolBar = ({
                      theme,
                      inboxType,
                      allSelected,
+                     selectedMails,
                      anySelected,
                      btnHandlers,
                      total,
@@ -15,17 +19,63 @@ const ToolBar = ({
                      hasPrevPage,
                      goToNextPage,
                      goToPrevPage,
+                     refreshMails,
                  }) => {
+
+    // checks if mobile UI or desktop
+    const isMobile = useIsMobile();
 
     // for cases where not all mails were selected but some do
     const selectAllRef = useRef(null);
     useEffect(() => {
         if (selectAllRef.current) {
-            selectAllRef.current.indeterminate = !allSelected && anySelected;
+            selectAllRef.current.indeterminate = !allSelected && selectedMails.length > 0;
         }
-    }, [allSelected, anySelected]);
+    }, [allSelected, selectedMails]);
 
-    const isMobile = useIsMobile();
+    // labels
+    const [labels, setLabels] = useState([]);
+    const [showLabelMenu, setShowLabelMenu] = useState(false);
+    const [selectedLabelId, setSelectedLabelId] = useState(null);
+    // fetches labels
+    useEffect(() => {
+        const loadLabels = async () => {
+            try {
+                const response = await fetchLabels();
+                setLabels(response);
+            } catch (e) {
+                console.error("Failed to fetch labels", e);
+            }
+        };
+        loadLabels();
+    }, []);
+
+    // apply label selection and refresh mails
+    const handleLabelToggle = async (label) => {
+        try {
+            await Promise.all(Array.from(selectedMails).map(async mail => {
+                const hasLabel = mail.labels.some(l => l.id === label.id);
+                let newLabels;
+
+                if (hasLabel) {
+                    newLabels = mail.labels.filter(l => l.id !== label.id); // Remove label
+                } else {
+                    newLabels = [...mail.labels, label]; // Add label
+                }
+                // update UI
+                mail.labels = newLabels;
+                // Send new label list to backend
+                await applyLabelsToMail(mail.id, newLabels);
+                console.log(mail.id);
+                console.log(newLabels);
+            }));
+            await refreshMails();
+        } catch (e) {
+            console.error("Failed to update label:", e);
+        }
+    };
+
+
 
     return (
         <div className="toolbar-container">
@@ -95,6 +145,33 @@ const ToolBar = ({
                             </button>
                         </div>
                     )}
+                    {/* label picker for selected mails */}
+                    <Dropdown show={showLabelMenu} onToggle={setShowLabelMenu}>
+                        <Dropdown.Toggle
+                            className="btn bi bi-tag icon"
+                            title="Manage Labels"
+                            variant="outline-secondary"
+                            id="dropdown-labels"
+                        />
+                        <Dropdown.Menu className="p-2" style={{ maxHeight: 250, overflowY: 'auto' }}>
+                            {labels.map(label => (
+                                <div key={label.id} className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id={`label-check-${label.id}`}
+                                        checked={Array.from(selectedMails).every(mail =>
+                                            mail.labels?.some(l => l.id === label.id)
+                                        )}
+                                        onChange={() => handleLabelToggle(label)}
+                                    />
+                                    <label className="form-check-label" htmlFor={`label-check-${label.id}`}>
+                                        {label.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </div>
             )}
             {/* paging info and buttons - always shown */}

@@ -152,9 +152,12 @@ const updateMail = (req, res) => {
         return editDraft(req, res, userId, mail);
 
     // otherwise it’s a mail already sent - only allow flags & labels
-    const {isRead, isStarred, isTrashed, isSpam, labels} = req.body;
+    const {isRead, isStarred, isTrashed, isSpam, labels} = req.body || {};
+    console.log('labels', labels);
     const labelsIds = convertLabelsToIds(userId, labels || []);
+    console.log('labelsIds', labelsIds);
     const updated = Mails.editSentMail(mailId, isRead, isStarred, isTrashed, isSpam, labelsIds);
+    console.log('updated', updated);
     if (updated)
         return res.status(200).json(updated);
     if (updated === 404)

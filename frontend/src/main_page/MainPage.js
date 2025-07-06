@@ -87,7 +87,7 @@ const MainPage = () => {
             setInboxType(location.state.inboxType);
         }
     }, [location.state?.inboxType]);
-
+    console.log('mails', emails);
     return (
         <div className={`main-page ${theme}`}>
             <TopMenu
@@ -114,6 +114,7 @@ const MainPage = () => {
                         theme={theme}
                         inboxType={inboxType}
                         allSelected={allSelected}
+                        selectedMails={selectedMails}
                         anySelected={anySelected}
                         btnHandlers={handlers}
                         total={total}
@@ -122,6 +123,7 @@ const MainPage = () => {
                         hasPrevPage={hasPrevPage}
                         goToNextPage={goToNextPage}
                         goToPrevPage={goToPrevPage}
+                        refreshMails={refreshMails}
                     />
                     {loading ? (
                         <SkeletonEmail rows={10} />
@@ -149,7 +151,7 @@ const MainPage = () => {
                     offset={c.offset}
                     draftMail={c.draftMail}
                     onCancel={() =>{ handleCloseCompose(c.id);
-                    refreshMails(c.id);}}
+                    refreshMails();}}
                     onSend={() => {
                         handleCloseCompose(c.id);
                         refreshMails();

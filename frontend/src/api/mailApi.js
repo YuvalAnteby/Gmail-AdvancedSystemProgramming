@@ -285,3 +285,30 @@ export async function getMailsByLabel(labelId, page = 1) {
     }
     return res.json();
 }
+
+/**
+ * Edits a mail with the new labels picked for it
+ * @param {number} mailId id of the mail to edit its labels
+ * @param {any[]} labels list of label object
+ * @returns {Promise<void>}
+ */
+export async function applyLabelsToMail(mailId, labels) {
+    console.log(labels)
+    const token = localStorage.getItem("token");
+    const url = `${API_BASE}/mails/${mailId}`;
+    const res = await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            'Content-Type': 'application/json'
+
+        },
+        body: JSON.stringify({
+            labels: labels,
+        })
+    })
+    if (!res.ok) {
+        throw new Error(`getMailsByLabel failed: ${res.status}`);
+    }
+    return res.json();
+}
