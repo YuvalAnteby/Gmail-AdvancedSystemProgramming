@@ -41,6 +41,28 @@ const ToolBar = ({
         };
         loadLabels();
     }, []);
+    // Helper to reload labels after changes
+    const reload = async () => setLabels(await fetchLabels());
+    useEffect(() => {
+        if (selectedMails.size === 0) return;
+
+        Array.from(selectedMails).forEach((mail) => {
+            // סנן את התגיות של המייל כך שיכילו רק תגיות שעדיין קיימות
+            const updatedLabels = mail.labels.filter(label =>
+                labels.some(l => l.id === label.id)
+            );
+
+            // אם שם תגית השתנה, עדכן אותו
+            updatedLabels.forEach(label => {
+                const fresh = labels.find(l => l.id === label.id);
+                if (fresh) label.name = fresh.name;
+            });
+
+            // שלח עדכון לשרת אם יש שינוי
+            applyLabelsToMail(mail.id, updatedLabels);
+        });
+
+    }, [reload]);
 
     // apply label selection and refresh mails
     const handleLabelToggle = async (label) => {
@@ -60,6 +82,7 @@ const ToolBar = ({
                 }
                 // update UI
                 mail.labels = newLabels;
+                mail._forceUpdate = Date.now();
                 // Send new label list to backend
                 await applyLabelsToMail(mail.id, newLabels);
 
@@ -149,7 +172,7 @@ const ToolBar = ({
                         </div>
                     )}
                     {/* label picker for selected mails */}
-                    <Dropdown show={showLabelMenu} onToggle={setShowLabelMenu}>
+                    <Dropdown show={showLabelMenu} onToggle={setShowLabelMenu} onClick={reload}>
                         <Dropdown.Toggle
                             className={`btn bi bi-tag icon ${theme} border-0 p-2`}
                             title="Manage Labels"
@@ -165,7 +188,9 @@ const ToolBar = ({
                                         id={`label-check-${label.id}`}
                                         checked={Array.from(selectedMails).every(mail =>
                                             Array.isArray(mail.labels) &&
-                                            mail.labels.some(l => l.id === label.id)
+                                            mail.labels
+                                                .filter(l => l && typeof l.id === "number")
+                                                .some(l => l.id === label.id)
                                         )}
                                         onChange={() => handleLabelToggle(label)}
                                     />

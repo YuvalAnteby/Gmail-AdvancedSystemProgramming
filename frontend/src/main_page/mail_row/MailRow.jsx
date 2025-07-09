@@ -24,7 +24,6 @@ const MailRow = ({
                      onOpenDraft
                  }) => {
     const navigate = useNavigate();
-
     const handleMailOpen = async () => {
         await markMailAsRead(email, onUpdate);
         if (inboxType === "draft" && onOpenDraft) {
@@ -53,10 +52,9 @@ const MailRow = ({
                         <div className={`email-subject ${theme}`}>{email.subject}</div>
                         <div className="mail-labels">
                             {email.labels?.map(label => (
-                                <span key={label.id} className="badge rounded-pill bg-secondary me-1"
-                                >
-                                {label.name}
-                            </span>
+                                <span key={label.id} className="badge rounded-pill bg-secondary me-1">
+                                    {label.name}
+                                </span>
                             ))}
                         </div>
                         <div className={`email-preview ${theme}`}>{stripHtml(email.body)}</div>
