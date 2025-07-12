@@ -42,27 +42,14 @@ const ToolBar = ({
         loadLabels();
     }, []);
     // Helper to reload labels after changes
-    const reload = async () => setLabels(await fetchLabels());
-    useEffect(() => {
-        if (selectedMails.size === 0) return;
-
-        Array.from(selectedMails).forEach((mail) => {
-            // סנן את התגיות של המייל כך שיכילו רק תגיות שעדיין קיימות
-            const updatedLabels = mail.labels.filter(label =>
-                labels.some(l => l.id === label.id)
-            );
-
-            // אם שם תגית השתנה, עדכן אותו
-            updatedLabels.forEach(label => {
-                const fresh = labels.find(l => l.id === label.id);
-                if (fresh) label.name = fresh.name;
-            });
-
-            // שלח עדכון לשרת אם יש שינוי
-            applyLabelsToMail(mail.id, updatedLabels);
-        });
-
-    }, [reload]);
+    const reload = async () => {
+        try {
+            const data = await fetchLabels();
+            setLabels(data);
+        } catch (e) {
+            console.error("Failed to reload labels:", e);
+        }
+    };
 
     // apply label selection and refresh mails
     const handleLabelToggle = async (label) => {
@@ -81,7 +68,8 @@ const ToolBar = ({
                     newLabels = Array.from(labelMap.values());
                 }
                 // update UI
-                mail.labels = newLabels;
+                mail.labels = newLabels.filter(label => label && typeof label.id === "number"
+                    && typeof label.name === "string");
                 mail._forceUpdate = Date.now();
                 // Send new label list to backend
                 await applyLabelsToMail(mail.id, newLabels);

@@ -13,6 +13,7 @@ import {markMailAsRead, stripHtml} from "../../utils/mailUtils";
  * @prop onSelect    (mail,checked)=>void
  * @prop onUpdate    ()=>void
  * @prop onOpenDraft (mail)=>void
+ * @prop allLabels    list of label
  */
 const MailRow = ({
                      theme,
@@ -21,9 +22,11 @@ const MailRow = ({
                      isSelected,
                      onSelect,
                      onUpdate,
-                     onOpenDraft
+                     onOpenDraft,
+                     allLabels
                  }) => {
     const navigate = useNavigate();
+    // Handle opening an email (navigate to full view or open draft)
     const handleMailOpen = async () => {
         await markMailAsRead(email, onUpdate);
         if (inboxType === "draft" && onOpenDraft) {
@@ -32,7 +35,6 @@ const MailRow = ({
             navigate(`/mails/${email.id}`, {state: {inboxType}});
         }
     };
-
     return (
         <div className={`mail-row-item ${theme} ${email.isRead ? "read" : "unread"}`}>
             <div className="row-top-controls">
@@ -47,15 +49,18 @@ const MailRow = ({
 
             <div className="mail-row-metadata" onClick={handleMailOpen}>
                 <div className="email-content">
-                    <div className={`email-sender ${theme}`}>{email.from.fullName}</div>
+                    <div className={`email-sender ${theme}`}> {email.from?.fullName || "Unknown Sender"}</div>
                     <div className="email-title-body">
                         <div className={`email-subject ${theme}`}>{email.subject}</div>
                         <div className="mail-labels">
-                            {email.labels?.map(label => (
-                                <span key={label.id} className="badge rounded-pill bg-secondary me-1">
-                                    {label.name}
-                                </span>
-                            ))}
+                            {(email.labels || []).map(label => {
+                                const updated = allLabels?.find(l => l.id === label.id);
+                                return (
+                                    <span key={label.id} className="badge rounded-pill bg-secondary me-1">
+                                        {updated?.name || label.name}
+                                    </span>
+                                );
+                            })}
                         </div>
                         <div className={`email-preview ${theme}`}>{stripHtml(email.body)}</div>
                     </div>

@@ -31,7 +31,7 @@ const mails = [
         body: "Here’s what we changed in v2.0...",
         createdAt: new Date('2025-06-03T20:27:11.000Z'),
         sentAt: new Date('2025-06-04T14:08:36.000Z'),
-        labels: [1],
+        labels: [],
         isDraft: false,
         isRead: true,
         isStarred: false,
@@ -48,7 +48,7 @@ const mails = [
         body: "Here’s what we changed in v2.0...",
         createdAt: new Date('2025-06-03T20:27:11.000Z'),
         sentAt: new Date('2025-06-04T14:08:36.000Z'),
-        labels: [2],
+        labels: [],
         isDraft: false,
         isRead: false,
         isStarred: false,
@@ -82,7 +82,7 @@ const mails = [
         body: "Don’t forget the team meeting at 9AM tomorrow.",
         createdAt: new Date('2025-06-03T03:15:27.000Z'),
         sentAt: new Date('2025-06-03T11:42:53.000Z'),
-        labels: [1,2],
+        labels: [],
         isDraft: false,
         isRead: false,
         isStarred: true,
@@ -92,23 +92,6 @@ const mails = [
     },
     {
         id: 5,
-        owner: 1,
-        from: 1,
-        sentTo: [2],
-        subject: "Your daily digest",
-        body: "Top tech news today: React 21.0 is out...",
-        createdAt: new Date('2025-06-02T18:55:04.000Z'),
-        sentAt: "",
-        labels: [],
-        isDraft: true,
-        isRead: false,
-        isStarred: false,
-        isTrashed: false,
-        isSpam: false,
-        files: []
-    },
-    {
-        id: 6,
         owner: 1,
         from: 1,
         sentTo: [1, 2, 3],
@@ -142,7 +125,7 @@ const mails = [
         ]
     },
     {
-        id: 7,
+        id: 6,
         owner: 2,
         from: 1,
         sentTo: [1, 2, 3],
@@ -164,7 +147,7 @@ const mails = [
         ]
     },
     {
-        id: 8,
+        id: 7,
         owner: 3,
         from: 1,
         sentTo: [1, 2, 3],

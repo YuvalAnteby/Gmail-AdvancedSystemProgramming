@@ -2,7 +2,7 @@ const Mails = require('../models/mails');
 const Blacklist = require('../models/blacklist');
 const {extractUrls} = require("../utils/mails");
 const {convertMailsToIds, usersToFullElement} = require("../utils/users");
-const {convertLabelsToIds, labelsToFullElement, mailLabelNames} = require("../utils/labels");
+const {convertLabelsToIds, labelsToFullElement} = require("../utils/labels");
 
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
@@ -19,7 +19,8 @@ const getLastMailsOrdered = (req, res) => {
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
     const inboxType = req.query.inboxType || 'all';
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 50; // limit is 50 according to instructions
+    // limit is 50 according to instructions
+    const limit = Number(req.query.limit) || 50;
 
     const labelIdFilter = Number(req.query.label);
     let {paged, total} = Mails.getUserMails(userId, limit, inboxType, page);
@@ -72,7 +73,7 @@ const getMailById = (req, res) => {
     if (!mail)
         return res.status(404).json({error: `No mail found with ID: ${id}`});
     // ensure the mail belongs to the user
-    if (mail.owner != userId)
+    if (mail.owner !== userId)
         return res.status(403).json({error: 'mail do not belong to user'});
     return res.status(200).json({
         ...mail,
