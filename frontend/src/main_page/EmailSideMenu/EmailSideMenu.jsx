@@ -208,9 +208,9 @@ export default function EmailSidebar({
     return (
         <div className={`sidebar ${theme} ${showSidebar ? 'show' : ''}`}>
             {/* Compose button (desktop only) */}
-                <button className={`btn compose-button ${theme}`} onClick={onComposeClick}>
-                    <i className="bi bi-pencil-square me-2" /> Compose
-                </button>
+            <button className={`btn compose-button ${theme}`} onClick={onComposeClick}>
+                <i className="bi bi-pencil-square me-2" /> Compose
+            </button>
 
             {/* Folders (Inbox, Sent, etc.) */}
             <ul className="nav nav-pills flex-column">

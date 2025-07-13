@@ -13,7 +13,6 @@ import { useTheme } from "../utils/useTheme";
 import { useRequireAuth } from "../utils/useAutoLogin";
 import SkeletonEmail from "../components/loading/SkeletonEmail";
 import useIsMobile from "../utils/useIsMobile";
-import { fetchLabels } from "../api/labelsApi";
 
 const MainPage = () => {
     useRequireAuth();
@@ -87,18 +86,6 @@ const MainPage = () => {
             setSelectedMails(new Set());
         }
     }, [location.state?.inboxType]);
-
-    const [labels, setLabels] = useState([]);
-
-    const loadLabels = async () => {
-        const data = await fetchLabels();
-        setLabels(data);
-    };
-
-    useEffect(() => {
-        loadLabels();
-    }, []);
-
     return (
         <div className={`main-page ${theme}`}>
             <TopMenu
@@ -150,7 +137,6 @@ const MainPage = () => {
                                 onSelect={handleSelect}
                                 onUpdate={refreshMails}
                                 onOpenDraft={handleOpenDraft}
-                                allLabels={labels}
                             />
                         ))
                     )}
@@ -164,7 +150,7 @@ const MainPage = () => {
                     offset={c.offset}
                     draftMail={c.draftMail}
                     onCancel={() =>{ handleCloseCompose(c.id);
-                    refreshMails();}}
+                        refreshMails();}}
                     onSend={() => {
                         handleCloseCompose(c.id);
                         refreshMails();

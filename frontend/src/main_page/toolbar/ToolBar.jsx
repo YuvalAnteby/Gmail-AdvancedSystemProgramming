@@ -68,8 +68,9 @@ const ToolBar = ({
                     newLabels = Array.from(labelMap.values());
                 }
                 // update UI
-                mail.labels = newLabels.filter(label => label && typeof label.id === "number"
-                    && typeof label.name === "string");
+                mail.labels = newLabels
+                    .map(newLabel => labels.find(l => l.id === newLabel.id))
+                    .filter(Boolean);
                 mail._forceUpdate = Date.now();
                 // Send new label list to backend
                 await applyLabelsToMail(mail.id, newLabels);

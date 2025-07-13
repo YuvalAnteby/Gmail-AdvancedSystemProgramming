@@ -108,8 +108,8 @@ function editLabelById(id, owner,newName) {
  * @returns {boolean} True if deleted, false if not found
  */
 function deleteLabelById(id,owner) {
-    const idx = getLabelById(id, owner);
-    if (!idx) return false;
+    const idx = labels.findIndex(l => l.id === id && l.owner === owner);
+    if (idx < 0) return false;
     // Recursively delete children
     const childLabels = labels.filter(l => l.parent === id && l.owner === owner);
     childLabels.forEach(child => {

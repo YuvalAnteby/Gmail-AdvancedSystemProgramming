@@ -13,7 +13,6 @@ import {markMailAsRead, stripHtml} from "../../utils/mailUtils";
  * @prop onSelect    (mail,checked)=>void
  * @prop onUpdate    ()=>void
  * @prop onOpenDraft (mail)=>void
- * @prop allLabels    list of label
  */
 const MailRow = ({
                      theme,
@@ -23,7 +22,6 @@ const MailRow = ({
                      onSelect,
                      onUpdate,
                      onOpenDraft,
-                     allLabels
                  }) => {
     const navigate = useNavigate();
     // Handle opening an email (navigate to full view or open draft)
