@@ -1,6 +1,7 @@
 // Initial example labels
 let labels = [ { id: 1, name: 'work',    owner: 1, parent: null },
-    { id: 2, name: 'friends', owner: 1, parent: null },];
+    { id: 2, name: 'friends', owner: 1, parent: null },{ id: 3, name: 'work',    owner: 2, parent: null }
+    ,{ id: 4, name: 'work',    owner: 3, parent: null }];
 
 // Simple incrementing ID
 let nextId = labels.length + 1;
@@ -69,7 +70,7 @@ function createSublabel(owner, parent, name) {
     if (!parentLabel) return null;
 
     // Prevent duplicate sublabel names under the same parent for the same user
-    if (isDuplicateLabel(owner, name, parent)) return null;
+    if (isDuplicateLabel(owner, name, parent)) throw new Error("409")
 
     const newLabel = {
         id: nextId++,
