@@ -146,7 +146,7 @@ const updateMail = (req, res) => {
     if (isNaN(mailId))
         return res.status(400).json({error: 'error no valid mail id was given'});
     const mail = Mails.getMail(mailId);
-    if (!mailId || mail.owner !== userId)
+    if (!mailId || mail.owner != userId)
         return res.status(404).json({error: 'error mail not found'});
     // edit it as a draft
     if (mail.isDraft)
