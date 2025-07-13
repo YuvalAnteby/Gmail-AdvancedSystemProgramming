@@ -49,7 +49,8 @@ const MailRow = ({
 
             <div className="mail-row-metadata" onClick={handleMailOpen}>
                 <div className="email-content">
-                    <div className={`email-sender ${theme}`}>{email.from.fullName}</div>                    <div className="email-title-body">
+                    <div className={`email-sender ${theme}`}>{email.from.fullName}</div>                   
+                      <div className="email-title-body">
                         <div className={`email-subject ${theme}`}>{email.subject}</div>
                         <div className="mail-labels">
                             {(email.labels || []).map(label => (
