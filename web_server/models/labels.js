@@ -1,5 +1,6 @@
 // Initial example labels
-let labels = [];
+let labels = [ { id: 1, name: 'work',    owner: 1, parent: null },
+    { id: 2, name: 'friends', owner: 1, parent: null },];
 
 // Simple incrementing ID
 let nextId = labels.length + 1;
