@@ -53,14 +53,11 @@ const MailRow = ({
                     <div className="email-title-body">
                         <div className={`email-subject ${theme}`}>{email.subject}</div>
                         <div className="mail-labels">
-                            {(email.labels || []).map(label => {
-                                const updated = allLabels?.find(l => l.id === label.id);
-                                return (
-                                    <span key={label.id} className="badge rounded-pill bg-secondary me-1">
-                                        {updated?.name || label.name}
-                                    </span>
-                                );
-                            })}
+                            {(email.labels || []).map(label => (
+                                <span key={label.id} className="badge rounded-pill bg-secondary me-1">
+                                    {label.name}
+                                </span>
+                            ))}
                         </div>
                         <div className={`email-preview ${theme}`}>{stripHtml(email.body)}</div>
                     </div>

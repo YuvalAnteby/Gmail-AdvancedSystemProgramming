@@ -176,9 +176,7 @@ const ToolBar = ({
                                         id={`label-check-${label.id}`}
                                         checked={Array.from(selectedMails).every(mail =>
                                             Array.isArray(mail.labels) &&
-                                            mail.labels
-                                                .filter(l => l && typeof l.id === "number")
-                                                .some(l => l.id === label.id)
+                                            mail.labels.some(l => l.id === label.id)
                                         )}
                                         onChange={() => handleLabelToggle(label)}
                                     />
