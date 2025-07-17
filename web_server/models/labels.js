@@ -1,7 +1,10 @@
 // Initial example labels
-let labels = [ { id: 1, name: 'work',    owner: 1, parent: null },
-    { id: 2, name: 'friends', owner: 1, parent: null },{ id: 3, name: 'work',    owner: 2, parent: null }
-    ,{ id: 4, name: 'work',    owner: 3, parent: null }];
+let labels = [ 
+    { id: 1, name: 'work',    owner: 1, parent: null },
+    { id: 2, name: 'friends', owner: 1, parent: null },
+    { id: 3, name: 'work',    owner: 2, parent: null },
+    { id: 4, name: 'work',    owner: 3, parent: null }
+];
 
 // Simple incrementing ID
 let nextId = labels.length + 1;
@@ -12,7 +15,7 @@ let nextId = labels.length + 1;
  * @returns {Array} Filtered label objects owned by the user
  */
 function getAllLabels(userId) {
-    return labels.filter(l => l.owner === userId);
+    return labels.filter(l => l.owner == userId);
 }
 
 /**
@@ -22,7 +25,7 @@ function getAllLabels(userId) {
  * @returns {object|null} Label object or null if not found
  */
 function getLabelById(id,owner) {
-    return labels.find(l => l.id === id && l.owner === owner) || null;
+    return labels.find(l => l.id == id && l.owner == owner) || null;
 }
 
 /**
@@ -109,10 +112,10 @@ function editLabelById(id, owner,newName) {
  * @returns {boolean} True if deleted, false if not found
  */
 function deleteLabelById(id,owner) {
-    const idx = labels.findIndex(l => l.id === id && l.owner === owner);
+    const idx = labels.findIndex(l => l.id == id && l.owner == owner);
     if (idx < 0) return false;
     // Recursively delete children
-    const childLabels = labels.filter(l => l.parent === id && l.owner === owner);
+    const childLabels = labels.filter(l => l.parent == id && l.owner == owner);
     childLabels.forEach(child => {
         deleteLabelById(child.id, owner);
     });
