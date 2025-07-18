@@ -73,7 +73,7 @@ const getMailById = (req, res) => {
     if (!mail)
         return res.status(404).json({error: `No mail found with ID: ${id}`});
     // ensure the mail belongs to the user
-    if (mail.owner !== userId)
+    if (mail.owner != userId)
         return res.status(403).json({error: 'mail do not belong to user'});
     return res.status(200).json({
         ...mail,
@@ -154,11 +154,8 @@ const updateMail = (req, res) => {
 
     // otherwise it’s a mail already sent - only allow flags & labels
     const {isRead, isStarred, isTrashed, isSpam, labels} = req.body || {};
-    console.log('labels', labels);
     const labelsIds = convertLabelsToIds(userId, labels || []);
-    console.log('labelsIds', labelsIds);
     const updated = Mails.editSentMail(mailId, isRead, isStarred, isTrashed, isSpam, labelsIds);
-    console.log('updated', updated);
     if (updated)
         return res.status(200).json(updated);
     if (updated === 404)
