@@ -66,7 +66,7 @@ const ReadingHeader = ({theme, toggleTheme, email, inboxType}) => {
                 newLabels = email.labels.filter(l => l.id !== label.id);
             } else {
                 // Add label without duplicates
-                const labelMap = new Map(email.labels.map(l => [l.id, l]));
+                const labelMap = new Map((email?.labels || []).map(l => [l.id, l]));
                 labelMap.set(label.id, label);
                 newLabels = Array.from(labelMap.values());
             }
@@ -141,7 +141,7 @@ const ReadingHeader = ({theme, toggleTheme, email, inboxType}) => {
                                     className={`form-check-input ${theme}`}
                                     type="checkbox"
                                     id={`label-check-${label.id}`}
-                                    checked={Array.isArray(email.labels) && email.labels.some(l => l.id === label.id)}
+                                    checked={Array.isArray(email?.labels) && email.labels.some(l => l.id === label.id)}
                                     onChange={() => handleLabelToggle(label)}
                                 />
                                 <label className="form-check-label" htmlFor={`label-check-${label.id}`}>
