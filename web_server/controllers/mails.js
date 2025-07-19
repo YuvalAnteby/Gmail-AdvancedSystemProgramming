@@ -180,12 +180,12 @@ const editDraft = async (req, res, userId, mail) => {
     if (!mail.isDraft)
         return res.status(400).json({error: 'error only drafts can be updated'});
     // Get the input params and edit the mail
-    const {subject, body, sentTo = [], saveAsDraft = true} = req.body;
+    const {subject, body, sentTo = [], saveAsDraft = true, files = []} = req.body;
     const sentToIds = convertMailsToIds(sentTo);
 
     // just update the fields in this draft
     if (saveAsDraft) {
-        const updated = Mails.updateDraft(mail.id, subject, body, sentToIds);
+        const updated = Mails.updateDraft(mail.id, subject, body, sentToIds, files);
         return res.status(200).json(updated);
     }
     // turn the draft to a new mail
@@ -195,7 +195,7 @@ const editDraft = async (req, res, userId, mail) => {
         return res.status(403).json({error: 'error mail contains blacklisted URLs'});
     // delete the draft and send a new mail
     Mails.deleteMail(userId, mail.id);
-    const ownerMail = Mails.sendNewMail(userId, subject, body, sentToIds);
+    const ownerMail = Mails.sendNewMail(userId, subject, body, sentToIds, files);
     return res.status(201).location(`/mails/${ownerMail.id}`).json(ownerMail);
 }
 

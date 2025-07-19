@@ -145,7 +145,7 @@ const MainPage = () => {
 
             {composes.map(c => (
                 <ComposeEmail
-                    key={c.id}
+                    key={`${c.id}-${theme}`}
                     theme={theme}
                     offset={c.offset}
                     draftMail={c.draftMail}
