@@ -2,12 +2,15 @@ import React, {useEffect, useRef, useState} from "react";
 import './ToolBar.css'
 import {MAILS_PER_PAGE} from "../../utils/constants";
 import useIsMobile from "../../utils/useIsMobile";
+import {fetchLabels} from "../../api/labelsApi";
+import {applyLabelsToMail} from "../../api/mailApi";
+import {Dropdown} from "react-bootstrap";
 
 const ToolBar = ({
                      theme,
                      inboxType,
-                     allSelected,
-                     anySelected,
+                     mailsAmount,
+                     selectedMails,
                      btnHandlers,
                      total,
                      page,
@@ -17,15 +20,77 @@ const ToolBar = ({
                      goToPrevPage,
                  }) => {
 
+    // checks if mobile UI or desktop
+    const isMobile = useIsMobile();
+
+    let isAllSelected = selectedMails.size === mailsAmount;
+    let isIndeterminate = selectedMails.size > 0 && selectedMails.size < mailsAmount;
+
+    // labels
+    const [labels, setLabels] = useState([]);
+    const [showLabelMenu, setShowLabelMenu] = useState(false);
+    // fetches labels
+    useEffect(() => {
+        const loadLabels = async () => {
+            try {
+                const response = await fetchLabels();
+                setLabels(response);
+            } catch (e) {
+                console.error("Failed to fetch labels", e);
+            }
+        };
+        loadLabels();
+    }, []);
+    // Helper to reload labels after changes
+    const reload = async () => {
+        try {
+            const data = await fetchLabels();
+            setLabels(data);
+        } catch (e) {
+            console.error("Failed to reload labels:", e);
+        }
+    };
+
+    // apply label selection and refresh mails
+    const handleLabelToggle = async (label) => {
+        try {
+            await Promise.all(Array.from(selectedMails).map(async mail => {
+                const hasLabel = mail.labels.some(l => l.id === label.id);
+                let newLabels;
+
+                if (hasLabel) {
+                    // Remove label
+                    newLabels = mail.labels.filter(l => l.id !== label.id);
+                } else {
+                    // add label - no duplicates
+                    const labelMap = new Map(mail.labels.map(l => [l.id, l]));
+                    labelMap.set(label.id, label);
+                    newLabels = Array.from(labelMap.values());
+                }
+                // update UI
+                mail.labels = newLabels
+                    .map(newLabel => labels.find(l => l.id === newLabel.id))
+                    .filter(Boolean);
+                mail._forceUpdate = Date.now();
+                // Send new label list to backend
+                await applyLabelsToMail(mail.id, newLabels);
+
+            }));
+            isAllSelected = false;
+            setShowLabelMenu(false);
+            btnHandlers.clearSelection();
+        } catch (e) {
+            console.error("Failed to update label:", e);
+        }
+    };
+
     // for cases where not all mails were selected but some do
     const selectAllRef = useRef(null);
     useEffect(() => {
         if (selectAllRef.current) {
-            selectAllRef.current.indeterminate = !allSelected && anySelected;
+            selectAllRef.current.indeterminate = isIndeterminate;
         }
-    }, [allSelected, anySelected]);
-
-    const isMobile = useIsMobile();
+    }, [isIndeterminate]);
 
     return (
         <div className="toolbar-container">
@@ -34,7 +99,7 @@ const ToolBar = ({
                 <input
                     ref={selectAllRef}
                     type="checkbox"
-                    checked={allSelected}
+                    checked={isAllSelected}
                     onChange={btnHandlers.handleSelectAll}
                 />
                 select all
@@ -46,7 +111,7 @@ const ToolBar = ({
                 onClick={btnHandlers.handleRefresh}
             />
             {/* additional buttons - shown when mails selected */}
-            {anySelected && (
+            {selectedMails.size > 0 && (
                 <div className="d-flex flex-row">
                     {/* mark read button */}
                     <i
@@ -95,6 +160,34 @@ const ToolBar = ({
                             </button>
                         </div>
                     )}
+                    {/* label picker for selected mails */}
+                    <Dropdown show={showLabelMenu} onToggle={setShowLabelMenu} onClick={reload}>
+                        <Dropdown.Toggle
+                            className={`btn bi bi-tag icon ${theme} border-0 p-2`}
+                            title="Manage Labels"
+                            variant="outline-secondary"
+                            id="dropdown-labels"
+                        />
+                        <Dropdown.Menu className={`p-2 labels-dropdown ${theme}`}>
+                            {labels.map(label => (
+                                <div key={label.id} className="form-check">
+                                    <input
+                                        className={`form-check-input ${theme}`}
+                                        type="checkbox"
+                                        id={`label-check-${label.id}`}
+                                        checked={Array.from(selectedMails).every(mail =>
+                                            Array.isArray(mail.labels) &&
+                                            mail.labels.some(l => l.id === label.id)
+                                        )}
+                                        onChange={() => handleLabelToggle(label)}
+                                    />
+                                    <label className="form-check-label" htmlFor={`label-check-${label.id}`}>
+                                        {label.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </div>
             )}
             {/* paging info and buttons - always shown */}

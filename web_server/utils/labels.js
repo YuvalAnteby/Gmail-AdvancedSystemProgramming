@@ -2,16 +2,15 @@ const Labels = require("../models/labels");
 
 /**
  * Converts an array of label names to their ids
- * @param userId owner of the label
- * @param labelsByNames array of labels' names
+ * @param {string} userId owner of the label
+ * @param {Array} labelsObjects array of labels' objects
  * @returns {number[]} array of labels ids
  */
-function convertLabelsToIds(userId, labelsByNames) {
-    if (!labelsByNames)
+function convertLabelsToIds(userId, labelsObjects) {
+    if (!labelsObjects)
         return [];
-    return labelsByNames.map(label => {
-        return Labels.getLabelByName(userId, label).id;
-    })
+    const ids = labelsObjects.map(label => label.id);
+    return [...new Set(ids)];
 }
 
 /**
@@ -21,9 +20,12 @@ function convertLabelsToIds(userId, labelsByNames) {
  * @returns {*} array of labels elements
  */
 function labelsToFullElement(userId, labelsIds) {
-    return labelsIds.map(label => {
-        return Labels.getLabelById(userId, label);
-    })
+    if (!labelsIds)
+        return [];
+    const objects = labelsIds
+        .map(id => Labels.getLabelById(id, userId))
+        .filter(label => label);
+    return [...new Set(objects)];
 }
 
 /**
@@ -33,9 +35,9 @@ function labelsToFullElement(userId, labelsIds) {
  */
 const mailLabelNames = (userId, mail) => {
     return (mail.labels || [])
-        .map(labelId => Labels.getLabelById(userId, labelId).name)
-        .filter(Boolean)
-        .map(name => name.toLowerCase());
+        .map(labelId => Labels.getLabelById(labelId, userId))
+        .filter(label => label && label.name)
+        .map(label => label.name.toLowerCase());
 };
 
 module.exports = {convertLabelsToIds, labelsToFullElement, mailLabelNames}

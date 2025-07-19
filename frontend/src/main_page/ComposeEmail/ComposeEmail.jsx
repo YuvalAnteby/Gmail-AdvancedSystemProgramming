@@ -56,7 +56,7 @@ export default function ComposeEmail({
             editorRef.current.innerHTML = initial;
         }
 
-        setAttachments(draftMail.attachments || []);
+        setAttachments(draftMail.files || []);
         setToQuery('');
         setSuggestions([]);
     }, [draftMail]);
@@ -73,6 +73,14 @@ export default function ComposeEmail({
         }, 300);
         return () => clearTimeout(timer);
     }, [toQuery]);
+    // ── auto‑minimize on narrow viewports ──
+    useEffect(() => {
+        const mql = window.matchMedia('(max-width: 600px)');
+        const handler = e => setView(e.matches ? 'minimized' : 'normal');
+        // modern API
+        mql.addEventListener('change', handler);
+        return () => mql.removeEventListener('change', handler);
+    }, []);
 
     // Add recipient if not already present
     const addRecipient = email => {

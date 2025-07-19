@@ -245,7 +245,8 @@ export async function updateMail(mailId, {
     subject,
     body,
     sentTo,
-    saveAsDraft = true
+    saveAsDraft = true,
+    files = []
 }) {
     const url = `${API_BASE}/mails/${mailId}`;
     const token = localStorage.getItem("token");
@@ -256,7 +257,7 @@ export async function updateMail(mailId, {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({subject, body, sentTo, saveAsDraft})
+        body: JSON.stringify({subject, body, sentTo, saveAsDraft, files})
     });
 
     if (!res.ok) throw new Error(`updateMail failed: ${res.status}`);
@@ -280,6 +281,32 @@ export async function getMailsByLabel(labelId, page = 1) {
             "Authorization": `Bearer ${token}`
         }
     });
+    if (!res.ok) {
+        throw new Error(`getMailsByLabel failed: ${res.status}`);
+    }
+    return res.json();
+}
+
+/**
+ * Edits a mail with the new labels picked for it
+ * @param {number} mailId id of the mail to edit its labels
+ * @param {any[]} labels list of label object
+ * @returns {Promise<void>}
+ */
+export async function applyLabelsToMail(mailId, labels) {
+    console.log(labels)
+    const token = localStorage.getItem("token");
+    const url = `${API_BASE}/mails/${mailId}`;
+
+    const res = await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+
+        },
+        body: JSON.stringify({labels})
+    })
     if (!res.ok) {
         throw new Error(`getMailsByLabel failed: ${res.status}`);
     }

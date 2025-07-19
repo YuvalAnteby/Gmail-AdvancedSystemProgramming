@@ -123,6 +123,7 @@
         transition: transform 0.3s ease-in-out;
         z-index: 1050;
         padding-top: 5rem;
+        overflow: visible;
     }
     .sidebar.show {
         transform: translateX(0);

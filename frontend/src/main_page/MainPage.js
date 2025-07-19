@@ -61,14 +61,12 @@ const MainPage = () => {
     } = useMails(inboxType);
 
     const [selectedMails, setSelectedMails] = useState(new Set());
-    const allSelected = selectedMails.size === emails.length;
-    const anySelected = selectedMails.size > 0;
 
     const handlers = useMailToolbarHandlers(
         selectedMails,
         setSelectedMails,
         emails,
-        refreshMails
+        refreshMails,
     );
 
     const handleSelect = (mail, checked) => {
@@ -85,9 +83,9 @@ const MainPage = () => {
     useEffect(() => {
         if (location.state?.inboxType) {
             setInboxType(location.state.inboxType);
+            setSelectedMails(new Set());
         }
     }, [location.state?.inboxType]);
-
     return (
         <div className={`main-page ${theme}`}>
             <TopMenu
@@ -106,6 +104,8 @@ const MainPage = () => {
                         onComposeClick={handleComposeClick}
                         showSidebar={showSidebar}
                         setShowSidebar={setShowSidebar}
+                        clearSelection={handlers.clearSelection}
+                        refreshMails={refreshMails}
                     />
                 </div>
 
@@ -113,8 +113,8 @@ const MainPage = () => {
                     <ToolBar
                         theme={theme}
                         inboxType={inboxType}
-                        allSelected={allSelected}
-                        anySelected={anySelected}
+                        mailsAmount={emails.length}
+                        selectedMails={selectedMails}
                         btnHandlers={handlers}
                         total={total}
                         page={page}
@@ -122,6 +122,7 @@ const MainPage = () => {
                         hasPrevPage={hasPrevPage}
                         goToNextPage={goToNextPage}
                         goToPrevPage={goToPrevPage}
+                        refreshMails={refreshMails}
                     />
                     {loading ? (
                         <SkeletonEmail rows={10} />
@@ -144,12 +145,12 @@ const MainPage = () => {
 
             {composes.map(c => (
                 <ComposeEmail
-                    key={c.id}
+                    key={`${c.id}-${theme}`}
                     theme={theme}
                     offset={c.offset}
                     draftMail={c.draftMail}
                     onCancel={() =>{ handleCloseCompose(c.id);
-                    refreshMails(c.id);}}
+                        refreshMails();}}
                     onSend={() => {
                         handleCloseCompose(c.id);
                         refreshMails();

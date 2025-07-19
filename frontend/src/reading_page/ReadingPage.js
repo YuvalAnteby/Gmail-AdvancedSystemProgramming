@@ -22,7 +22,7 @@ const ReadingPage = () => {
     const [composeProps, setComposeProps] = useState(null);
     // Read inboxType from location state
     const location = useLocation();
-    const { inboxType } = location.state || {};
+    const {inboxType} = location.state || {};
 
     // Load the mail when ID changes
     useEffect(() => {
@@ -69,7 +69,7 @@ ${email.body}`,
 
     // Allow updating the "starred" state locally
     const handleStarToggle = (newStarValue) => {
-        setEmail(prev => ({ ...prev, isStarred: newStarValue }));
+        setEmail(prev => ({...prev, isStarred: newStarValue}));
     };
 
     return (
@@ -78,10 +78,16 @@ ${email.body}`,
             <ReadingHeader theme={theme} toggleTheme={toggleTheme} email={email} inboxType={inboxType}/>
             {/* Main content */}
             {loading ? (
-                <SkeletonEmail />
+                <SkeletonEmail/>
             ) : (
                 <div className="email-view-content">
                     <h1 className="email-view-title">{email.subject}</h1>
+                    <div className="d-flex flex-wrap align-items-center mt-1">
+                        {email.labels?.map(label => (
+                            <span key={label.id} className="badge rounded-pill bg-secondary ms-2 mb-2">{label.name}</span>
+                        ))}
+                    </div>
+
                     {/* Sender info and date */}
                     <div className={`email-view-meta ${theme}`}>
                         <SenderDetails email={email} theme={theme} onUpdate={handleStarToggle}/>
@@ -90,13 +96,13 @@ ${email.body}`,
                     {/* Email body with safe links */}
                     <div
                         className="email-body"
-                        dangerouslySetInnerHTML={{ __html: addBlankToLinks(email.body) }}
+                        dangerouslySetInnerHTML={{__html: addBlankToLinks(email.body)}}
                     />
                     <div className="separator"></div>
                     {/* Attachments if any */}
                     {email.files && email.files.length > 0 && (
                         <div>
-                            <h6 style={{ textAlign: "start", marginBottom: 0 }}>Attachments:</h6>
+                            <h6 style={{textAlign: "start", marginBottom: 0}}>Attachments:</h6>
                             <FileList files={email.files} theme={theme}/>
                         </div>
                     )}
@@ -121,7 +127,7 @@ ${email.body}`,
                     onSend={() => setComposeProps(null)}
                     offset={0}
                     draftMail={{
-                        sentTo: composeProps.recipients.map(mail => ({ mail })),
+                        sentTo: composeProps.recipients.map(mail => ({mail})),
                         subject: composeProps.subject,
                         body: composeProps.body,
                         attachments: composeProps.attachments

@@ -1,3 +1,4 @@
+/* ── Base drawer with transitions & overflow hidden ── */
 .compose-email {
     position: fixed;
     bottom: 2vh;
@@ -8,20 +9,31 @@
     background: #fff;
     border: 1px solid #dadce0;
     border-radius: 8px 8px 0 0;
-    box-shadow: 0 1px 2px rgba(60,64,67,0.15),
-    0 2px 6px rgba(60,64,67,0.15);
+    box-shadow:
+            0 1px 2px rgba(60,64,67,0.15),
+            0 2px 6px rgba(60,64,67,0.15);
     display: flex;
     flex-direction: column;
     font-family: 'Roboto', sans-serif;
     z-index: 1000;
-    color: #202124; /* default text color */
+    color: #202124;
+    transition: all 0.2s ease;
+    overflow: hidden;
 }
 
+/* ── Minimized: only header shows ── */
+.compose-email.minimized {
+    height: auto;       /* shrink to header bar */
+    width: 250px;       /* Gmail‑style small width */
+    max-width: 100%;
+    bottom: 0;
+}
 .compose-email.minimized .compose-body,
 .compose-email.minimized .compose-footer {
     display: none;
 }
 
+/* ── Maximized: inset overlay with gutters ── */
 .compose-email.maximized {
     top: 10vh !important;
     bottom: 10vh !important;
@@ -29,10 +41,37 @@
     right: 10vw !important;
     width: auto !important;
     height: auto !important;
-    max-width: none !important;
-    max-height: none !important;
+    max-width: 80vw !important;
+    max-height: 80vh !important;
     border-radius: 8px !important;
+    overflow: hidden;
+
+    /* inherit whatever the root .compose-email is set to */
+    background: inherit !important;
+    border-color: inherit !important;
 }
+
+/* ── Responsive auto‑minimize under 600px ── */
+@media (max-width: 600px) {
+    .compose-email {
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: none;
+    }
+    /* collapse unless user manually maximized */
+    .compose-email:not(.maximized) {
+        height: auto;
+        bottom: 0;
+    }
+    /* if maximized, fill screen */
+    .compose-email.maximized {
+        height: 100% !important;
+        width: 100% !important;
+    }
+}
+
+/* --- existing styles below this line --- */
 
 .compose-header {
     background: #f1f3f4;
@@ -49,11 +88,10 @@
     color: #202124;
 }
 
-/* --- Only this part was added for dark mode title --- */
+/* Dark mode title override */
 .compose-email.dark .compose-title {
     color: #f1f3f4 !important;
 }
-/* ---------------------------------------- */
 
 .compose-controls .control-btn {
     background: transparent;
@@ -193,7 +231,6 @@
     border-bottom-color: #1a73e8;
 }
 
-
 .attachment-item {
     display: flex;
     align-items: center;
@@ -231,18 +268,6 @@
 .attachment-item .remove-btn:hover {
     color: #d93025;
 }
-
-/* Optional: dark mode tweaks */
-.compose-email.dark .attachment-item {
-    color: #e8eaed;
-}
-.compose-email.dark .remove-btn {
-    color: #9aa0a6;
-}
-.compose-email.dark .remove-btn:hover {
-    color: #f28b82;
-}
-
 
 .compose-footer {
     padding: 0.5em 1em;

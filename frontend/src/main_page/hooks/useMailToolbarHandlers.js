@@ -91,6 +91,12 @@ export const useMailToolbarHandlers = (selectedMails, setSelectedMails, allEmail
         setSelectedMails(new Set());
     }, [selectedMails, setSelectedMails]);
 
+    // Clears selection of mails
+    const clearSelection = useCallback(async () => {
+        setSelectedMails(new Set());
+        refreshMails();
+    }, []);
+
     return {
         handleSelectAll,
         handleRefresh,
@@ -98,5 +104,6 @@ export const useMailToolbarHandlers = (selectedMails, setSelectedMails, allEmail
         handleMarkAsRead,
         handleMarkSpam,
         handleRestore,
+        clearSelection,
     };
 }

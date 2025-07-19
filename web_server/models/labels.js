@@ -1,27 +1,31 @@
 // Initial example labels
-let labels = [
+let labels = [ 
     { id: 1, name: 'work',    owner: 1, parent: null },
     { id: 2, name: 'friends', owner: 1, parent: null },
+    { id: 3, name: 'work',    owner: 2, parent: null },
+    { id: 4, name: 'work',    owner: 3, parent: null }
 ];
 
 // Simple incrementing ID
 let nextId = labels.length + 1;
 
 /**
- * Get all labels (no user filter; in a real app, should filter by user)
- * @returns {Array} All label objects
+ * Return all labels owned by a specific user.
+ * @param {number} userId - ID of the user requesting the labels
+ * @returns {Array} Filtered label objects owned by the user
  */
-function getAllLabels() {
-    return labels;
+function getAllLabels(userId) {
+    return labels.filter(l => l.owner == userId);
 }
 
 /**
- * Find a label by its ID
- * @param {number} id
+ * Find a label by its ID and owner
+ * @param {number} id - ID of label
+ * @param {number} owner - ID of the user
  * @returns {object|null} Label object or null if not found
  */
-function getLabelById(id) {
-    return labels.find(l => l.id === id);
+function getLabelById(id,owner) {
+    return labels.find(l => l.id == id && l.owner == owner) || null;
 }
 
 /**
@@ -31,9 +35,29 @@ function getLabelById(id) {
  * @returns {object} The created label
  */
 function createNewLabel(owner, name) {
+    if (isDuplicateLabel(owner, name, null)) return null;
     const lab = { id: nextId++, owner, name, parent: null };
     labels.push(lab);
     return lab;
+}
+
+/**
+ * Check if a label with the same name already exists
+ * for a given user and (optional) parent.
+ * Used to prevent duplicates on create/edit.
+ * @param {number} owner - User ID
+ * @param {string} name - Label name to check
+ * @param {number|null} parent - Parent label ID or null
+ * @param {number|null} excludeId - Optional: label ID to exclude from check (for editing)
+ * @returns {boolean} True if duplicate exists, false otherwise
+ */
+function isDuplicateLabel(owner, name, parent = null, excludeId = null) {
+    return labels.some(l =>
+        l.owner === owner &&
+        l.name === name &&
+        l.parent === parent &&
+        (excludeId === null || l.id !== excludeId)
+    );
 }
 
 /**
@@ -45,12 +69,17 @@ function createNewLabel(owner, name) {
  */
 function createSublabel(owner, parent, name) {
     // Check parent exists (could also check ownership)
-    if (!labels.find(l => l.id === parent)) return null;
+    const parentLabel = getLabelById(parent, owner);
+    if (!parentLabel) return null;
+
+    // Prevent duplicate sublabel names under the same parent for the same user
+    if (isDuplicateLabel(owner, name, parent)) throw new Error("409")
+
     const newLabel = {
-        id: nextId++,     // Use global nextId for unique ID
+        id: nextId++,
         name,
         owner,
-        parent,           // Link to parent label by id
+        parent,
     };
     labels.push(newLabel);
     return newLabel;
@@ -59,24 +88,39 @@ function createSublabel(owner, parent, name) {
 /**
  * Rename a label by ID
  * @param {number} id
- * @param {string} name
+ * @param {string} newName
+ * @param {number} owner - User ID
  * @returns {object|null} Updated label or null if not found
  */
-function editLabelById(id, name) {
-    const lab = getLabelById(id);
-    if (!lab) return null;
-    lab.name = name;
-    return lab;
+function editLabelById(id, owner,newName) {
+    // Check parent exists (could also check ownership)
+    const Label = getLabelById(id, owner);
+    if (!Label) return null;
+    // Check if another label with the same name already exists
+    if (isDuplicateLabel(owner, newName, Label.parent, id)) {
+            throw new Error("409");
+        }
+    // Rename the label
+    Label.name = newName;
+    return Label;
 }
 
 /**
  * Delete a label by ID (does not cascade to sublabels)
  * @param {number} id
+ * @param {number} owner - User ID
  * @returns {boolean} True if deleted, false if not found
  */
-function deleteLabelById(id) {
-    const idx = labels.findIndex(l => l.id === id);
+function deleteLabelById(id,owner) {
+    const idx = labels.findIndex(l => l.id == id && l.owner == owner);
     if (idx < 0) return false;
+    // Recursively delete children
+    const childLabels = labels.filter(l => l.parent == id && l.owner == owner);
+    childLabels.forEach(child => {
+        deleteLabelById(child.id, owner);
+    });
+
+    // Delete the label itself
     labels.splice(idx, 1);
     return true;
 }
