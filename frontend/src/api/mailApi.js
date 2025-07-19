@@ -245,7 +245,8 @@ export async function updateMail(mailId, {
     subject,
     body,
     sentTo,
-    saveAsDraft = true
+    saveAsDraft = true,
+    files = []
 }) {
     const url = `${API_BASE}/mails/${mailId}`;
     const token = localStorage.getItem("token");
@@ -256,7 +257,7 @@ export async function updateMail(mailId, {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({subject, body, sentTo, saveAsDraft})
+        body: JSON.stringify({subject, body, sentTo, saveAsDraft, files})
     });
 
     if (!res.ok) throw new Error(`updateMail failed: ${res.status}`);

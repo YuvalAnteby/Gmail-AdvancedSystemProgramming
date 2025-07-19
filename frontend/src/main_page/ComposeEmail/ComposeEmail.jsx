@@ -56,7 +56,7 @@ export default function ComposeEmail({
             editorRef.current.innerHTML = initial;
         }
 
-        setAttachments(draftMail.attachments || []);
+        setAttachments(draftMail.files || []);
         setToQuery('');
         setSuggestions([]);
     }, [draftMail]);
