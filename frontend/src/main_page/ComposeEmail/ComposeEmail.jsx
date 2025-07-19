@@ -74,16 +74,14 @@ export default function ComposeEmail({
         return () => clearTimeout(timer);
     }, [toQuery]);
     // ── auto‑minimize on narrow viewports ──
-       useEffect(() => {
-             const mq = window.matchMedia("(max-width: 600px)");
-             const handler = e => {
-                   // if under 600px → minimized; else → normal
-                       setView(e.matches ? "minimized" : "normal");
-                };
-             mq.addListener(handler);
-             handler(mq);
-             return () => mq.removeListener(handler);
-           }, []);
+    useEffect(() => {
+        const mql = window.matchMedia('(max-width: 600px)');
+        const handler = e => setView(e.matches ? 'minimized' : 'normal');
+        // modern API
+        mql.addEventListener('change', handler);
+        return () => mql.removeEventListener('change', handler);
+    }, []);
+
     // Add recipient if not already present
     const addRecipient = email => {
         const e = email.trim();
