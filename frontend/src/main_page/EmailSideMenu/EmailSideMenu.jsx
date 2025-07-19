@@ -33,7 +33,8 @@ export default function EmailSidebar({
                                          onComposeClick,   // Callback for "Compose" button
                                          showSidebar,      // Boolean: is sidebar open (mobile)
                                          setShowSidebar,   // Callback to toggle sidebar (mobile)
-                                         clearSelection
+                                         clearSelection,
+                                         refreshMails
                                      }) {
     const isMobile = useIsMobile();
     const [labels, setLabels] = useState([]); // Flat list of all labels (from backend)
@@ -56,16 +57,36 @@ export default function EmailSidebar({
     const handleAddLabel = async () => {
         const name = prompt("New label name:");
         if (!name) return;
-        await createLabel(name);
-        await reload();
+
+        try {
+            await createLabel(name);
+            await reload();
+        } catch (err) {
+            if (err.message.includes("409")) {
+                alert(`A label named "${name}" already exists.`);
+            } else {
+                alert("An error occurred while creating the label.");
+                console.error(err);
+            }
+        }
     };
 
     // Rename label
     const handleEditLabel = async lab => {
         const name = prompt("Rename label:", lab.name);
         if (!name || name === lab.name) return;
-        await editLabel(lab.id, name);
-        await reload();
+        try {
+            await editLabel(lab.id, name);
+            await reload();
+            await refreshMails();
+        } catch (err) {
+            if (err.message.includes("409")) {
+                alert(`A label named "${name}" already exists.`);
+            } else {
+                alert("An error occurred while creating the label.");
+                console.error(err);
+            }
+        }
     };
 
     // Delete label with confirmation
@@ -73,14 +94,24 @@ export default function EmailSidebar({
         if (!window.confirm(`Delete "${lab.name}"?`)) return;
         await deleteLabel(lab.id);
         await reload();
+        await refreshMails();
     };
 
     // Add sublabel under parent
     const handleAddSublabel = async lab => {
         const name = prompt(`Sublabel name under "${lab.name}":`);
         if (!name) return;
-        await createLabelUnderParent(lab.id, name);
-        await reload();
+        try {
+            await createLabelUnderParent(lab.id, name);
+            await reload();
+        } catch (err) {
+            if (err.message.includes("409")) {
+                alert(`A label named "${name}" already exists.`);
+            } else {
+                alert("An error occurred while creating the label.");
+                console.error(err);
+            }
+        }
     };
 
     // Open the context menu at the position of the clicked label
@@ -177,9 +208,9 @@ export default function EmailSidebar({
     return (
         <div className={`sidebar ${theme} ${showSidebar ? 'show' : ''}`}>
             {/* Compose button (desktop only) */}
-                <button className={`btn compose-button ${theme}`} onClick={onComposeClick}>
-                    <i className="bi bi-pencil-square me-2" /> Compose
-                </button>
+            <button className={`btn compose-button ${theme}`} onClick={onComposeClick}>
+                <i className="bi bi-pencil-square me-2" /> Compose
+            </button>
 
             {/* Folders (Inbox, Sent, etc.) */}
             <ul className="nav nav-pills flex-column">

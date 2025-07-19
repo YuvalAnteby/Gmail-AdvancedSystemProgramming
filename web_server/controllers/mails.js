@@ -2,7 +2,7 @@ const Mails = require('../models/mails');
 const Blacklist = require('../models/blacklist');
 const {extractUrls} = require("../utils/mails");
 const {convertMailsToIds, usersToFullElement} = require("../utils/users");
-const {convertLabelsToIds, labelsToFullElement, mailLabelNames} = require("../utils/labels");
+const {convertLabelsToIds, labelsToFullElement} = require("../utils/labels");
 
 /**
  * Gets the last 50 mails of a user, ordered by the most recent (first) to least recent (last)
@@ -19,7 +19,8 @@ const getLastMailsOrdered = (req, res) => {
         return res.status(400).json({error: 'User not authenticated - failed fetching last 50 mails'});
     const inboxType = req.query.inboxType || 'all';
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 50; // limit is 50 according to instructions
+    // limit is 50 according to instructions
+    const limit = Number(req.query.limit) || 50;
 
     const labelIdFilter = Number(req.query.label);
     let {paged, total} = Mails.getUserMails(userId, limit, inboxType, page);
@@ -145,7 +146,7 @@ const updateMail = (req, res) => {
     if (isNaN(mailId))
         return res.status(400).json({error: 'error no valid mail id was given'});
     const mail = Mails.getMail(mailId);
-    if (!mailId || mail.owner !== userId)
+    if (!mailId || mail.owner != userId)
         return res.status(404).json({error: 'error mail not found'});
     // edit it as a draft
     if (mail.isDraft)
@@ -153,11 +154,8 @@ const updateMail = (req, res) => {
 
     // otherwise it’s a mail already sent - only allow flags & labels
     const {isRead, isStarred, isTrashed, isSpam, labels} = req.body || {};
-    console.log('labels', labels);
     const labelsIds = convertLabelsToIds(userId, labels || []);
-    console.log('labelsIds', labelsIds);
     const updated = Mails.editSentMail(mailId, isRead, isStarred, isTrashed, isSpam, labelsIds);
-    console.log('updated', updated);
     if (updated)
         return res.status(200).json(updated);
     if (updated === 404)

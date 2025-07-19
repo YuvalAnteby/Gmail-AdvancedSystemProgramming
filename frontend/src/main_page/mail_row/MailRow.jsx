@@ -21,10 +21,10 @@ const MailRow = ({
                      isSelected,
                      onSelect,
                      onUpdate,
-                     onOpenDraft
+                     onOpenDraft,
                  }) => {
     const navigate = useNavigate();
-
+    // Handle opening an email (navigate to full view or open draft)
     const handleMailOpen = async () => {
         await markMailAsRead(email, onUpdate);
         if (inboxType === "draft" && onOpenDraft) {
@@ -33,7 +33,6 @@ const MailRow = ({
             navigate(`/mails/${email.id}`, {state: {inboxType}});
         }
     };
-
     return (
         <div className={`mail-row-item ${theme} ${email.isRead ? "read" : "unread"}`}>
             <div className="row-top-controls">
@@ -52,11 +51,10 @@ const MailRow = ({
                     <div className="email-title-body">
                         <div className={`email-subject ${theme}`}>{email.subject}</div>
                         <div className="mail-labels">
-                            {email.labels?.map(label => (
-                                <span key={label.id} className="badge rounded-pill bg-secondary me-1"
-                                >
-                                {label.name}
-                            </span>
+                            {(email.labels || []).map(label => (
+                                <span key={label.id} className="badge rounded-pill bg-secondary me-1">
+                                    {label.name}
+                                </span>
                             ))}
                         </div>
                         <div className={`email-preview ${theme}`}>{stripHtml(email.body)}</div>

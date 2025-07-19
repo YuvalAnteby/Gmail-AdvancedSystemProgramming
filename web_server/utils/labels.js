@@ -22,7 +22,9 @@ function convertLabelsToIds(userId, labelsObjects) {
 function labelsToFullElement(userId, labelsIds) {
     if (!labelsIds)
         return [];
-    const objects = labelsIds.map(id => Labels.getLabelById(id));
+    const objects = labelsIds
+        .map(id => Labels.getLabelById(id, userId))
+        .filter(label => label);
     return [...new Set(objects)];
 }
 
@@ -33,9 +35,9 @@ function labelsToFullElement(userId, labelsIds) {
  */
 const mailLabelNames = (userId, mail) => {
     return (mail.labels || [])
-        .map(labelId => Labels.getLabelById(labelId).name)
-        .filter(Boolean)
-        .map(name => name.toLowerCase());
+        .map(labelId => Labels.getLabelById(labelId, userId))
+        .filter(label => label && label.name)
+        .map(label => label.name.toLowerCase());
 };
 
 module.exports = {convertLabelsToIds, labelsToFullElement, mailLabelNames}

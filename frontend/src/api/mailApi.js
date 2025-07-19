@@ -296,16 +296,15 @@ export async function applyLabelsToMail(mailId, labels) {
     console.log(labels)
     const token = localStorage.getItem("token");
     const url = `${API_BASE}/mails/${mailId}`;
+
     const res = await fetch(url, {
         method: "PATCH",
         headers: {
             "Authorization": `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json"
 
         },
-        body: JSON.stringify({
-            labels: labels,
-        })
+        body: JSON.stringify({labels})
     })
     if (!res.ok) {
         throw new Error(`getMailsByLabel failed: ${res.status}`);

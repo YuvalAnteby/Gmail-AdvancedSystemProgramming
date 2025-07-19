@@ -41,6 +41,15 @@ const ToolBar = ({
         };
         loadLabels();
     }, []);
+    // Helper to reload labels after changes
+    const reload = async () => {
+        try {
+            const data = await fetchLabels();
+            setLabels(data);
+        } catch (e) {
+            console.error("Failed to reload labels:", e);
+        }
+    };
 
     // apply label selection and refresh mails
     const handleLabelToggle = async (label) => {
@@ -59,7 +68,10 @@ const ToolBar = ({
                     newLabels = Array.from(labelMap.values());
                 }
                 // update UI
-                mail.labels = newLabels;
+                mail.labels = newLabels
+                    .map(newLabel => labels.find(l => l.id === newLabel.id))
+                    .filter(Boolean);
+                mail._forceUpdate = Date.now();
                 // Send new label list to backend
                 await applyLabelsToMail(mail.id, newLabels);
 
@@ -149,7 +161,7 @@ const ToolBar = ({
                         </div>
                     )}
                     {/* label picker for selected mails */}
-                    <Dropdown show={showLabelMenu} onToggle={setShowLabelMenu}>
+                    <Dropdown show={showLabelMenu} onToggle={setShowLabelMenu} onClick={reload}>
                         <Dropdown.Toggle
                             className={`btn bi bi-tag icon ${theme} border-0 p-2`}
                             title="Manage Labels"

@@ -86,7 +86,6 @@ const MainPage = () => {
             setSelectedMails(new Set());
         }
     }, [location.state?.inboxType]);
-
     return (
         <div className={`main-page ${theme}`}>
             <TopMenu
@@ -106,6 +105,7 @@ const MainPage = () => {
                         showSidebar={showSidebar}
                         setShowSidebar={setShowSidebar}
                         clearSelection={handlers.clearSelection}
+                        refreshMails={refreshMails}
                     />
                 </div>
 
@@ -150,7 +150,7 @@ const MainPage = () => {
                     offset={c.offset}
                     draftMail={c.draftMail}
                     onCancel={() =>{ handleCloseCompose(c.id);
-                    refreshMails();}}
+                        refreshMails();}}
                     onSend={() => {
                         handleCloseCompose(c.id);
                         refreshMails();
