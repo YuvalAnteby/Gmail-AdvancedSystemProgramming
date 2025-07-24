@@ -11,7 +11,7 @@ Roee's miluim service documents are uploaded to `Issues` tab if needed, Tzvika w
   - [Getting started](#getting-started)
   - [Testing bloom filter server and python client](#to-test-the-python-client-and-bloom-filter-server) 
   - [Running as web application project](#running-the-entire-web-app)
-  - [Changing env variables](#changing-env-variables)
+  - [env variables](#env-variables)
 - [Screenshots](#screenshots)
 - [Useful links](#useful-links)
   - [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Exe/server_cpp) 
@@ -42,7 +42,7 @@ This will build and run only the web application related containers (React, Node
   docker-compose --profile web_app up --build
 ```
 
-### Changing env variables
+### env variables
 In Node.js and React root folders you can find .env files with default values to help you check the project.</br>
 In a real world application these wouldn't be uploaded, we did it for easier set up for the checkers :)
 
