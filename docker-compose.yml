@@ -8,8 +8,10 @@ services:
     container_name: react_frontend
     depends_on:
       - web_server
+    env_file:
+      - ./frontend/.env
     ports:
-      - "3000:3000"
+      - "${REACT_APP_PORT:-3000}:3000"
     networks:
       - gmail-net
 

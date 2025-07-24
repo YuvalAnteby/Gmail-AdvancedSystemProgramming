@@ -3,8 +3,7 @@ import {convertToBase64} from "../utils/files";
 /**
  * File responsible on calls to the web server for profile related information.
  */
-// Base URL — adjust port if needed
-const API_BASE = "http://localhost:3001/api";
+const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:3001/api";
 
 /**
  * change the user's profile picture (doesn't save the image, only updates the path)
