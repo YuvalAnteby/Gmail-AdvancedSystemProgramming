@@ -20,10 +20,12 @@ services:
       context: ./web_server
       dockerfile: Dockerfile
     container_name: web_server
-    ports:
-      - "3001:3001"
+    env_file:
+      - ./web_server/.env
     depends_on:
       - run_server
+    ports:
+      - "${NODE_PORT:-3001}:3001"
     networks:
       - gmail-net
 
