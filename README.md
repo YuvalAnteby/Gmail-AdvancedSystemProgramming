@@ -1,8 +1,8 @@
 # Gmail-AdvancedSystemProgramming
 Daily meeting summaries are uploaded to `Issues` tab
-## Dear TA please check main-Ex1 for the final version of Ex1
-## Dear TA please check main-Ex2 for the final version of Ex2
-## Dear TA please check main-Ex3 for the final version of Ex3
+Roee's miluim service documents are uploaded to `Issues` tab if needed, Tzvika was informed about it.
+
+## Dear TA please check main-Ex4 for the final version of Ex4
 
 ---
 
@@ -10,10 +10,9 @@ Daily meeting summaries are uploaded to `Issues` tab
 - [Running server and client](#testing-and-running)
   - [Getting started](#getting-started)
   - [Testing bloom filter server and python client](#to-test-the-python-client-and-bloom-filter-server) 
-  - [Running the web server](#running-the-servers)
-
-- [Screenshots & routes examples](#screenshots)
-  - [Ex3](#ex3-screenshots)
+  - [Running as web application project](#running-the-entire-web-app)
+  - [env variables](#env-variables)
+- [Screenshots](#screenshots)
 - [Useful links](#useful-links)
   - [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Exe/server_cpp) 
   - [Python client README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/python_client/README.md)
@@ -28,32 +27,30 @@ First clone the project
 git clone https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming.git
 cd Gmail-AdvancedSystemProgramming/python_client
 ```
-And build it
-```bash
-  docker-compose build
-```
+**If you want to change the configuration (ports, names, bloom filter integers etc.) you can do it in dockerfiles 
+and docker compose.**
 
 ### To test the python client and bloom filter server
-**Make sure you already cloned the project and built it using docker compose**
+This will build and run only the test related containers (CPP server, gtest, python test)
 ```bash
-  docker-compose run --build --rm gtest
-  docker-compose run --build --rm test_client
+  docker-compose --profile tests up --build
 ```
 
-#### Running the servers
-**Make sure you already cloned the project and built it using docker compose** </br>
-In case you want to change any configuration value (port, bloom filter integers etc.) change the relevant dockerfile or docker compose file. </br>
-Changing the port and the name of the cpp server also requires changing models/blacklist.js global vars (since we shouldn't include .env files)
+### Running the entire web app
+This will build and run only the web application related containers (React, Node.js, CPP server)
+```bash
+  docker-compose --profile web_app up --build
+```
 
-- To run the web server and bloom filter server
+### env variables
+In Node.js and React root folders you can find .env files with default values to help you check the project.</br>
+In a real world application these wouldn't be uploaded, we did it for easier set up for the checkers :)
+
+### Running the python client
+**NOTE: The instructions didn't ask to run the python client and express server together using the same command**
 ```bash
-  docker-compose up web_server
+  docker-compose run client --build
 ```
-- To run the python client 
-```bash
-  docker-compose run python_client
-```
-**NOTE: The Ex3 instructions didn't ask to run the python client and express server together using the same command**
 
 - Remainder, to exit the container gracefully use
 ```bash
@@ -63,26 +60,25 @@ control+c
 ---
 
 ### Screenshots
-#### Ex3 screenshots
 <details>
-<summary>Click to expand Ex3 screenshots</summary>
+<summary>Click to expand Ex4 screenshots</summary>
 
-<img src="screenshots/ex3/curl runexample1.png" height="50%" alt="">
-<img src="screenshots/ex3/curl runexample2.png" height="50%" alt="">
-<img src="screenshots/ex3/curl runexample3.png" height="50%" alt="">
-<img src="screenshots/ex3/curl runexample4.png" height="50%" alt="">
-<img src="screenshots/ex3/curl runexample5.png" height="50%" alt="">
+<img src="screenshots/ex4/light_login.png" width="50%" alt="light_login">
+<img src="screenshots/ex4/dark_inbox.png" width="50%" alt="dark_inbox">
+<img src="screenshots/ex4/light_compose.png" width="50%" alt="light_compose">
+<img src="screenshots/ex4/dark_reading.png" width="50%" alt="dark_reading">
+<img src="screenshots/ex4/dark_signup.png" width="50%" alt="dark_signup">
 
 </details>
 
-For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/main-Ex3/screenshots/ex3)
+For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/main-Ex4/screenshots/ex4)
 
 ---
 
 ## Useful links
-- [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Exe/server_cpp)
-- [Python client README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/python_client/README.md)
-- [JavaScript server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/web_server/README.md)
+- [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex4/server_cpp)
+- [JavaScript server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex4/web_server/README.md)
+- [React frontend README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex4/frontend/README.md)
 
 ---
 

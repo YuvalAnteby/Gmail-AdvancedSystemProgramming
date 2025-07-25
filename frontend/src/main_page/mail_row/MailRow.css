@@ -1,0 +1,218 @@
+@import "../../theme.css";
+
+/* ─── row container ───────────────────────────────── */
+.mail-row-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    background-color: #ffffff;
+    transition:
+            background-color 0.2s ease,      /* fade background */
+            box-shadow 0.2s ease,             /* elevate */
+            transform 0.15s ease;             /* slide slightly */
+}
+
+.mail-row-metadata {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+}
+@media (max-width: 768px) {
+    .mail-row-metadata {
+        flex-direction: column;
+        flex: 1;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}
+
+.mail-row-item.light {
+    background-color: var(--light-bg-mail-row);
+    border-bottom: 1px solid var(--light-strong-border-mail-row);
+    border-top: 1px solid var(--light-strong-border-mail-row);
+    border-left: 1px solid var(--light-strong-border-mail-row);
+    border-right: 1px solid var(--light-strong-border-mail-row);
+
+}
+.mail-row-item.dark {
+    background-color: var(--dark-bg-read-mail-row);
+    border-bottom: 1px solid var(--dark-strong-border-mail-row);
+    border-top: 1px solid var(--dark-strong-border-mail-row);
+    border-right: 1px solid var(--dark-strong-border-mail-row);
+    border-left: 1px solid var(--dark-strong-border-mail-row);
+}
+
+/* ─── UNREAD EFFECT ───────────────────────────────── */
+/* Give unread a light-gray background */
+.mail-row-item.unread {
+    font-weight: 600;
+    border-left: 4px solid #0d6efd;     /* Bootstrap’s primary blue */
+}
+.mail-row-item.light.unread {
+    background-color: var(--light-bg-unread-mail-row);
+}
+.mail-row-item.dark.unread {
+    background-color: var(--dark-bg-unread-mail-row);
+}
+
+/* ─── READ EFFECT ───────────────────────────────── */
+/* If already read, normal text */
+.mail-row-item.read {
+    font-weight: 400;
+}
+.mail-row-item.light.read {
+    background-color: var(--light-bg-read-mail-row);
+}
+.mail-row-item.dark.read {
+    background-color: var(--dark-bg-read-mail-row);
+}
+
+
+/* ─── HOVER EFFECT ───────────────────────────────── */
+/* On hover, lift the row and slide it in from the left */
+.mail-row-item:hover {
+    transform: translateX(4px);         /* shift 4px to the right */
+    padding-left: 1.25rem;              /* account for the new left border */
+}
+.mail-row-item.light:hover {
+    background-color: var(--light-hover-bg-mail-row);
+    box-shadow: 0 2px 8px var(--light-shadow-bg-mail-row);
+}
+.mail-row-item.dark:hover {
+    background-color: var(--dark-hover-bg-mail-row);
+    box-shadow: 0 2px 8px var(--dark-shadow-bg-mail-row);
+}
+
+
+.row-top-controls {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+}
+
+/* ─── MAIL CONTENT ───────────────────────────────── */
+.email-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+.email-main-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.email-title-body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.email-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.email-sender {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 700;
+}
+@media (max-width: 768px) {
+    .email-sender {
+        max-width: 100%;
+    }
+}
+.email-sender.light {
+    color: #000000;
+}
+.email-sender.dark {
+    color: #ffffff;
+}
+
+.email-subject {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.email-subject.light {
+    color: #333;
+}
+.email-subject.dark {
+    color: #ffffff;
+}
+
+.email-preview {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.email-preview.light {
+    color: #666;
+}
+.email-preview.dark {
+    color: #ffffff;
+}
+
+.email-time {
+    display: flex;
+    align-items: end;
+    gap: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-weight: 400;
+}
+.email-time.light {
+    color: #666666;
+}
+.email-time.dark {
+    color: #ffffff;
+}
+
+.icon.light {
+    color: #666666;
+}
+.icon.dark {
+    color: white;
+}
+
+
+@media (max-width: 768px) {
+    .email-time {
+        align-self: flex-end;
+        font-size: 12px;
+    }
+
+    .email-main-line {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}
+
+
+
+
+/* remove icons on very small screens */
+@media (max-width: 576px) {
+    .bi-paperclip {
+        display: none;
+    }
+    .bi-clock {
+        display: none;
+    }
+}

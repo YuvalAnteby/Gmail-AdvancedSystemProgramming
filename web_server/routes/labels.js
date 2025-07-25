@@ -1,11 +1,12 @@
 const express = require('express');
-const router = express.Router();
-const controller = require('../controllers/labels');
+const Auth    = require('../utils/authentication');
+const ctrl    = require('../controllers/labels');
+const router  = express.Router();
 
-router
-    .get('/', controller.getAllLabels)
-    .post('/', controller.createNewLabel)
-    .get('/:id', controller.getLabelById)
-    .patch('/:id', controller.editLabel)
-    .delete('/:id', controller.deleteLabel);
+router.get   ('/',          Auth.authenticateToken, ctrl.getAllLabels);
+router.post  ('/',          Auth.authenticateToken, ctrl.createNewLabel);
+router.post  ('/:id/sublabel', Auth.authenticateToken, ctrl.createSublabel);
+router.patch ('/:id',       Auth.authenticateToken, ctrl.editLabel);
+router.delete('/:id',       Auth.authenticateToken, ctrl.deleteLabel);
+
 module.exports = router;

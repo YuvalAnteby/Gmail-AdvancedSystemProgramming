@@ -1,0 +1,109 @@
+import {useCallback} from "react";
+import {deleteMail, markAsRead, restoreMail, toggleSpamReport} from "../../api/mailApi";
+
+
+/**
+ * @param {Set<Object>} selectedMails
+ * @param {function} setSelectedMails
+ * @param {Object[]} allEmails
+ * @param {function} refreshMails
+ *
+ * @returns {{
+ *   handleSelectAll: function,
+ *   handleRefresh: function,
+ *   handleDelete: function,
+ *   handleMarkAsRead: function,
+ *   handleMarkSpam: function
+ * }}
+ */
+export const useMailToolbarHandlers = (selectedMails, setSelectedMails, allEmails, refreshMails) => {
+
+    // Handle selection of all mails (or canceling) using the checkbox
+    const handleSelectAll = useCallback((e) => {
+        if (e.target.checked) {
+            setSelectedMails(new Set(allEmails));
+        } else {
+            setSelectedMails(new Set());
+        }
+    }, [allEmails, setSelectedMails]);
+
+    // Refresh current inbox
+    const handleRefresh = useCallback(() => {
+        setSelectedMails(new Set());
+        if (typeof refreshMails === 'function')
+            refreshMails();
+    }, [refreshMails, setSelectedMails]);
+
+    // Delete selected mails
+    const handleDelete = useCallback(async () => {
+        // nothing to delete
+        if (selectedMails.size === 0)
+            return;
+        try {
+            await Promise.all(Array.from(selectedMails).map((mail) => deleteMail(mail)));
+            setSelectedMails(new Set());
+            refreshMails();
+        } catch (error) {
+            console.error("Error deleting mails:", error);
+        }
+
+    }, [selectedMails, setSelectedMails, refreshMails]);
+
+    // Mark selected mails as read
+    const handleMarkAsRead = useCallback(async () => {
+        if (selectedMails.size === 0)
+            return;
+        try {
+            await Promise.all(Array.from(selectedMails).map((mail) => markAsRead(mail.id)));
+            setSelectedMails(new Set());
+            refreshMails();
+        } catch (error) {
+            console.error("Error marking read mails:", error);
+        }
+    }, [selectedMails, setSelectedMails]);
+
+    // Mark selected mails as spam (using the blacklist)
+    const handleMarkSpam = useCallback(async () => {
+        // nothing to delete
+        if (selectedMails.size === 0)
+            return;
+        try {
+            await Promise.all(Array.from(selectedMails).map((mail) => toggleSpamReport(mail)));
+            setSelectedMails(new Set());
+            refreshMails();
+        } catch (error) {
+            console.error("Error marking spam:", error);
+        }
+        setSelectedMails(new Set());
+    }, [selectedMails, setSelectedMails]);
+
+    // Restore selected mails from the trash inbox to their previous inbox
+    const handleRestore = useCallback(async () => {
+        if (selectedMails.size === 0)
+            return;
+        try {
+            await Promise.all(Array.from(selectedMails).map((mail) => restoreMail(mail)));
+            setSelectedMails(new Set());
+            refreshMails();
+        } catch (error) {
+            console.error("Error restoring mail:", error);
+        }
+        setSelectedMails(new Set());
+    }, [selectedMails, setSelectedMails]);
+
+    // Clears selection of mails
+    const clearSelection = useCallback(async () => {
+        setSelectedMails(new Set());
+        refreshMails();
+    }, []);
+
+    return {
+        handleSelectAll,
+        handleRefresh,
+        handleDelete,
+        handleMarkAsRead,
+        handleMarkSpam,
+        handleRestore,
+        clearSelection,
+    };
+}

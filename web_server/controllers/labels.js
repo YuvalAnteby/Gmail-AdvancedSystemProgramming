@@ -2,158 +2,86 @@ const Labels = require('../models/labels');
 
 /**
  * GET /api/labels
- * @returns a pretty-printed JSON array of all labels with newlines and indentation.
+ * Return all labels (flat list),  belonging only to the authenticated user.
+ * Responds: [{ id, name, parent }]
  */
-const getAllLabels = (req, res) => {
-    const rawLabels = Labels.getAllLabels();
-    const cleanLabels = rawLabels.map(label => ({
-        id: label.id,
-        name: label.name
-    }));
-
-    return res
-        .status(200)
-        .set('Content-Type', 'application/json; charset=utf-8')
-        .send(JSON.stringify(cleanLabels, null, 2));
+exports.getAllLabels = (req, res) => {
+    const userId = +req.user.id;
+    const all = Labels.getAllLabels(userId);
+    // Only send fields required by frontend; "parent" is id of parent label (or null for root)
+    res.status(200).json(all.map(l => ({
+        id: l.id,
+        name: l.name,
+        parent: l.parent
+    })));
 };
 
 /**
  * POST /api/labels
- * Creates a new label. Expects a numeric “userid” header and a JSON
- * @returns 201 Created with Location header only
- * Errors:
- *   - 400 Bad Request if name is missing
- *   - 400 Bad Request if creation fails
+ * Create a new root-level label for the user.
+ * Request body: { name }
+ * Responds: created label object, 201 status.
  */
-const createNewLabel = (req, res) => {
-    const userId = Number(req.headers['user-id']);
-    const labelName = req.body.name;
-
-    if (!labelName) {
-        return res
-            .status(400)
-            .set('Content-Type', 'application/json; charset=utf-8')
-            .send(JSON.stringify(
-                { error: 'Name is required' },
-                null,
-                2
-            ));
-    }
-
-    const newLabel = Labels.createNewLabel(userId, labelName);
-    if (!newLabel) {
-        return res
-            .status(400)
-            .set('Content-Type', 'application/json; charset=utf-8')
-            .send(JSON.stringify(
-                { error: 'Failed to create label' },
-                null,
-                2
-            ));
-    }
-
-    return res
-        .status(201)
-        .location(`/api/labels/${newLabel.id}`)
-        .end();
+exports.createNewLabel = (req, res) => {
+    // User ID from authentication middleware
+    const userId = +req.user.id;
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: 'Name required' });
+    const lab = Labels.createNewLabel(userId, name);
+    if (!lab) return res.status(409).json({ error: 'Label name already exists' });
+    res.status(201).location(`/api/labels/${lab.id}`).json(lab);
 };
 
 /**
- * GET /api/labels/:id
- * @returns the label object { id, name } pretty-printed, or 404 if not found.
+ * POST /api/labels/:id/sublabel
+ * Create a new sublabel under a parent label (parent ID in URL).
+ * Request body: { name }
+ * Responds: created sublabel object, or 404 if parent not found.
  */
-const getLabelById = (req, res) => {
-    const labelId = Number(req.params.id);
-    const label = Labels.getLabelById(labelId);
-
-    if (!label) {
-        return res
-            .status(404)
-            .set('Content-Type', 'application/json; charset=utf-8')
-            .send(JSON.stringify(
-                { error: 'Label not found' },
-                null,
-                2
-            ));
-    }
-
-    return res
-        .status(200)
-        .set('Content-Type', 'application/json; charset=utf-8')
-        .send(JSON.stringify(
-            { id: label.id, name: label.name },
-            null,
-            2
-        ));
+exports.createSublabel = (req, res) => {
+    const userId = +req.user.id;
+    const parentId = +req.params.id;
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: 'Name required' });
+    // Model should handle parent existence/ownership
+    const lab = Labels.createSublabel(userId, parentId, name);
+    if (!lab) return res.status(404).json({ error: 'Parent not found' });
+    else if (!lab) return res.status(409).json({ error: 'Label name already exists' });
+    res.status(201).location(`/api/labels/${lab.id}`).json(lab);
 };
 
 /**
  * PATCH /api/labels/:id
- * Updates the name of an existing label. Expects JSON body { "name": "<newName>" }.
- * @returns 204 No Content on success.
- * Errors:
- *   - 400 Bad Request if name is missing
- *   - 404 Not Found if label does not exist
+ * Rename an existing label by ID.
+ * Request body: { name }
+ * Responds: 204 on success, 404 if not found.
  */
-const editLabel = (req, res) => {
-    const labelId = Number(req.params.id);
-    const name = req.body.name;
+exports.editLabel = (req, res) => {
+    const id = +req.params.id;
+    const userId = +req.user.id;
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: 'Name required' });
+    const ok = Labels.editLabelById(id,userId, name);
+    if (!ok) return res.status(404).json({ error: 'Not found' });
 
-    if (!name) {
-        return res
-            .status(400)
-            .set('Content-Type', 'application/json; charset=utf-8')
-            .send(JSON.stringify(
-                { error: 'Name is required to update' },
-                null,
-                2
-            ));
-    }
-
-    const updated = Labels.editLabel(labelId, name);
-    if (!updated) {
-        return res
-            .status(404)
-            .set('Content-Type', 'application/json; charset=utf-8')
-            .send(JSON.stringify(
-                { error: 'Label not found' },
-                null,
-                2
-            ));
-    }
-
-    return res.status(204).end();
+    res.status(204).end();
 };
 
 /**
  * DELETE /api/labels/:id
- * Deletes an existing label by ID.
- * @returns 204 No Content on success.
- * Errors:
- *   - 404 Not Found if label does not exist
+ * Delete label (and, usually, its sublabels) by ID.
+ * Responds: 204 on success, 404 if not found.
  */
-const deleteLabel = (req, res) => {
-    const labelId = Number(req.params.id);
-    const success = Labels.deleteLabel(labelId);
+exports.deleteLabel = (req, res) => {
+    const labelId = +req.params.id;
+    const userId = +req.user.id;
 
-    if (!success) {
-        return res
-            .status(404)
-            .set('Content-Type', 'application/json; charset=utf-8')
-            .send(JSON.stringify(
-                { error: 'Label not found' },
-                null,
-                2
-            ));
-    }
+    if (!(labelId))
+        return res.status(400).json({ error: 'Invalid label ID' });
+
+    const deleted = Labels.deleteLabelById(labelId, userId);
+    if (!deleted)
+        return res.status(404).json({ error: 'Label not found or not owned by user' });
 
     return res.status(204).end();
-};
-
-module.exports = {
-    getAllLabels,
-    createNewLabel,
-    getLabelById,
-    editLabel,
-    deleteLabel
-};
+}

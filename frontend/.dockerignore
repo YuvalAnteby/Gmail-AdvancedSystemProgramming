@@ -1,0 +1,21 @@
+# Node modules and build output should be created inside the container
+node_modules/
+build/
+dist/
+
+# Log files
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+*.log
+
+# Environment files
+.env
+
+# macOS/IDE files
+.DS_Store
+.vscode/
+.idea/
+
+# READMEs
+*.md

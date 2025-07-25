@@ -45,28 +45,30 @@ async function sendToCppServer(message) {
 }
 
 /**
- * Adds a new URL to the blacklist
- * @param url to be added
+ * Adds new URLs to the blacklist
+ * @param urls to be added
  * @returns {Promise<*>} true if added successfully
  */
-const addToBlacklist = async (url) => {
+const addToBlacklist = async (urls) => {
     try {
         // connect to CPP server and send the command
         await connectToServer();
-        const command = `POST ${url}`;
-        const result = await sendToCppServer(command);
-        // check the outcome and return matching true/false
-        if (result.trim().toLowerCase().includes('201 created')) {
-            await disconnectFromServer();
-            return true;
+        for (const url of urls) {
+            const command = `POST ${url}`;
+            const result = await sendToCppServer(command);
+            // check the outcome and return matching true/false
+            if (!result.trim().toLowerCase().includes('201 created')) {
+                await disconnectFromServer();
+                return false;
+            }
         }
     } catch (err) {
-        console.error(`addToBlacklist ${url} error:`, err);
+        console.error(`addToBlacklist ${urls} error:`, err);
         return false;
     } finally {
         await disconnectFromServer();
     }
-    return false;
+    return true;
 }
 
 /**
@@ -98,19 +100,22 @@ const isInBlacklist = async (urls) => {
 
 /**
  * Delete a URL from the blacklist
- * @param url to be deleted
+ * @param urls to be deleted
  * @returns {Promise<boolean>} true of deleted successfully, otherwise false
  */
-const deleteFromBlacklist = async (url) => {
+const deleteFromBlacklist = async (urls) => {
+    let isSuccessful = true;
     try {
         // connect to CPP server and send the command
         await connectToServer();
-        const command = `DELETE ${url}`;
-        const result = await sendToCppServer(command);
-        // check the outcome and return matching true/false
-        if (result.trim().toLowerCase().includes('204 no content')) {
-            await disconnectFromServer();
-            return true;
+        for (const url of urls) {
+            const command = `DELETE ${url}`;
+            const result = await sendToCppServer(command);
+            // check the outcome and return matching true/false
+            if (!result.trim().toLowerCase().includes('204 no content')) {
+                await disconnectFromServer();
+                isSuccessful = false;
+            }
         }
     } catch (err) {
         console.error(`deleteFromBlacklist ${url} error:`, err);
@@ -118,7 +123,7 @@ const deleteFromBlacklist = async (url) => {
     } finally {
         await disconnectFromServer();
     }
-    return false;
+    return isSuccessful;
 }
 
 module.exports = {addToBlacklist, isInBlacklist, deleteFromBlacklist}

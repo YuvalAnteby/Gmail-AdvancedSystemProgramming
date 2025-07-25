@@ -1,42 +1,69 @@
 const Blacklist = require('../models/blacklist');
+const Mails = require('../models/mails');
+const {extractUrls} = require("../utils/mails");
 
 /**
  * Adds a URL to the blacklist.
  * Validates the provided URL, normalizes it by removing trailing slashes,
  * and attempts to insert it into the blacklist. If the URL is already blacklisted,
  * no content is returned. On success, sets the Location header to the new resource.
- * @param req HTTP request, expects JSON body with `url` field
+ * @param req HTTP request, expects JSON body with `url` field, if inserting a mail - mailId
  * @param res HTTP response
- * @returns 201 Created with Location header if newly added;
- * 204 No Content if URL was already in blacklist;
+ * @returns 201 Created if newly added;
+ * 204 No Content if no URL are given in mail
  * 400 Bad Request if URL is missing or invalid;
  * 502 on server error
  */
 exports.addToBlacklist = async (req, res) => {
-    const raw = req.body.url;
-    if (!raw) {
-        return res.status(400).json({ error: 'URL is required' });
-    }
-
-    let validated;
-    try {
-        validated = String(raw).toString().replace(/\/+$/, '');  // Remove trailing slashes
-    } catch {
-        return res.status(400).json({ error: 'Invalid URL' });
-    }
+    const userId = Number(req.user.id);
+    const rawUrl = req.body.url;
+    const mailId = req.body.mailId;
+    // check for valid input
+    if (!userId || (!rawUrl && !mailId))
+        return res.status(400).json({error: 'error missing input'})
+    // find the mail and fetch it's subject and body
+    const {subject, body} = Mails.getMail(Number(mailId));
 
     try {
-        const created = await Blacklist.addToBlacklist(String(validated));
-        if (created) {
-            res.set('Location', `/api/blacklist/${encodeURIComponent(validated)}`);
-            return res.status(201).end();
+        // gotten a single URL - add it and finish
+        if (rawUrl) {
+            // Remove trailing slashes
+            const validated = String(rawUrl).toString().replace(/\/+$/, '');
+            const created = await Blacklist.addToBlacklist(String(validated));
+            if (created) {
+                res.status(201).end();
+            } else {
+                res.status(400).end();
+            }
         }
-        return res.status(204).end();
-    } catch (err) {
-        console.error('Error in addToBlacklist controller:', err);
-        return res.status(502).end();
+
+        // we haven't gotten a single URL, meaning we got a mail - check it's content and add URLs to blacklist
+        const urls = [
+            ...extractUrls(subject),
+            ...extractUrls(body)
+        ]
+            .map(extractUrls)
+            .filter((u) => u !== null);
+        // flag the mail as spam
+        const toggle = Mails.editSentMail(mailId, null, null, null, true, null);
+        // Check if the mail got any URLs
+        if (urls.length === 0)
+            return res.status(204).json({ error: 'No valid URLs found in mail' });
+        // found URLs - add to blacklist
+        const added = await Blacklist.addToBlacklist(urls);
+        if (added && toggle === 200) {
+            res.status(201).end();
+        } else {
+            res.status(204).end();
+        }
+
+    } catch (error) {
+        // in case a server error occurred
+        console.error('Error in addToBlacklist:', error);
+        res.status(502).json({ error: 'Server error' });
     }
 };
+
 
 /**
  * Checks if a given URL is in the blacklist.
@@ -53,12 +80,12 @@ exports.isInBlacklist = async (req, res) => {
     try {
         decoded = decodeURIComponent(req.params.url).replace(/\/+$/, '');  // Normalize
     } catch {
-        return res.status(400).json({ error: 'Invalid URL encoding' });
+        return res.status(400).json({error: 'Invalid URL encoding'});
     }
 
     try {
         const found = await Blacklist.isInBlacklist([decoded]);
-        return res.json({ blacklisted: found });
+        return res.json({blacklisted: found});
     } catch (err) {
         console.error('Error in isInBlacklist controller:', err);
         return res.status(502).end();
@@ -82,17 +109,46 @@ exports.deleteFromBlacklist = async (req, res) => {
     try {
         decoded = decodeURIComponent(req.params.url).replace(/\/+$/, '');  // Normalize
     } catch {
-        return res.status(400).json({ error: 'Invalid URL encoding' });
+        return res.status(400).json({error: 'Invalid URL encoding'});
     }
-
     try {
         const removed = await Blacklist.deleteFromBlacklist(decoded);
         if (removed) {
             return res.status(204).end();
         }
-        return res.status(404).json({ error: 'Not found' });
+        return res.status(404).json({error: 'Not found'});
     } catch (err) {
         console.error('Error in deleteFromBlacklist controller:', err);
         return res.status(502).end();
     }
+};
+
+/**
+ * Removes a mail from the spam, including all URLs in it that were previously blacklisted in the bloom filter.
+ * @param req request
+ * @param res response
+ * @returns {Promise<*>}
+ */
+exports.removeMailFromBlacklist = async (req, res) => {
+    const userId = Number(req.user.id);
+    if (!userId)
+        return res.status(400).json({error: 'No user id'});
+    // fetch the mail
+    const mailId = req.body.mailId;
+    if (!mailId)
+        return res.status(400).json({error: 'No mail id'});
+    const mail = Mails.getMail(mailId);
+    // make sure it was found and belongs to the user
+    if (!mail || mail.owner !== Number(userId))
+        return res.status(404).json({error: 'mail not found for user'});
+    // update the mail's spam flag
+    const updated = Mails.editSentMail(mail.id, null, null, null, false, null);
+    // extract URLs, if we found URLs - remove them from the blacklist
+    const urls = extractUrls(mail.subject + ' ' + mail.body);
+    let removedUrls;
+    if (urls.length !== 0)
+        removedUrls = await Blacklist.deleteFromBlacklist(urls);
+    if ((urls.length === 0 || removedUrls) && updated)
+        return res.status(204).end();
+    return res.status(500).json({error: 'unexpected error while unspamming mail'});
 };

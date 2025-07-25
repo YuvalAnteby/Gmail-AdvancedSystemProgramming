@@ -1,0 +1,99 @@
+.top-menu-wrapper {
+    display: flex;
+    height: 64px;
+    padding: 6px 16px;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1100;
+    position: relative;
+}
+
+/* LIGHT: subtle border, no shadow */
+.top-menu-wrapper.light {
+    background-color: #f1f3f4;
+    color: #000;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.top-menu-wrapper.dark {
+    color: #ffffff;
+    border-bottom: 1px solid rgb(202, 202, 202, 0.08);
+}
+
+/* logo button in top corner */
+.logo-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* space between logo and text */
+    transition: transform 0.2s ease;
+}
+
+.logo-img {
+    width: 32px;
+    height: 32px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
+}
+.icon.light {
+    color: #000000;
+}
+.icon.dark {
+    color: #ffffff;
+}
+
+/* Hover and active animation */
+.logo-btn:hover .logo-img {
+    transform: scale(1.08);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+.logo-btn:active .logo-img {
+    transform: scale(0.95);
+    box-shadow: none;
+}
+/* text next to logo */
+.logo-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: inherit;
+    user-select: none;
+}
+.logo-text.light {
+    color: #000;
+
+}
+.logo-text.dark {
+    color: #ffffff;
+}
+
+.light-top-menu .logo-text {
+    color: #202124;
+}
+.dark-top-menu .logo-text {
+    color: #e8eaed;
+}
+
+/* profile picture menu popup */
+.profile-popup {
+    position: absolute;
+    right: 0;
+    top: 52px;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    min-width: 240px;
+    z-index: 1000;
+    text-align: center;
+}
+
+.dark-popup {
+    background-color: #2c2c2c;
+    color: white;
+}
+
+.hello-text {
+    font-size: 1rem;
+    margin-top: 4px;
+}
+

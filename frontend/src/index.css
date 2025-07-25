@@ -1,0 +1,38 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Always apply a base background early */
+body {
+  margin: 0;
+  background-color: #f1f3f4; /* fallback to light */
+  transition: background-color 0.3s ease;
+}
+
+/* Optional: control background via body class */
+body.dark {
+  background-color: #121212; /* Or var(--dark-bg-page) if defined */
+  color: #ffffff;
+}
+body.light {
+  background-color: #f1f3f4;
+  color: #000000;
+}

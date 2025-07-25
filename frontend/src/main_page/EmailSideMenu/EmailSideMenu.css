@@ -1,0 +1,132 @@
+/* src/main_page/EmailSideMenu/EmailSideMenu.css */
+
+/* Layout and base colors for sidebar */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Light/dark color schemes */
+.sidebar.light {
+    background: #fff;
+    color: #000;
+    border-right: 1px solid #dee2e6;
+}
+.sidebar.dark {
+    background: #202124;
+    color: #e8eaed;
+    border-right: 1px solid #5f6368;
+}
+
+/* Compose button at top */
+.compose-button {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+.compose-button.light {
+    background-color: #1a73e8;
+    color: #fff;
+    border: 1px solid #1a73e8;
+}
+.compose-button.dark {
+    background: transparent;
+    color: #e8eaed;
+    border: 1px solid #e8eaed;
+}
+
+/* Mail folder links (Inbox, Sent, etc.) */
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+/* Hover state for mail links */
+.nav-link:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+.sidebar.dark .nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+/* Active tab coloring */
+.sidebar.light .nav-link.active-tab {
+    background-color: #1a73e8;
+    color: #fff;
+}
+.sidebar.dark .nav-link.active-tab {
+    background-color: #5f6368;
+    color: #fff;
+}
+
+/* Header for Labels section */
+.labels-header {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: inherit;
+}
+
+/* Context menu for label actions */
+.label-context-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.label-context-menu li:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+/* Expand/collapse button for parent labels (the caret) */
+.label-expand-btn {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin-left: -5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+}
+
+/* Each label line: set consistent height and allow indentation */
+.label-li {
+    min-height: 32px;
+}
+
+/* Style for label text and ellipsis if long */
+.label-li .nav-link {
+    min-width: 0;
+    flex: 1 1 auto;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-left: 0.5rem;
+}
+
+/* Right-align three-dots menu for label */
+.label-li .bi-three-dots-vertical {
+    margin-left: auto;
+}
+
+/* Sidebar slide-in for mobile */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 1050;
+        padding-top: 5rem;
+        overflow: visible;
+    }
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+}

@@ -36,7 +36,7 @@
 # CLion config
 .idea/
 # build, cmake folders
-server_cpp/build/
+**/build/
 server_cpp/cmake-build-debug/
 cmake-build-debug/
-/web_server/node_modules/
+**/node_modules/

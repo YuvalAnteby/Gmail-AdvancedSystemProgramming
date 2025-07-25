@@ -1,0 +1,80 @@
+.toolbar-container {
+    display: flex;
+    flex-direction: row;
+    min-height: 56px;
+    align-items: center;
+    padding-left: 16px; /* Matches the padding-left of mail-container */
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* select all checkbox div */
+.select-all {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-right: 12px;
+}
+.toolbar-text.light {
+    color: #000000;
+}
+.toolbar-text.dark {
+    color: white;
+}
+
+/* icon buttons */
+.icon.light {
+    color: black;
+}
+.icon.light:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.icon.dark {
+    color: white;
+}
+.icon.dark:hover {
+    box-shadow: 0 4px 12px rgba(240, 240, 240, 0.15);
+}
+.disabled-icon {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+}
+
+/* paging info */
+.paging-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    margin-left: auto;
+}
+.paging-text {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 4px;
+}
+.paging-text.light {
+    color: #666;
+}
+.paging-text.dark {
+    color: #ffffff;
+}
+
+.labels-dropdown {
+    overflow-y: auto;
+    max-height: 250px;
+}
+.labels-dropdown.light {
+    color: black;
+    background-color: #fff;
+}
+.labels-dropdown.dark {
+    color: white;
+    background-color: #2c2c2c;
+}
+.form-check.light .form-check-input {
+    color: black;
+}
