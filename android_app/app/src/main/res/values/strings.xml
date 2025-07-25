@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Mail ASP</string>
+    <!-- Strings used in login & signup pages -->
+
+    <!-- Strings used in mail list page -->
+    <string name="compose_mail">Compose mail</string>
+
+    <!-- Strings used in mail reading page -->
+
+    <!-- Strings used in mail writing page -->
+
+</resources>
