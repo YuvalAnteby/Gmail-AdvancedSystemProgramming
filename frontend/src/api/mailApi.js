@@ -1,7 +1,6 @@
-// Base URL — adjust port if needed
 import {MAILS_PER_PAGE} from "../utils/constants";
 
-const API_BASE = "http://localhost:3001/api";
+const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:3001/api";
 
 /**
  * GET /api/mails/:id

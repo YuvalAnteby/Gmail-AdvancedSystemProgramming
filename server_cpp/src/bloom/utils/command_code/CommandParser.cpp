@@ -7,7 +7,6 @@
 #include <sstream>
 #include <string>
 
-///TODO create tests
 /**
 * Turns a line of input to a command request object.
 * @param line line of input from the user

@@ -46,7 +46,6 @@ const inboxFilters = {
                 mail.owner == userId && mail.isSpam === true && !mail.isTrashed,
             sortKey: (mail) => new Date(mail.sentAt).getTime(),
         }
-/// TODO get by labels
     };
 
 /**
