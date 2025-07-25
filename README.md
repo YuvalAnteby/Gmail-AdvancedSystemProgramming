@@ -71,7 +71,7 @@ control+c
 
 </details>
 
-For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/main-Ex4/screenshots/ex4)
+For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Ex4/screenshots/ex4)
 
 ---
 
@@ -81,4 +81,3 @@ For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedS
 - [React frontend README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex4/frontend/README.md)
 
 ---
-
