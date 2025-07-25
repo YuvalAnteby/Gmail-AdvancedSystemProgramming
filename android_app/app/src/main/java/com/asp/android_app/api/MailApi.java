@@ -1,6 +1,5 @@
 package com.asp.android_app.api;
 
-
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.ReadStatus;
 import com.asp.android_app.model.request.SpamRequest;
@@ -56,3 +55,4 @@ public interface MailApi {
     @GET("mails/search/{query}")
     Call<List<Mail>> searchMails(@Path("query") String query);
 }
+
