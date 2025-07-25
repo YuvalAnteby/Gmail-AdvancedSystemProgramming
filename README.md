@@ -71,7 +71,7 @@ control+c
 
 </details>
 
-For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/main-Ex4/screenshots/ex4)
+For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Ex4/screenshots/ex4)
 
 ---
 
