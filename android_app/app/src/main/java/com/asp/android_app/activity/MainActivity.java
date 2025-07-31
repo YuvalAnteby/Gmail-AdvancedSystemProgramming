@@ -1,8 +1,10 @@
-package com.asp.android_app;
+package com.asp.android_app.activity;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.asp.android_app.R;
 
 public class MainActivity extends AppCompatActivity {
 

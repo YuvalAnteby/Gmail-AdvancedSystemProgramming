@@ -1,4 +1,4 @@
-package com.asp.android_app.model.request;
+package com.asp.android_app.model.response;
 
 
 /**
