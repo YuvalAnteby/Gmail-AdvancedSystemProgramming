@@ -37,89 +37,34 @@ public class MailRepository {
      *
      * @param inboxType      "incoming", "sent", "star", "trash", etc.
      * @param page           current page number
-     * @param resultLiveData a LiveData object to observe result (success, error, loading)
+     * @param resultLiveData a LiveData object to observe result (mail list)
      */
-    public void getMailsByType(
-            String inboxType,
-            int page,
-            MutableLiveData<Result<List<Mail>>> resultLiveData) {
+    public void getMailsByType(String inboxType, int page, MutableLiveData<Result<List<Mail>>> resultLiveData) {
         final int MAIL_LIMIT = 50;
         resultLiveData.postValue(new Result.Loading<>());
-
-        // GET mails by type
-        mailApi.getMailsByType(inboxType, page, MAIL_LIMIT).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Mail>> call, @NonNull Response<List<Mail>> res) {
-                if (res.isSuccessful()) {
-                    resultLiveData.postValue(new Result.Success<>(res.body()));
-                    return;
-                }
-                resultLiveData.postValue(new Result.Error<>("Error fetching mails: " + res.code()));
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<Mail>> call, @NonNull Throwable t) {
-                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-            }
-        });
+        mailApi.getMailsByType(inboxType, page, MAIL_LIMIT).enqueue(createCallback(resultLiveData));
     }
 
     /**
      * Fetch a mail by it's id.
      *
      * @param id             id of the mail
-     * @param resultLiveData a LiveData object to observe result (success, error, loading)
+     * @param resultLiveData a LiveData object to observe result (mail object)
      */
     public void fetchMail(int id, MutableLiveData<Result<Mail>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-
-        mailApi.fetchMail(id).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<Mail> call, @NonNull Response<Mail> res) {
-                if (res.isSuccessful()) {
-                    resultLiveData.postValue(new Result.Success<>(res.body()));
-                    return;
-                }
-                resultLiveData.postValue(new Result.Error<>("Error fetching mail: " + res.code()));
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Mail> call, @NonNull Throwable t) {
-                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-            }
-        });
+        mailApi.fetchMail(id).enqueue(createCallback(resultLiveData));
     }
 
     /**
      * Delete a mail by its ID.
      *
      * @param mailId         The ID of the mail to delete
-     * @param resultLiveData The LiveData object where the result will be posted
+     * @param resultLiveData a LivData object to observe result (void on success)
      */
     public void deleteMail(int mailId, MutableLiveData<Result<Void>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-
-        mailApi.deleteMail(mailId).enqueue(
-                new Callback<>() {
-                    @Override
-                    public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> res) {
-                        if (res.isSuccessful()) {
-                            // no content expected in body (code 204)
-                            resultLiveData.postValue(new Result.Success<>(null));
-                        } else {
-                            resultLiveData.postValue(new Result.Error<>(
-                                    "Error deleting mail: " + res.code())
-                            );
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                        resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-                    }
-                }
-        );
+        mailApi.deleteMail(mailId).enqueue(createCallback(resultLiveData));
     }
 
     /**
@@ -127,33 +72,11 @@ public class MailRepository {
      *
      * @param mailId         The ID of the mail to restore
      * @param status         The trash flag status
-     * @param resultLiveData The LiveData object where the result will be posted
+     * @param resultLiveData a LiveData object to observe result (trash status result)
      */
-    public void restoreMail(
-            int mailId,
-            TrashStatus status,
-            MutableLiveData<Result<TrashStatus>> resultLiveData) {
-
+    public void restoreMail(int mailId, TrashStatus status, MutableLiveData<Result<Void>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-
-        mailApi.restoreMail(mailId, status).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.isSuccessful()) {
-                    resultLiveData.postValue(new Result.Success<>(null));
-                } else {
-                    resultLiveData.postValue(new Result.Error<>(
-                            "Failed to restore mail: " + response.code())
-                    );
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-
-            }
-        });
+        mailApi.restoreMail(mailId, status).enqueue(createCallback(resultLiveData));
     }
 
     /**
@@ -165,23 +88,7 @@ public class MailRepository {
     public void markAsSpam(SpamRequest request, MutableLiveData<Result<Void>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
 
-        mailApi.markAsSpam(request).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.isSuccessful()) {
-                    resultLiveData.postValue(new Result.Success<>(null));
-                } else {
-                    resultLiveData.postValue(new Result.Error<>(
-                            "Failed to mark as spam: " + response.code())
-                    );
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-            }
-        });
+        mailApi.markAsSpam(request).enqueue(createCallback(resultLiveData));
     }
 
     /**
@@ -192,24 +99,7 @@ public class MailRepository {
      */
     public void removeFromSpam(SpamRequest request, MutableLiveData<Result<Void>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-
-        mailApi.removeFromSpam(request).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.isSuccessful()) {
-                    resultLiveData.postValue(new Result.Success<>(null));
-                } else {
-                    resultLiveData.postValue(new Result.Error<>(
-                            "Failed to remove from spam: " + response.code())
-                    );
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-            }
-        });
+        mailApi.removeFromSpam(request).enqueue(createCallback(resultLiveData));
     }
 
     /**
@@ -219,29 +109,9 @@ public class MailRepository {
      * @param status         The star flag status
      * @param resultLiveData result live data to observe success or error
      */
-    public void toggleStar(
-            int mailId,
-            StarStatus status,
-            MutableLiveData<Result<Void>> resultLiveData) {
+    public void toggleStar(int mailId, StarStatus status, MutableLiveData<Result<Void>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-
-        mailApi.toggleStar(mailId, status).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.isSuccessful()) {
-                    resultLiveData.postValue(new Result.Success<>(null));
-                } else {
-                    resultLiveData.postValue(new Result.Error<>(
-                            "Failed to toggle star: " + response.code())
-                    );
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-            }
-        });
+        mailApi.toggleStar(mailId, status).enqueue(createCallback(resultLiveData));
     }
 
     /**
@@ -251,30 +121,10 @@ public class MailRepository {
      * @param status         The read flag status
      * @param resultLiveData result live data to observe success or error
      */
-    public void markAsRead(
-            int mailId,
-            ReadStatus status,
-            MutableLiveData<Result<Void>> resultLiveData) {
+    public void markRead(int mailId, ReadStatus status, MutableLiveData<Result<Void>> resultLiveData) {
 
         resultLiveData.postValue(new Result.Loading<>());
-
-        mailApi.markAsRead(mailId, status).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.isSuccessful()) {
-                    resultLiveData.postValue(new Result.Success<>(null));
-                } else {
-                    resultLiveData.postValue(new Result.Error<>(
-                            "Failed to toggle star: " + response.code())
-                    );
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-            }
-        });
+        mailApi.markAsRead(mailId, status).enqueue(createCallback(resultLiveData));
     }
 
     /**
@@ -285,26 +135,33 @@ public class MailRepository {
      */
     public void searchMails(String query, MutableLiveData<Result<List<Mail>>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-
-        mailApi.searchMails(query).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Mail>> call, @NonNull Response<List<Mail>> response) {
-                if (response.isSuccessful()) {
-                    resultLiveData.postValue(new Result.Success<>(response.body()));
-                    return;
-                }
-                resultLiveData.postValue(new Result.Error<>(
-                        "Error searching mails: " + response.code())
-                );
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<Mail>> call, @NonNull Throwable t) {
-                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-            }
-        });
+        mailApi.searchMails(query).enqueue(createCallback(resultLiveData));
     }
 
     // TODO Additional methods: sendNewMail
 
+
+    /**
+     * Helper class to centralize callback creation
+     *
+     * @param liveData result live data to show
+     * @return callback of type T
+     */
+    private <T> Callback<T> createCallback(MutableLiveData<Result<T>> liveData) {
+        return new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<T> call, @NonNull Response<T> response) {
+                if (response.isSuccessful()) {
+                    liveData.postValue(new Result.Success<>(response.body()));
+                } else {
+                    liveData.postValue(new Result.Error<>("Error: " + response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<T> call, @NonNull Throwable t) {
+                liveData.postValue(new Result.Error<>(t.getMessage()));
+            }
+        };
+    }
 }
