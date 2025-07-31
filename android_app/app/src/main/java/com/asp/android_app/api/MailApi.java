@@ -1,10 +1,10 @@
 package com.asp.android_app.api;
 
 import com.asp.android_app.model.Mail;
-import com.asp.android_app.model.request.ReadStatus;
+import com.asp.android_app.model.response.ReadStatus;
 import com.asp.android_app.model.request.SpamRequest;
-import com.asp.android_app.model.request.StarStatus;
-import com.asp.android_app.model.request.TrashStatus;
+import com.asp.android_app.model.response.StarStatus;
+import com.asp.android_app.model.response.TrashStatus;
 
 import java.util.List;
 
