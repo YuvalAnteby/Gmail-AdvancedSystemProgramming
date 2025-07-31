@@ -8,6 +8,7 @@ package com.asp.android_app.model.request;
  */
 public class SpamRequest {
     private int mailId;
+    private boolean isPreviouslySpam = false;
 
     /**
      * Constructs a request for marking or unmarking spam.
@@ -30,5 +31,13 @@ public class SpamRequest {
      */
     public void setMailId(int mailId) {
         this.mailId = mailId;
+    }
+
+    public boolean getIsPreviouslySpam() {
+        return isPreviouslySpam;
+    }
+
+    public void setIsPreviouslySpam(boolean isSpam) {
+        this.isPreviouslySpam = isSpam;
     }
 }
