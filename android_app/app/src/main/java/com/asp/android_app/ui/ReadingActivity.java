@@ -101,13 +101,18 @@ public class ReadingActivity extends AppCompatActivity {
         btnForward.setOnClickListener(view -> onForwardClick());
 
         // initialize the star checkbox
-        int color = ContextCompat.getColor(this, R.color.star_fill);
-        CompoundButtonCompat.setButtonTintList(starCheckbox, ColorStateList.valueOf(color));
         starCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             // prevent extra calls when setting manually
             if (suppressStarChange)
                 return;
             if (mailId != -1) {
+                // set the star checkbox color
+                int color;
+                if (!isChecked)
+                    color = ContextCompat.getColor(this, R.color.light_gray);
+                else
+                    color = ContextCompat.getColor(this, R.color.star_fill);
+                CompoundButtonCompat.setButtonTintList(starCheckbox, ColorStateList.valueOf(color));
                 // Disable to prevent mass clicking while waiting for backend response
                 starCheckbox.setEnabled(false);
                 lastEditAction = "star";
@@ -115,6 +120,7 @@ public class ReadingActivity extends AppCompatActivity {
                 isMailStarred = isChecked;
             }
         });
+
 
         // set the action bar
         Toolbar toolbar = findViewById(R.id.toolbar);
