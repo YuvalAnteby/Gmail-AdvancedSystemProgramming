@@ -1,6 +1,5 @@
 package com.asp.android_app.ui.auth_activity;
 
-import static android.app.Activity.RESULT_OK;
 import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
 import static com.asp.android_app.utils.InputValidation.calculateAge;
 import static com.asp.android_app.utils.InputValidation.isEmailValid;
@@ -10,9 +9,7 @@ import static com.asp.android_app.utils.InputValidation.isPasswordValid;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,19 +18,19 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
 import com.asp.android_app.model.User;
 import com.asp.android_app.model.response.AuthResponse;
-import com.asp.android_app.repository.UserRepository;
 import com.asp.android_app.ui.inbox_activity.InboxActivity;
-import com.asp.android_app.utils.Base64Converter;
+import com.asp.android_app.utils.ImagePicker;
 import com.asp.android_app.utils.Result;
+import com.asp.android_app.utils.TokenManager;
+import com.asp.android_app.viewmodel.UserViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -42,8 +39,13 @@ import java.util.Calendar;
 
 public class SignupFragment extends Fragment {
 
-    private ActivityResultLauncher<Intent> imagePickerLauncher;
-    private Uri selectedImageUri = null;
+    private ActivityResultLauncher<String> imagePickerLauncher;
+
+    UserViewModel userViewModel;
+
+    TextInputLayout nameLayout, emailLayout, passwordLayout, birthDateLayout;
+    TextInputEditText etName, etEmail, etPassword, etBirthDate;
+    ImageView profileImage;
 
     @Nullable
     @Override
@@ -51,47 +53,44 @@ public class SignupFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.signup_fragment, container, false);
 
+        // Initialize the view model class
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
         // Initialize the views
-        TextInputLayout nameLayout = view.findViewById(R.id.nameLayout);
-        TextInputEditText etName = view.findViewById(R.id.etName);
-        TextInputLayout emailLayout = view.findViewById(R.id.emailLayout);
-        TextInputEditText etEmail = view.findViewById(R.id.etEmail);
-        TextInputLayout passwordLayout = view.findViewById(R.id.passwordLayout);
-        TextInputEditText etPassword = view.findViewById(R.id.etPassword);
-        TextInputLayout birthDateLayout = view.findViewById(R.id.birthDateLayout);
-        TextInputEditText etBirthDate = view.findViewById(R.id.etBirthDate);
-        ImageView profileImage = view.findViewById(R.id.profileImage);
+        nameLayout = view.findViewById(R.id.nameLayout);
+        etName = view.findViewById(R.id.etName);
+        emailLayout = view.findViewById(R.id.emailLayout);
+        etEmail = view.findViewById(R.id.etEmail);
+        passwordLayout = view.findViewById(R.id.passwordLayout);
+        etPassword = view.findViewById(R.id.etPassword);
+        birthDateLayout = view.findViewById(R.id.birthDateLayout);
+        etBirthDate = view.findViewById(R.id.etBirthDate);
+        profileImage = view.findViewById(R.id.profileImage);
         MaterialButton btnSignup = view.findViewById(R.id.btnSignup);
 
         // clicking the date of birth will let you pick a date
         etBirthDate.setOnClickListener(v -> showDatePicker(etBirthDate));
         // clicking the avatar will let you pick a new profile picture
-        profileImage.setOnClickListener(v -> chooseImage());
+        profileImage.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
         // clicking signup will ensure the input is valid and create a new user
-        btnSignup.setOnClickListener(view1 -> {
-            handleSignup(nameLayout,
-                    etName,
-                    emailLayout,
-                    etEmail,
-                    passwordLayout,
-                    etPassword,
-                    birthDateLayout,
-                    etBirthDate);
-        });
+        btnSignup.setOnClickListener(view1 -> handleSignup());
 
         // create the external activity of picking an image
-        imagePickerLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        Uri imageUri = result.getData().getData();
-                        //String img = handleImageUri(imageUri);
-                        selectedImageUri = imageUri;
-                        String img = Base64Converter.fileUriToBase64(imageUri, view.getContext());
-                        displayBase64Image(img, profileImage);
+        imagePickerLauncher = ImagePicker.registerImagePicker(this, requireContext(),
+                new ImagePicker.ImagePickerCallback() {
+                    @Override
+                    public void onImagePicked(String base64Image) {
+                        displayBase64Image(base64Image, profileImage);
+                        // store base64 in a tag or field for use in registering
+                        profileImage.setTag(base64Image);
                     }
-                }
-        );
+
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
 
         return view;
     }
@@ -116,37 +115,11 @@ public class SignupFragment extends Fragment {
     }
 
     /**
-     * Launches the external activity to pick an image
-     */
-    private void chooseImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        imagePickerLauncher.launch(intent);
-    }
-
-    /**
      * Checks if input fields are valid
      *
-     * @param nameLayout      layout containing the full name input
-     * @param etName          edit text of the name
-     * @param emailLayout     layout containing the email address input
-     * @param etEmail         edit text of the email
-     * @param passwordLayout  layout containing the password input
-     * @param etPassword      edit text of the password
-     * @param birthDateLayout layout containing the birthday input
-     * @param etBirthDate     edit text of the birthday
      * @return true if all fields are valid, otherwise false
      */
-    private boolean isInputValid(
-            TextInputLayout nameLayout,
-            TextInputEditText etName,
-            TextInputLayout emailLayout,
-            TextInputEditText etEmail,
-            TextInputLayout passwordLayout,
-            TextInputEditText etPassword,
-            TextInputLayout birthDateLayout,
-            TextInputEditText etBirthDate
-    ) {
+    private boolean isInputValid() {
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
@@ -198,70 +171,71 @@ public class SignupFragment extends Fragment {
 
     /**
      * Handles the signup of a user, checks the user's input and sends the input to the server
-     *
-     * @param nameLayout      layout containing the full name input
-     * @param etName          edit text of the name
-     * @param emailLayout     layout containing the email address input
-     * @param etEmail         edit text of the email
-     * @param passwordLayout  layout containing the password input
-     * @param etPassword      edit text of the password
-     * @param birthDateLayout layout containing the birthday input
-     * @param etBirthDate     edit text of the birthday
      */
-    private void handleSignup(
-            TextInputLayout nameLayout,
-            TextInputEditText etName,
-            TextInputLayout emailLayout,
-            TextInputEditText etEmail,
-            TextInputLayout passwordLayout,
-            TextInputEditText etPassword,
-            TextInputLayout birthDateLayout,
-            TextInputEditText etBirthDate
-    ) {
-        // Initialize the repository class
-        UserRepository userRepository = new UserRepository(requireContext());
-
+    private void handleSignup() {
         // get the input
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String birthDate = etBirthDate.getText().toString().trim();
         String imageBase64 = "";
-        if (selectedImageUri != null)
-            imageBase64 = Base64Converter.fileUriToBase64(selectedImageUri, requireContext());
+
+        Object tag = profileImage.getTag();
+        if (tag instanceof String)
+            imageBase64 = (String) tag;
 
         // check input validity - if info isn't valid don't continue
-        if (!isInputValid(
-                nameLayout,
-                etName,
-                emailLayout,
-                etEmail,
-                passwordLayout,
-                etPassword,
-                birthDateLayout, etBirthDate
-        ))
+        if (!isInputValid())
             return;
 
+        // register
         User newUser = new User(email, password, name, birthDate, imageBase64);
-        MutableLiveData<Result<AuthResponse>> resultLiveData = new MutableLiveData<>();
-
-        resultLiveData.observe(getViewLifecycleOwner(), result -> {
-            if (result instanceof Result.Loading) {
-                /// TODO show loading
-                Toast.makeText(getContext(), "LOADING", Toast.LENGTH_SHORT).show();
-            } else if (result instanceof Result.Success) {
+        userViewModel.register(newUser);
+        // wait for results
+        userViewModel.getAuthResult().observe(getViewLifecycleOwner(), result -> {
+            if (result instanceof Result.Success) {
                 AuthResponse auth = ((Result.Success<AuthResponse>) result).getData();
-                Toast.makeText(getContext(), "Welcome " + auth.getUser().getFullName(), Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getContext(), InboxActivity.class));
-                requireActivity().finish();
+                handleSignupSuccess(auth);
             } else if (result instanceof Result.Error) {
-                Log.i("login:", ((Result.Error<?>) result).getMessage());
-                Toast.makeText(getContext(), "Login failed: " + ((Result.Error<?>) result).getMessage(), Toast.LENGTH_LONG).show();
+                String msg = ((Result.Error<?>) result).getMessage();
+                handleSignupErrors(msg, emailLayout);
             }
         });
+    }
 
-        userRepository.register(newUser, resultLiveData);
+    /**
+     * Handles the case of successful signup - saves the JWT token and moves to inbox
+     *
+     * @param auth authorization call response instance
+     */
+    private void handleSignupSuccess(AuthResponse auth) {
+        // save the token
+        TokenManager tokenManager = TokenManager.getInstance(requireContext());
+        tokenManager.saveToken(auth.getToken());
+        // navigate to the inbox screen
+        Toast.makeText(getContext(), "Welcome " + auth.getUser().getFullName(), Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(getContext(), InboxActivity.class));
+        requireActivity().finish();
+    }
 
+    /**
+     * Handles errors that occur during login
+     *
+     * @param msg         message from the server
+     * @param emailLayout layout containing the edit text of the mail address
+     */
+    private void handleSignupErrors(String msg, TextInputLayout emailLayout) {
+        Log.i("signup error:", msg);
+        // error of already existing mail address
+        if (msg.contains("400") || msg.contains("exists")) {
+            emailLayout.setError("Email address taken");
+            return;
+        }
+        Toast.makeText(
+                getContext(),
+                getResources().getString(R.string.unexpected_error) + msg,
+                Toast.LENGTH_LONG
+        ).show();
     }
 
 }
