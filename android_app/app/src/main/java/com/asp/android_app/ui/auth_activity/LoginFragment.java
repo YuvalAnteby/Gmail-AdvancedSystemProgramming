@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
 import com.asp.android_app.model.request.LoginRequest;
@@ -23,6 +23,7 @@ import com.asp.android_app.repository.UserRepository;
 import com.asp.android_app.ui.InboxActivity;
 import com.asp.android_app.utils.Result;
 import com.asp.android_app.utils.TokenManager;
+import com.asp.android_app.viewmodel.UserViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -31,11 +32,15 @@ public class LoginFragment extends Fragment {
     public LoginFragment() {
     }
 
+    UserViewModel userViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.login_fragment, container, false);
+
+        // Initialize the view model class
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
         // Initialize views
         Button btnSwitch = view.findViewById(R.id.btnSignup);
@@ -122,11 +127,12 @@ public class LoginFragment extends Fragment {
             return;
 
         LoginRequest request = new LoginRequest(mail, password);
-        MutableLiveData<Result<AuthResponse>> resultLiveData = new MutableLiveData<>();
+        userViewModel.login(request);
 
-        resultLiveData.observe(getViewLifecycleOwner(), result -> {
+        // wait for results
+        userViewModel.getAuthResult().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Loading) {
-                /// TODO show loading
+                // TODO show loading
                 Toast.makeText(getContext(), "LOADING", Toast.LENGTH_SHORT).show();
             } else if (result instanceof Result.Success) {
                 AuthResponse auth = ((Result.Success<AuthResponse>) result).getData();
@@ -136,8 +142,6 @@ public class LoginFragment extends Fragment {
                 handleLoginError(msg, passwordLayout, etPassword);
             }
         });
-
-        repo.login(request, resultLiveData);
     }
 
     /**
@@ -172,10 +176,18 @@ public class LoginFragment extends Fragment {
         }
         // check if the server is up
         if (msg.contains("Failed to connect")) {
-            Toast.makeText(requireContext(), getResources().getString(R.string.server_off), Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                    requireContext(),
+                    getResources().getString(R.string.server_off),
+                    Toast.LENGTH_SHORT
+            ).show();
             return;
         }
 
-        Toast.makeText(requireContext(), "Unexpected Error, try again", Toast.LENGTH_SHORT).show();
+        Toast.makeText(
+                requireContext(),
+                getResources().getString(R.string.unexpected_error),
+                Toast.LENGTH_SHORT
+        ).show();
     }
 }

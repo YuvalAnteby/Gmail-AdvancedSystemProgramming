@@ -3,6 +3,7 @@
     <string name="server_off">Server is down, try again later</string>
     <string name="logo_description">Logo</string>
     <string name="avatar_description">Profile Image</string>
+    <string name="unexpected_error">Unexpected Error, try again</string>
 
     <!-- Strings used in login & signup pages -->
     <string name="invalid_name">Invalid name</string>
