@@ -47,6 +47,10 @@ public class UserViewModel extends AndroidViewModel {
         userRepository.register(user, authResult);
     }
 
+    public void validateToken() {
+        userRepository.validateToken(authResult);
+    }
+
     public void fetchUserInfo(int userId) {
         userRepository.fetchUserInfo(userId, userInfoResult);
     }

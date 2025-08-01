@@ -39,6 +39,11 @@ public class UserRepository {
         userApi.register(user).enqueue(createCallback(resultLiveData));
     }
 
+    public void validateToken(MutableLiveData<Result<AuthResponse>> resultLiveData) {
+        resultLiveData.postValue(new Result.Loading<>());
+        userApi.validateToken().enqueue(createCallback(resultLiveData));
+    }
+
     public void fetchUserInfo(int userId, MutableLiveData<Result<UserInfo>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
         userApi.fetchUserInfo(userId).enqueue(createCallback(resultLiveData));
@@ -49,6 +54,7 @@ public class UserRepository {
         resultLiveData.postValue(new Result.Loading<>());
         userApi.changeProfileImage(userId, request).enqueue(createCallback(resultLiveData));
     }
+
 
     /**
      * Helper class to centralize callback creation

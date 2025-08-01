@@ -30,6 +30,9 @@ public interface UserApi {
     @POST("tokens")
     Call<AuthResponse> login(@Body LoginRequest loginRequest);
 
+    @GET("/api/auth-check")
+    Call<AuthResponse> validateToken();
+
     @GET("users/search")
     Call<List<UserSearchResult>> searchByEmail(@Query("email") String query);
 

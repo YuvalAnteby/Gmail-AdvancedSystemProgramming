@@ -19,6 +19,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
+import com.asp.android_app.utils.TokenManager;
 import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.ui.auth_activity.AuthActivity;
@@ -116,8 +117,9 @@ public class InboxActivity extends AppCompatActivity {
                         imagePickerLauncher.launch("image/*");
                     } else if (i == 1) {
                         // Log out
+                        TokenManager tokenManager = TokenManager.getInstance(this);
+                        tokenManager.clearToken();
                         Intent intent = new Intent(this, AuthActivity.class);
-                        // TODO remove JWT token in cache
                         startActivity(intent);
                     }
                 })
