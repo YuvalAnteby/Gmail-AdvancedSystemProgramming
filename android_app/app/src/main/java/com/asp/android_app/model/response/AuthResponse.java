@@ -14,6 +14,11 @@ public class AuthResponse {
     private String token;
 
     /**
+     * User object returned in the JSON from the backend
+     */
+    private UserInfo user;
+
+    /**
      * @return JWT token returned by the server
      */
     public String getToken() {
@@ -21,9 +26,10 @@ public class AuthResponse {
     }
 
     /**
-     * @param token JWT token to assign
+     * @return user object from the server
      */
-    public void setToken(String token) {
-        this.token = token;
+    public UserInfo getUser() {
+        return user;
     }
+
 }

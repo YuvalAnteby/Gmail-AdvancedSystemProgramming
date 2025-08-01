@@ -12,10 +12,14 @@ public abstract class Result<T> {
      * Represents a successful result.
      */
     public static final class Success<T> extends Result<T> {
-        public final T data;
+        private final T data;
 
         public Success(T data) {
             this.data = data;
+        }
+
+        public T getData() {
+            return data;
         }
     }
 
@@ -23,10 +27,14 @@ public abstract class Result<T> {
      * Represents an error result.
      */
     public static final class Error<T> extends Result<T> {
-        public final String message;
+        private final String message;
 
         public Error(String message) {
             this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
         }
     }
 

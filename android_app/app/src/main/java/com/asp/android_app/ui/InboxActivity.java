@@ -1,4 +1,4 @@
-package com.asp.android_app.activity;
+package com.asp.android_app.ui;
 
 import android.os.Bundle;
 
