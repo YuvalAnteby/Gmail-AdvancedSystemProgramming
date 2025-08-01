@@ -21,6 +21,8 @@
     <style name="etLayoutAuth" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="android:layout_marginTop">16dp</item>
         <item name="boxBackgroundMode">outline</item>
+        <item name="boxStrokeColor">@color/react_blue</item>
+        <item name="hintTextColor">@color/react_blue</item>
     </style>
 
     <style name="btnPrimary">

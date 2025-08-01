@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Login & signup screens styles -->
+    <style name="etLayoutAuth" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="boxBackgroundMode">outline</item>
+        <item name="boxStrokeColor">@color/react_light_blue</item>
+        <item name="hintTextColor">@color/react_light_blue</item>
+    </style>
+
+
+</resources>
