@@ -1,16 +1,15 @@
 package com.asp.android_app.api;
 
 import com.asp.android_app.model.Mail;
+import com.asp.android_app.model.request.EditMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
-import com.asp.android_app.model.response.ReadStatus;
-import com.asp.android_app.model.response.StarStatus;
-import com.asp.android_app.model.response.TrashStatus;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -33,24 +32,19 @@ public interface MailApi {
             @Query("limit") int limit
     );
 
+    @PATCH("mails/{id}")
+    Call<Void> editMail(@Path("id") int mailId, @Body EditMailRequest request);
+
     @DELETE("mails/{id}")
     Call<Void> deleteMail(@Path("id") int id);
 
-    @POST("blacklist")
-    Call<Void> markAsSpam(@Body SpamRequest request);
+    @POST("blacklist/")
+    Call<Void> markAsSpam(@Body SpamRequest spamRequest);
 
-    @DELETE("blacklist")
-    Call<Void> removeFromSpam(@Body SpamRequest request);
-
-    @PATCH("mails/{id}")
-    Call<Void> markAsRead(@Path("id") int id, @Body ReadStatus status);
-
-    @PATCH("mails/{id}")
-    Call<Void> toggleStar(@Path("id") int id, @Body StarStatus status);
-
-    @PATCH("mails/{id}")
-    Call<Void> restoreMail(@Path("id") int id, @Body TrashStatus status);
+    @HTTP(method = "DELETE", path = "blacklist/", hasBody = true)
+    Call<Void> removeFromSpam(@Body SpamRequest spamRequest);
 
     @GET("mails/search/{query}")
     Call<MailListResponse> searchMails(@Path("query") String query);
+
 }

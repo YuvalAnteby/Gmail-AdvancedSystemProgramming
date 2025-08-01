@@ -87,7 +87,7 @@ const loginUser = async (req, res) => {
     }
 
     const token = signToken(user);
-    return res.status(200).json({ token });
+    return res.status(200).json({ token, user });
 };
 
 /**

@@ -39,7 +39,10 @@
     </style>
 
     <!-- mail list styles -->
-
+    <style name="drawer_header_item">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+    </style>
 
     <!-- mail row styles -->
     <style name="cardMail">
@@ -47,9 +50,9 @@
         <item name="android:layout_marginEnd">8dp</item>
         <item name="android:layout_marginTop">4dp</item>
         <item name="android:layout_marginBottom">4dp</item>
-        <item name="elevation">2dp</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="elevation">4dp</item>
+
         <item name="android:foreground">?attr/selectableItemBackground</item>
     </style>
 
@@ -72,7 +75,7 @@
     <style name="tvPreview">
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">?android:textColorSecondary</item>
-        <item name="maxLines">1</item>
+        <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
 
@@ -95,6 +98,14 @@
         <item name="boxStrokeWidthFocused">0dp</item>
         <item name="boxStrokeColor">@android:color/transparent</item>
         <item name="endIconMode">custom</item>
+    </style>
+
+    <!-- reading page -->
+    <style name="tvRecipients">
+        <item name="android:autoLink">email</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:breakStrategy">simple</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
     </style>
 
 </resources>

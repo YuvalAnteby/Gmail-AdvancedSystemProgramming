@@ -8,11 +8,9 @@ import androidx.lifecycle.MutableLiveData;
 import com.asp.android_app.api.ApiClient;
 import com.asp.android_app.api.MailApi;
 import com.asp.android_app.model.Mail;
+import com.asp.android_app.model.request.EditMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
-import com.asp.android_app.model.response.ReadStatus;
-import com.asp.android_app.model.response.StarStatus;
-import com.asp.android_app.model.response.TrashStatus;
 import com.asp.android_app.utils.Result;
 
 import retrofit2.Call;
@@ -67,64 +65,30 @@ public class MailRepository {
     }
 
     /**
-     * Restores a mail from the trash by its ID.
-     *
-     * @param mailId         The ID of the mail to restore
-     * @param status         The trash flag status
-     * @param resultLiveData a LiveData object to observe result (trash status result)
-     */
-    public void restoreMail(int mailId, TrashStatus status, MutableLiveData<Result<Void>> resultLiveData) {
-        resultLiveData.postValue(new Result.Loading<>());
-        mailApi.restoreMail(mailId, status).enqueue(createCallback(resultLiveData));
-    }
-
-    /**
      * toggle a mail's spam flag by calling the backend's POST or DELETE /blacklist/:id endpoint.
      *
      * @param request        contains the mail ID and user ID
      * @param resultLiveData result live data to observe success or error
      */
-    public void markAsSpam(SpamRequest request, MutableLiveData<Result<Void>> resultLiveData) {
+    public void toggleSpam(SpamRequest request, MutableLiveData<Result<Void>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-
-        mailApi.markAsSpam(request).enqueue(createCallback(resultLiveData));
+        if (!request.getIsPreviouslySpam())
+            mailApi.markAsSpam(request).enqueue(createCallback(resultLiveData));
+        else
+            mailApi.removeFromSpam(request).enqueue(createCallback(resultLiveData));
     }
 
     /**
-     * Remove a mail from the spam list by calling DELETE /blacklist.
-     *
-     * @param request        contains the mail ID and user ID
-     * @param resultLiveData result live data to observe success or error
+     * Edits a mail
+     * @param mailId the ID of the mail to edit
+     * @param req    request object containing all data to edit
+     * @param result result live data to observe success or error
      */
-    public void removeFromSpam(SpamRequest request, MutableLiveData<Result<Void>> resultLiveData) {
-        resultLiveData.postValue(new Result.Loading<>());
-        mailApi.removeFromSpam(request).enqueue(createCallback(resultLiveData));
+    public void editMail(int mailId, EditMailRequest req, MutableLiveData<Result<Void>> result) {
+        result.postValue(new Result.Loading<>());
+        mailApi.editMail(mailId, req).enqueue(createCallback(result));
     }
 
-    /**
-     * Toggles a mail's star flag.
-     *
-     * @param mailId         The ID of the mail to un/star
-     * @param status         The star flag status
-     * @param resultLiveData result live data to observe success or error
-     */
-    public void toggleStar(int mailId, StarStatus status, MutableLiveData<Result<Void>> resultLiveData) {
-        resultLiveData.postValue(new Result.Loading<>());
-        mailApi.toggleStar(mailId, status).enqueue(createCallback(resultLiveData));
-    }
-
-    /**
-     * Marks a mail as read.
-     *
-     * @param mailId         The ID of the mail to un/star
-     * @param status         The read flag status
-     * @param resultLiveData result live data to observe success or error
-     */
-    public void markRead(int mailId, ReadStatus status, MutableLiveData<Result<Void>> resultLiveData) {
-
-        resultLiveData.postValue(new Result.Loading<>());
-        mailApi.markAsRead(mailId, status).enqueue(createCallback(resultLiveData));
-    }
 
     /**
      * Search mails using a query from the user.

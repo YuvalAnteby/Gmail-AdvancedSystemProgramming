@@ -127,9 +127,30 @@ public class Mail {
     }
 
     /**
+     * @return true if the mail is marked as read, otherwise false
+     */
+    public boolean isRead() {
+        return isRead;
+    }
+
+    /**
+     * @param isRead update the is read flag
+     */
+    public void setIsRead(boolean isRead) {
+        this.isRead = isRead;
+    }
+
+    /**
      * @param spam whether the mail is marked as spam
      */
     public void setSpam(boolean spam) {
         isSpam = spam;
+    }
+
+    /**
+     * @return list of files attached to mail
+     */
+    public List<Attachment> getAttachments() {
+        return files;
     }
 }
