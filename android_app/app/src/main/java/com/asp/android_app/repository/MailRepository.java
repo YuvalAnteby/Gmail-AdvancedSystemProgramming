@@ -9,12 +9,11 @@ import com.asp.android_app.api.ApiClient;
 import com.asp.android_app.api.MailApi;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.SpamRequest;
+import com.asp.android_app.model.response.MailListResponse;
 import com.asp.android_app.model.response.ReadStatus;
 import com.asp.android_app.model.response.StarStatus;
 import com.asp.android_app.model.response.TrashStatus;
 import com.asp.android_app.utils.Result;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -39,7 +38,7 @@ public class MailRepository {
      * @param page           current page number
      * @param resultLiveData a LiveData object to observe result (mail list)
      */
-    public void getMailsByType(String inboxType, int page, MutableLiveData<Result<List<Mail>>> resultLiveData) {
+    public void getMailsByType(String inboxType, int page, MutableLiveData<Result<MailListResponse>> resultLiveData) {
         final int MAIL_LIMIT = 50;
         resultLiveData.postValue(new Result.Loading<>());
         mailApi.getMailsByType(inboxType, page, MAIL_LIMIT).enqueue(createCallback(resultLiveData));
@@ -133,7 +132,7 @@ public class MailRepository {
      * @param query          string to search for in mails
      * @param resultLiveData result live data to observe success or error
      */
-    public void searchMails(String query, MutableLiveData<Result<List<Mail>>> resultLiveData) {
+    public void searchMails(String query, MutableLiveData<Result<MailListResponse>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
         mailApi.searchMails(query).enqueue(createCallback(resultLiveData));
     }

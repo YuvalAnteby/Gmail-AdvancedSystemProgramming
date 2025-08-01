@@ -8,5 +8,11 @@
         <item name="hintTextColor">@color/react_light_blue</item>
     </style>
 
+    <!-- mail list styles -->
+    <style name="drawer_header_item">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
 
 </resources>

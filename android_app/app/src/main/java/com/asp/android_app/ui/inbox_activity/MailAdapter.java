@@ -1,0 +1,126 @@
+package com.asp.android_app.ui.inbox_activity;
+
+import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
+
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.asp.android_app.R;
+import com.asp.android_app.model.Mail;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.imageview.ShapeableImageView;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * RecyclerView Adapter for displaying a list of Mail items.
+ */
+public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder> {
+
+    private List<Mail> mailList;
+    private final Set<Integer> selectedPositions = new HashSet<>();
+
+
+    public void setMailList(List<Mail> mailList) {
+        this.mailList = mailList;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public MailViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.mail_item, parent, false);
+        return new MailViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MailViewHolder holder, int position) {
+        // set the data to the fields
+        Mail mail = mailList.get(position);
+        holder.subjectText.setText(mail.getSubject());
+        holder.senderText.setText(mail.getSender().getFullName());
+        holder.previewText.setText(mail.getBody());
+        displayBase64Image(mail.getSender().getImageUrl(), holder.imageCheckbox);
+
+        // TODO change style to unread if needed
+
+        // handle the image checkbox - shows V when selected, user's image when not
+        handleImageCheckbox(holder, position);
+
+        // handle clicks on anything else beside the checkbox
+        holder.mailCard.setOnClickListener(view -> onContentClick(position));
+    }
+
+    /**
+     * Handles the selection of mail rows by showing a V vector asset instead of a user's image.
+     *
+     * @param holder   view
+     * @param position row index
+     */
+    private void handleImageCheckbox(@NonNull MailViewHolder holder, int position) {
+        Mail mail = mailList.get(position);
+        boolean isSelected = selectedPositions.contains(position);
+
+        if (isSelected) {
+            holder.imageCheckbox.setImageResource(R.drawable.ic_checkmark);
+            holder.imageContainer.setBackgroundResource(R.drawable.circle_selected_background);
+            // scaling to make it look better
+            holder.imageCheckbox.setScaleX(0.8f);
+            holder.imageCheckbox.setScaleY(0.8f);
+            holder.imageContainer.setScaleX(0.9f);
+            holder.imageContainer.setScaleY(0.9f);
+        } else {
+            displayBase64Image(mail.getSender().getImageUrl(), holder.imageCheckbox);
+            holder.imageContainer.setBackgroundResource(R.drawable.circle_background);
+        }
+        // listen to clicks on the image
+        holder.imageCheckbox.setOnClickListener(v -> {
+            if (isSelected) {
+                selectedPositions.remove(position);
+            } else {
+                selectedPositions.add(position);
+            }
+            notifyItemChanged(position);
+        });
+    }
+
+    private void onContentClick(int position) {
+        // TODO implement reading page
+        Mail m = mailList.get(position);
+        String msg =
+                "id: " + m.getId() + ", sender: " + m.getSender().getFullName() + ", subject:" + m.getSubject();
+        Log.i("ROW CLICK: ", msg);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mailList != null ? mailList.size() : 0;
+    }
+
+    static class MailViewHolder extends RecyclerView.ViewHolder {
+        TextView subjectText, senderText, previewText;
+        ShapeableImageView imageCheckbox;
+        FrameLayout imageContainer;
+        MaterialCardView mailCard;
+
+        public MailViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mailCard = itemView.findViewById(R.id.cardMail);
+            subjectText = itemView.findViewById(R.id.text_subject);
+            senderText = itemView.findViewById(R.id.text_sender);
+            previewText = itemView.findViewById(R.id.text_preview);
+            imageCheckbox = itemView.findViewById(R.id.image_checkbox);
+            imageContainer = itemView.findViewById(R.id.image_checkbox_container);
+        }
+    }
+}

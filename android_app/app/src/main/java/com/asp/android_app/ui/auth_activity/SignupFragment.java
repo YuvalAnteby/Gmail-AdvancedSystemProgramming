@@ -31,7 +31,7 @@ import com.asp.android_app.R;
 import com.asp.android_app.model.User;
 import com.asp.android_app.model.response.AuthResponse;
 import com.asp.android_app.repository.UserRepository;
-import com.asp.android_app.ui.InboxActivity;
+import com.asp.android_app.ui.inbox_activity.InboxActivity;
 import com.asp.android_app.utils.Base64Converter;
 import com.asp.android_app.utils.Result;
 import com.google.android.material.button.MaterialButton;

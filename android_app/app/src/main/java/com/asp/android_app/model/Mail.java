@@ -1,5 +1,9 @@
 package com.asp.android_app.model;
 
+import com.asp.android_app.model.response.Attachment;
+import com.asp.android_app.model.response.UserInfo;
+
+import java.util.List;
 
 /**
  * Represents an email message.
@@ -10,16 +14,19 @@ package com.asp.android_app.model;
  */
 public class Mail {
     private int id;
-    private int senderId;
-    private String senderName;
-    private String senderMail;
+    private int owner;
+    private UserInfo from;
+    private List<UserInfo> sentTo;
     private String subject;
     private String body;
-    private String timestamp;
+    private String sentAt;
+    private String createdAt;
+    private boolean isDraft;
     private boolean isRead;
     private boolean isStarred;
     private boolean isTrashed;
     private boolean isSpam;
+    private List<Attachment> files;
 
     /**
      * @return the unique ID of the mail
@@ -36,45 +43,17 @@ public class Mail {
     }
 
     /**
-     * @return the sender's user ID
+     * @return the sender user object
      */
-    public int getSenderId() {
-        return senderId;
+    public UserInfo getSender() {
+        return from;
     }
 
     /**
-     * @param senderId the sender's user ID
+     * @return list of users the mail was sent to
      */
-    public void setSenderId(int senderId) {
-        this.senderId = senderId;
-    }
-
-    /**
-     * @return the full name of the sender
-     */
-    public String getSenderName() {
-        return senderName;
-    }
-
-    /**
-     * @param senderName the full name of the sender
-     */
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
-    }
-
-    /**
-     * @return the email address of the sender
-     */
-    public String getSenderMail() {
-        return senderMail;
-    }
-
-    /**
-     * @param senderMail the sender's email address
-     */
-    public void setSenderMail(String senderMail) {
-        this.senderMail = senderMail;
+    public List<UserInfo> getSentTo() {
+        return sentTo;
     }
 
     /**
@@ -108,29 +87,8 @@ public class Mail {
     /**
      * @return timestamp string of when the mail was sent
      */
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    /**
-     * @param timestamp timestamp string of when the mail was sent
-     */
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    /**
-     * @return true if the mail has been read
-     */
-    public boolean isRead() {
-        return isRead;
-    }
-
-    /**
-     * @param read whether the mail has been read
-     */
-    public void setRead(boolean read) {
-        isRead = read;
+    public String getSentAt() {
+        return sentAt;
     }
 
     /**
