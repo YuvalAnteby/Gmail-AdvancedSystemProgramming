@@ -37,7 +37,15 @@ public class Base64Converter {
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
             byte[] fileBytes = readAllBytes(inputStream);
-            return Base64.encodeToString(fileBytes, Base64.NO_WRAP);
+
+            // Detect file type from URI
+            String mimeType = context.getContentResolver().getType(uri);
+            if (mimeType == null) {
+                mimeType = "image/jpeg"; // fallback
+            }
+
+            String base64Data = Base64.encodeToString(fileBytes, Base64.NO_WRAP);
+            return "data:" + mimeType + ";base64," + base64Data; // ✅ data URI format
         } catch (Exception e) {
             Log.i("fileUriToBase64", Objects.requireNonNull(e.getMessage()));
             return "";

@@ -47,6 +47,9 @@
     <string name="search_bar_hint">Search mail</string>
     <string name="close_action_bar">Close toolbar</string>
     <string name="mark_as_read">Mark as read</string>
+    <string name="user_settings">User settings</string>
+    <string name="change_picture">Change picture</string>
+    <string name="logout_user">Logout</string>
 
     <!-- Strings used in mail reading page -->
     <string name="attachments">Attachments:</string>

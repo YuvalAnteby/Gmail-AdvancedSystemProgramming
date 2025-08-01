@@ -2,6 +2,7 @@ package com.asp.android_app.ui.inbox_activity;
 
 import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,22 +10,34 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
+import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.UserInfo;
+import com.asp.android_app.ui.auth_activity.AuthActivity;
+import com.asp.android_app.utils.ImagePicker;
+import com.asp.android_app.utils.Result;
+import com.asp.android_app.viewmodel.UserViewModel;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 
 public class InboxActivity extends AppCompatActivity {
     private InboxFragment inboxFragment;
+    private ActivityResultLauncher<String> imagePickerLauncher;
+    private ImageView userImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inbox);
+        UserInfo user = getIntent().getParcelableExtra("user");
         // initialize the mail list
         if (savedInstanceState == null) {
             inboxFragment = new InboxFragment();
@@ -37,8 +50,9 @@ public class InboxActivity extends AppCompatActivity {
                     .findFragmentById(R.id.fragment_container);
         }
         // initialize the profile image
-        ImageView userImageView = findViewById(R.id.user_avatar);
-        loadProfileImage(userImageView);
+        userImageView = findViewById(R.id.user_avatar);
+        loadProfileImage(userImageView, user);
+        userImageView.setOnClickListener(view -> showProfileOptionsDialog(user));
         // initialize the drawer menu
         initializeDrawerMenu();
 
@@ -46,6 +60,34 @@ public class InboxActivity extends AppCompatActivity {
         EditText searchInput = findViewById(R.id.search_input);
         searchInput.setSelected(false); // on creation - don't show as focused
         handleMailSearch(searchInput);
+
+        UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        userViewModel.getImageUpdateStatus().observe(this, result -> {
+            if (result instanceof Result.Success) {
+                UserInfo updatedUser = ((Result.Success<UserInfo>) result).getData();
+                displayBase64Image(updatedUser.getImageUrl(), userImageView);
+            } else if (result instanceof Result.Error) {
+                Toast.makeText(this, ((Result.Error<?>) result).getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        imagePickerLauncher = ImagePicker.registerImagePicker(this, this,
+                new ImagePicker.ImagePickerCallback() {
+                    @Override
+                    public void onImagePicked(String base64Image) {
+                        UserInfo user = getIntent().getParcelableExtra("user");
+                        if (user != null) {
+                            ProfileImageRequest request = new ProfileImageRequest(base64Image);
+                            userViewModel.changeProfileImage(user.getId(), request);
+                        }
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(InboxActivity.this, message, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
     }
 
     /**
@@ -53,14 +95,33 @@ public class InboxActivity extends AppCompatActivity {
      *
      * @param userImageView image view instance to show on
      */
-    private void loadProfileImage(ImageView userImageView) {
-        UserInfo user = getIntent().getParcelableExtra("user");
+    private void loadProfileImage(ImageView userImageView, UserInfo user) {
         if (user != null && user.getImageUrl() != null) {
             String imageBase64 = user.getImageUrl();
             displayBase64Image(imageBase64, userImageView);
         } else {
             userImageView.setImageResource(R.drawable.profile_default);
         }
+    }
+
+    private void showProfileOptionsDialog(UserInfo user) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.user_settings)
+                .setItems(new String[]{
+                        getString(R.string.change_picture),
+                        getString(R.string.logout_user)
+                }, (dialogInterface, i) -> {
+                    if (i == 0) {
+                        // Change profile picture
+                        imagePickerLauncher.launch("image/*");
+                    } else if (i == 1) {
+                        // Log out
+                        Intent intent = new Intent(this, AuthActivity.class);
+                        // TODO remove JWT token in cache
+                        startActivity(intent);
+                    }
+                })
+                .show();
     }
 
     /**

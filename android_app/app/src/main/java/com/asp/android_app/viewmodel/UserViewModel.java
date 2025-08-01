@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.asp.android_app.model.User;
 import com.asp.android_app.model.request.LoginRequest;
+import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.AuthResponse;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.repository.UserRepository;
@@ -23,6 +24,7 @@ public class UserViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Result<AuthResponse>> authResult = new MutableLiveData<>();
     private final MutableLiveData<Result<UserInfo>> userInfoResult = new MutableLiveData<>();
+
 
     public UserViewModel(@NonNull Application application) {
         super(application);
@@ -47,5 +49,14 @@ public class UserViewModel extends AndroidViewModel {
 
     public void fetchUserInfo(int userId) {
         userRepository.fetchUserInfo(userId, userInfoResult);
+    }
+
+
+    public void changeProfileImage(int userId, ProfileImageRequest request) {
+        userRepository.changeProfileImage(userId, request, userInfoResult);
+    }
+
+    public LiveData<Result<UserInfo>> getImageUpdateStatus() {
+        return userInfoResult;
     }
 }
