@@ -22,4 +22,9 @@ public class Attachment {
     public String getData() {
         return data;
     }
+
+    public boolean isImage() {
+        return name != null && name.matches("(?i).+\\.(png|jpg|jpeg|gif|bmp|webp)$");
+    }
+
 }

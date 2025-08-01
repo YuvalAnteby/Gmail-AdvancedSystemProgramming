@@ -2,8 +2,13 @@ package com.asp.android_app.ui;
 
 import static android.view.View.GONE;
 import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
+import static com.asp.android_app.utils.Base64Converter.getFileIconResource;
+import static com.asp.android_app.utils.Base64Converter.getMimeType;
+import static com.asp.android_app.utils.Base64Converter.saveBase64FileToCache;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -39,7 +44,7 @@ public class ReadingActivity extends AppCompatActivity {
     private TextView senderName, senderEmail;
     // mail contents
     private TextView mailDate, mailSubject, mailBody, mailAttachments;
-    private LinearLayout attachmentsContainer;
+    private LinearLayout attachmentsContainer, attachmentsLayout;
     private CheckBox starCheckbox;
     private boolean isMailStarred, suppressStarChange = false;
 
@@ -62,6 +67,7 @@ public class ReadingActivity extends AppCompatActivity {
         mailBody = findViewById(R.id.mail_body);
         attachmentsContainer = findViewById(R.id.attachments_container);
         mailAttachments = findViewById(R.id.tvAttachments);
+        attachmentsLayout = findViewById(R.id.attachmentsLayout);
         starCheckbox = findViewById(R.id.starCheckbox);
 
         toggleRecipients = findViewById(R.id.tv_toggle_recipients);
@@ -185,7 +191,6 @@ public class ReadingActivity extends AppCompatActivity {
         });
     }
 
-
     /**
      * Sets the activity's fields to show the mail's contents (subject, body, time etc.)
      *
@@ -205,7 +210,60 @@ public class ReadingActivity extends AppCompatActivity {
         if (attachments.isEmpty()) {
             attachmentsContainer.setVisibility(GONE);
         } else {
-            // TODO show attachments
+            attachmentsContainer.setVisibility(View.VISIBLE);
+            showAttachments(mail.getAttachments());
+        }
+    }
+
+    /**
+     * Shows mail attachments as a horizontal list
+     *
+     * @param attachments list of attachments in mail
+     */
+    private void showAttachments(List<Attachment> attachments) {
+        attachmentsLayout.removeAllViews(); // Clear any previous ones
+        for (Attachment attachment : attachments) {
+            View attachmentView = getLayoutInflater().inflate(R.layout.attachment_item, attachmentsLayout, false);
+            TextView fileName = attachmentView.findViewById(R.id.attachment_name);
+            ImageView thumbnail = attachmentView.findViewById(R.id.attachment_thumbnail);
+            // set resources
+            fileName.setText(attachment.getName());
+            int iconRes = getFileIconResource(attachment.getName());
+            thumbnail.setImageResource(iconRes);
+            // cache and preview on click
+            attachmentView.setOnClickListener(v -> {
+                openFile(attachment.getName(), attachment.getData());
+            });
+            attachmentsLayout.addView(attachmentView);
+        }
+    }
+
+    /**
+     * Opens an attachment file
+     *
+     * @param fileName   name of the file
+     * @param base64Data string in base64 format of the file
+     */
+    private void openFile(String fileName, String base64Data) {
+        // attempt to save the file to cache
+        Uri fileUri = saveBase64FileToCache(this, fileName, base64Data);
+        if (fileUri == null) {
+            Toast.makeText(this, "Failed to cache file", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String mimeType = getMimeType(base64Data);
+        if (mimeType == null) mimeType = "*/*";
+
+        // open the file, if several options exist let the user pick
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(fileUri, mimeType);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(Intent.createChooser(intent, "Open with"));
+        } catch (Exception e) {
+            Toast.makeText(this, "No app found to open this file type", Toast.LENGTH_SHORT).show();
         }
     }
 

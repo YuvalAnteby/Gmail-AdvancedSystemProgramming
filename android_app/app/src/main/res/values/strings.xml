@@ -55,6 +55,7 @@
     <string name="more_recipients">Sent to ▼</string>
     <string name="hide_recipients">Sent to ▲</string>
     <string name="no_recipients">to nobody</string>
+    <string name="attachment_desc">attachment</string>
 
     <!-- Strings used in mail writing page -->
 
