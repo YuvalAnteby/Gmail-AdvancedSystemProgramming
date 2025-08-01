@@ -71,13 +71,12 @@
 
                         <!-- recipients -->
                         <TextView
-                            android:id="@+id/tv_to_field"
-                            style="@style/tvRecipients"
+                            android:id="@+id/tv_toggle_recipients"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="to a@gmail.com, b@gmail.com"
-                            tools:ignore="HardcodedText" />
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/more_recipients"
+                            android:textStyle="italic" />
 
                         <TextView
                             android:id="@+id/tv_all_recipients"
@@ -88,15 +87,6 @@
                             android:text=""
                             android:visibility="gone" />
 
-                        <TextView
-                            android:id="@+id/tv_toggle_recipients"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:text="@string/more_recipients"
-                            android:textColor="@color/link_color"
-                            android:textStyle="italic" />
-
 
                     </LinearLayout>
 
@@ -104,9 +94,9 @@
                         android:id="@+id/mail_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:text="Jun 4, 2025 17:08"
                         android:textSize="12sp"
-                        android:gravity="center"
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

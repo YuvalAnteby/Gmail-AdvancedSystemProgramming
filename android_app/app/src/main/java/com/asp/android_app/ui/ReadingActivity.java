@@ -43,7 +43,7 @@ public class ReadingActivity extends AppCompatActivity {
     private CheckBox starCheckbox;
     private boolean isMailStarred, suppressStarChange = false;
 
-    private TextView toField, toggleRecipients, allRecipients;
+    private TextView toggleRecipients, allRecipients;
     private boolean recipientsExpanded = false;
 
 
@@ -64,7 +64,6 @@ public class ReadingActivity extends AppCompatActivity {
         mailAttachments = findViewById(R.id.tvAttachments);
         starCheckbox = findViewById(R.id.starCheckbox);
 
-        toField = findViewById(R.id.tv_to_field);
         toggleRecipients = findViewById(R.id.tv_toggle_recipients);
         allRecipients = findViewById(R.id.tv_all_recipients);
 
@@ -156,7 +155,6 @@ public class ReadingActivity extends AppCompatActivity {
         // show recipients info, toggle between showing a few and all recipients
         List<UserInfo> recipients = mail.getSentTo();
         if (recipients == null || recipients.isEmpty()) {
-            toField.setText(R.string.no_recipients);
             toggleRecipients.setVisibility(View.GONE);
             allRecipients.setVisibility(View.GONE);
             return;
@@ -167,29 +165,23 @@ public class ReadingActivity extends AppCompatActivity {
             recipientMails.add(recipient.getMail());
 
         // Join with comma and zero width space to allow safe line wrapping
-        String allMails = getString(
-                R.string.sent_to,
-                TextUtils.join(",\u200B ", recipientMails));
+        String allMails = TextUtils.join(",\u200B ", recipientMails);
         // Show in full list view
         allRecipients.setText(allMails);
         // Show abbreviated preview
         int count = Math.min(2, recipientMails.size());
-        String preview = TextUtils.join(",\u200B ", recipientMails.subList(0, count));
-        toField.setText(getResources().getString(R.string.sent_to, preview));
         toggleRecipients.setVisibility(recipientMails.size() > count ? View.VISIBLE : View.GONE);
 
         // observe clicks on the hide/show text view
         toggleRecipients.setOnClickListener(v -> {
             recipientsExpanded = !recipientsExpanded;
             if (recipientsExpanded) {
-                toField.setVisibility(View.GONE);
                 allRecipients.setVisibility(View.VISIBLE);
                 toggleRecipients.setText(R.string.hide_recipients);
-            } else {
-                toField.setVisibility(View.VISIBLE);
-                allRecipients.setVisibility(View.GONE);
-                toggleRecipients.setText(R.string.more_recipients);
+                return;
             }
+            allRecipients.setVisibility(View.GONE);
+            toggleRecipients.setText(R.string.more_recipients);
         });
     }
 
