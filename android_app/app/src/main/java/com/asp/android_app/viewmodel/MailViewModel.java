@@ -14,6 +14,8 @@ import com.asp.android_app.model.response.MailListResponse;
 import com.asp.android_app.repository.MailRepository;
 import com.asp.android_app.utils.Result;
 
+import java.util.List;
+
 /**
  * ViewModel class for handling mail-related logic and exposing LiveData to the UI.
  * Acts as a bridge between the Repository and UI layer.
@@ -25,6 +27,7 @@ public class MailViewModel extends AndroidViewModel {
     private final MutableLiveData<Result<MailListResponse>> mailsListLiveData = new MutableLiveData<>();
     private final MutableLiveData<Result<Mail>> mailLiveData = new MutableLiveData<>();
     private final MutableLiveData<Result<Void>> editMailStatus = new MutableLiveData<>();
+    private final MutableLiveData<Result<List<Mail>>> searchMailLiveData = new MutableLiveData<>();
 
     private int currentPage = 1;
 
@@ -43,6 +46,10 @@ public class MailViewModel extends AndroidViewModel {
 
     public LiveData<Result<Void>> getEditMailStatus() {
         return editMailStatus;
+    }
+
+    public LiveData<Result<List<Mail>>> getSearchData() {
+        return searchMailLiveData;
     }
 
     /**
@@ -143,7 +150,7 @@ public class MailViewModel extends AndroidViewModel {
      * @param query string to search by
      */
     public void searchMail(String query) {
-        mailRepository.searchMails(query, mailsListLiveData);
+        mailRepository.searchMails(query, searchMailLiveData);
     }
 
     // TODO Additional methods: sendNewMail

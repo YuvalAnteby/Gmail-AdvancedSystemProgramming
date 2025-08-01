@@ -13,6 +13,8 @@ import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
 import com.asp.android_app.utils.Result;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -96,7 +98,7 @@ public class MailRepository {
      * @param query          string to search for in mails
      * @param resultLiveData result live data to observe success or error
      */
-    public void searchMails(String query, MutableLiveData<Result<MailListResponse>> resultLiveData) {
+    public void searchMails(String query, MutableLiveData<Result<List<Mail>>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
         mailApi.searchMails(query).enqueue(createCallback(resultLiveData));
     }

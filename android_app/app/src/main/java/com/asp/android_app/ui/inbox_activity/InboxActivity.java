@@ -3,6 +3,8 @@ package com.asp.android_app.ui.inbox_activity;
 import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
@@ -114,11 +116,16 @@ public class InboxActivity extends AppCompatActivity {
     }
 
     /**
-     * TODO implement search
+     * Adds a text change listener to the search input field and triggers
+     * the mail search after user types (with a small delay).
      *
-     * @param searchInput
+     * @param searchInput the EditText for entering search queries
      */
     private void handleMailSearch(EditText searchInput) {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        final long delayMillis = 300; // debounce time
+        final Runnable[] searchRunnable = new Runnable[1];
+
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -127,12 +134,19 @@ public class InboxActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Live filtering logic here
+                handler.removeCallbacks(searchRunnable[0]);
+
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
-
+                String query = editable.toString().trim();
+                searchRunnable[0] = () -> {
+                    if (inboxFragment != null) {
+                        inboxFragment.searchMails(query);
+                    }
+                };
+                handler.postDelayed(searchRunnable[0], delayMillis);
             }
         });
     }

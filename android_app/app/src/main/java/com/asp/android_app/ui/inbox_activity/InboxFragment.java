@@ -6,6 +6,7 @@ import static android.view.View.VISIBLE;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,6 +105,7 @@ public class InboxFragment extends Fragment {
      * Observer for mail data changes
      */
     private void observeViewModel(SwipeRefreshLayout swipeRefreshLayout) {
+        // mails load observer
         mailViewModel.getMailsLiveData().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Loading) {
                 swipeRefreshLayout.setRefreshing(true);
@@ -111,20 +113,36 @@ public class InboxFragment extends Fragment {
                 MailListResponse mails = ((Result.Success<MailListResponse>) result).getData();
                 mailAdapter.setMailList(mails.getMails());
                 swipeRefreshLayout.setRefreshing(false);
-
             } else if (result instanceof Result.Error) {
                 swipeRefreshLayout.setRefreshing(false);
                 String msg = ((Result.Error<?>) result).getMessage();
+                Log.i("err", msg);
                 Toast.makeText(getContext(), getResources().getString(R.string.err_mails_load) + msg, Toast.LENGTH_LONG).show();
             }
         });
 
+        // edit observer
         mailViewModel.getEditMailStatus().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Success) {
                 mailAdapter.clearSelection();
                 mailViewModel.loadMails(inboxType);
             } else if (result instanceof Result.Error) {
                 Toast.makeText(getContext(), R.string.unexpected_error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // search observer
+        mailViewModel.getSearchData().observe(getViewLifecycleOwner(), result -> {
+            if (result instanceof Result.Loading) {
+                swipeRefreshLayout.setRefreshing(true);
+            } else if (result instanceof Result.Success) {
+                List<Mail> mails = ((Result.Success<List<Mail>>) result).getData();
+                mailAdapter.setMailList(mails);
+                swipeRefreshLayout.setRefreshing(false);
+            } else if (result instanceof Result.Error) {
+                swipeRefreshLayout.setRefreshing(false);
+                String msg = ((Result.Error<?>) result).getMessage();
+                Toast.makeText(getContext(), getResources().getString(R.string.err_mails_load) + msg, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -182,11 +200,31 @@ public class InboxFragment extends Fragment {
 
     }
 
+    /**
+     * Sets a new inbox using the picked option from the drawer menu
+     *
+     * @param newInboxType new inbox type
+     */
     public void setInbox(String newInboxType) {
         if (newInboxType == null)
             return;
 
         this.inboxType = newInboxType;
         mailViewModel.loadMails(inboxType);
+    }
+
+    /**
+     * Triggers a search through the MailViewModel for a given query.
+     * Also resets pagination and updates the RecyclerView on result.
+     *
+     * @param query the string to search by
+     */
+    public void searchMails(String query) {
+        mailViewModel.resetPage();
+        if (query.isEmpty()) {
+            mailViewModel.loadMails(inboxType);
+        } else {
+            mailViewModel.searchMail(query);
+        }
     }
 }
