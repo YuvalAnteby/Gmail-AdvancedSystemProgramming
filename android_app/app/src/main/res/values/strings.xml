@@ -1,15 +1,26 @@
 <resources>
     <string name="app_name">Mail ASP</string>
+    <string name="server_off">Server is down, try again later</string>
+    <string name="logo_description">Logo</string>
+    <string name="avatar_description">Profile Image</string>
+
     <!-- Strings used in login & signup pages -->
+    <string name="invalid_name">Invalid name</string>
     <string name="invalid_email">Invalid email</string>
     <string name="empty_password">No password given</string>
-    <string name="empty_birth_date">No birth date given</string>
-    <string name="invalid_birth_date">No way you\'re %d years old and signing up 🙄</string>
-    <string name="avatar_description">Profile Image</string>
-    <string name="signup">Sign Up</string>
+    <string name="login">Login</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+
+    <!-- Strings used in signup page -->
+    <string name="empty_birth_date">No birth date given</string>
+    <string name="signup">Sign Up</string>
+    <string name="enter_name">Full name</string>
     <string name="birth_date">Date of Birth (YYYY/MM/DD)</string>
+    <string name="invalid_birth_date">No way you\'re %d years old and signing up 🙄</string>
+    <!-- Strings used in login page -->
+    <string name="new_account">Create account</string>
+    <string name="wrong_input">Wrong mail or password</string>
     <!-- Strings used in mail list page -->
     <string name="compose_mail">Compose mail</string>
 

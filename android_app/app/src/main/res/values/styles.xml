@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Login & signup screens styles -->
+    <style name="imgLogo">
+        <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+    <style name="imgAvatar">
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="tvAuth">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+    <style name="etLayoutAuth" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="boxBackgroundMode">outline</item>
+    </style>
+
+    <style name="btnPrimary">
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="backgroundTint">@color/react_light_blue</item>
+    </style>
+
+    <!-- Login & signup screens styles -->
+    <style name="btnSecondary">
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="elevation">0dp</item>
+        <item name="android:textColor">@color/react_light_blue</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
+</resources>

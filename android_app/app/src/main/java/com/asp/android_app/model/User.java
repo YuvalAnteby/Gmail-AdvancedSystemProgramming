@@ -23,6 +23,16 @@ public class User {
     private String password;
 
     /**
+     * Date of birth of the user.
+     */
+    private final String dateOfBirth;
+
+    /**
+     * Image in base64 format
+     */
+    private final String image;
+
+    /**
      * Constructs a new User for registration.
      *
      * @param fullName the full name of the user
@@ -30,9 +40,24 @@ public class User {
      * @param password the user's password
      */
     public User(String fullName, String mail, String password) {
+        this(fullName, mail, password, "", "");
+    }
+
+    /**
+     * Constructs a new User for registration.
+     *
+     * @param fullName the full name of the user
+     * @param mail     the user's email address
+     * @param password the user's password
+     * @param date     user's date of birth
+     * @param image    user's image in base64
+     */
+    public User(String fullName, String mail, String password, String date, String image) {
         this.fullName = fullName;
         this.mail = mail;
         this.password = password;
+        this.dateOfBirth = date;
+        this.image = image;
     }
 
     /**

@@ -12,12 +12,14 @@
         android:gravity="center_horizontal"
         android:padding="24dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/profileImage"
             android:layout_width="96dp"
             android:layout_height="96dp"
-            android:layout_marginBottom="16dp"
+            style="@style/imgAvatar"
             android:src="@drawable/profile_default"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/imgAvatar"
             android:contentDescription="@string/avatar_description"
             android:clickable="true"
             android:focusable="true" />
@@ -26,17 +28,29 @@
             android:id="@+id/titleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/signup"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
+            style="@style/etLayoutAuth"
+            android:text="@string/signup" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/nameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/etLayoutAuth"
+            android:hint="@string/enter_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/emailLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/email"
-            app:boxBackgroundMode="outline">
+            style="@style/etLayoutAuth"
+            android:hint="@string/email">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
@@ -50,8 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/password"
-            android:layout_marginTop="16dp"
-            app:boxBackgroundMode="outline">
+            style="@style/etLayoutAuth">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
@@ -64,9 +77,8 @@
             android:id="@+id/birthDateLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/birth_date"
-            android:layout_marginTop="16dp"
-            app:boxBackgroundMode="outline">
+            style="@style/etLayoutAuth"
+            android:hint="@string/birth_date">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etBirthDate"
@@ -80,7 +92,7 @@
             android:id="@+id/btnSignup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            style="@style/btnPrimary"
             android:text="@string/signup" />
 
     </LinearLayout>
