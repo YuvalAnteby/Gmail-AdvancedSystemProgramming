@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,9 +33,13 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
     private List<Mail> mailList;
     private final Set<Integer> selectedPositions = new HashSet<>();
     private final Context context;
+    private final String inboxType;
+    private final ActivityResultLauncher<Intent> launcher;
 
-    public MailAdapter(Context context) {
+    public MailAdapter(Context context, String inboxType, ActivityResultLauncher<Intent> launcher) {
         this.context = context;
+        this.inboxType = inboxType;
+        this.launcher = launcher;
     }
 
     public void setMailList(List<Mail> mailList) {
@@ -104,8 +109,9 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
     private void onContentClick(int position) {
         Mail m = mailList.get(position);
         Intent intent = new Intent(context, ReadingActivity.class);
+        intent.putExtra("inboxType", inboxType);
         intent.putExtra("mailId", m.getId());
-        context.startActivity(intent);
+        launcher.launch(intent);
         // TODO remove logs
         String msg =
                 "id: " + m.getId() + ", sender: " + m.getSender().getFullName() + ", subject:" + m.getSubject();

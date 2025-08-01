@@ -8,11 +8,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.asp.android_app.model.Mail;
+import com.asp.android_app.model.request.EditMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
-import com.asp.android_app.model.response.ReadStatus;
-import com.asp.android_app.model.response.StarStatus;
-import com.asp.android_app.model.response.TrashStatus;
 import com.asp.android_app.repository.MailRepository;
 import com.asp.android_app.utils.Result;
 
@@ -26,12 +24,7 @@ public class MailViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Result<MailListResponse>> mailsListLiveData = new MutableLiveData<>();
     private final MutableLiveData<Result<Mail>> mailLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Result<Void>> deleteMailStatus = new MutableLiveData<>();
-    private final MutableLiveData<Result<Void>> restoreMailStatus = new MutableLiveData<>();
-    private final MutableLiveData<Result<Void>> readMailStatus = new MutableLiveData<>();
-    private final MutableLiveData<Result<Void>> spamMailStatus = new MutableLiveData<>();
-    private final MutableLiveData<Result<Void>> notSpamMailStatus = new MutableLiveData<>();
-    private final MutableLiveData<Result<Void>> toggleStarMailStatus = new MutableLiveData<>();
+    private final MutableLiveData<Result<Void>> editMailStatus = new MutableLiveData<>();
 
     private int currentPage = 1;
 
@@ -48,24 +41,8 @@ public class MailViewModel extends AndroidViewModel {
         return mailLiveData;
     }
 
-    public LiveData<Result<Void>> getDeleteMailStatus() {
-        return deleteMailStatus;
-    }
-
-    public LiveData<Result<Void>> getRestoreMailStatus() {
-        return restoreMailStatus;
-    }
-
-    public LiveData<Result<Void>> getSpamMailStatus() {
-        return spamMailStatus;
-    }
-
-    public LiveData<Result<Void>> getReadMailStatus() {
-        return readMailStatus;
-    }
-
-    public LiveData<Result<Void>> getStarStatus() {
-        return toggleStarMailStatus;
+    public LiveData<Result<Void>> getEditMailStatus() {
+        return editMailStatus;
     }
 
     /**
@@ -104,13 +81,17 @@ public class MailViewModel extends AndroidViewModel {
         mailRepository.fetchMail(mailId, mailLiveData);
     }
 
+    public void editMail(int mailId, EditMailRequest request) {
+        mailRepository.editMail(mailId, request, editMailStatus);
+    }
+
     /**
      * Moves the mail with the given ID to the trash and updates LiveData.
      *
      * @param mailId The ID of the mail to delete
      */
     public void deleteMail(int mailId) {
-        mailRepository.deleteMail(mailId, deleteMailStatus);
+        mailRepository.deleteMail(mailId, editMailStatus);
     }
 
     /**
@@ -118,8 +99,27 @@ public class MailViewModel extends AndroidViewModel {
      *
      * @param mailId The ID of the mail to restore
      */
-    public void restoreMail(int mailId, TrashStatus status) {
-        mailRepository.restoreMail(mailId, status, restoreMailStatus);
+    public void restoreMail(int mailId) {
+        editMail(mailId, new EditMailRequest(null, null, false, null));
+    }
+
+    /**
+     * Marks the read flag of a mail as true
+     *
+     * @param mailId id of the mail to mark the read flag as true
+     */
+    public void markAsRead(int mailId) {
+        editMail(mailId, new EditMailRequest(true, null, null, null));
+    }
+
+    /**
+     * Toggles the star flag of a mail
+     *
+     * @param mailId    id of the mail to toggle the star flag for
+     * @param isStarred status of the star flag of a mail
+     */
+    public void toggleStar(int mailId, boolean isStarred) {
+        editMail(mailId, new EditMailRequest(null, isStarred, null, null));
     }
 
     /**
@@ -128,32 +128,7 @@ public class MailViewModel extends AndroidViewModel {
      * @param request object containing the mail id to toggle it's spam flag
      */
     public void toggleSpam(SpamRequest request) {
-        if (request.getIsPreviouslySpam()) {
-            mailRepository.removeFromSpam(request, spamMailStatus);
-        } else {
-            mailRepository.markAsSpam(request, spamMailStatus);
-        }
-    }
-
-
-    /**
-     * Toggles the star flag of a mail
-     *
-     * @param mailId id of the mail to toggle the star flag for
-     * @param status status of the star flag of a mail
-     */
-    public void toggleStar(int mailId, StarStatus status) {
-        mailRepository.toggleStar(mailId, status, toggleStarMailStatus);
-    }
-
-    /**
-     * Marks the read flag of a mail as true
-     *
-     * @param mailId id of the mail to mark the read flag as true
-     * @param status status of the read flag of a mail
-     */
-    public void markAsRead(int mailId, ReadStatus status) {
-        mailRepository.markRead(mailId, status, readMailStatus);
+        mailRepository.toggleSpam(request, editMailStatus);
     }
 
     /**

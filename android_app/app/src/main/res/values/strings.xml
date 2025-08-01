@@ -57,6 +57,13 @@
     <string name="no_recipients">to nobody</string>
     <string name="attachment_desc">attachment</string>
 
+    <!-- Strings used in mail reading menus -->
+    <string name="delete_mail">Delete forever</string>
+    <string name="trash_mail">Trash</string>
+    <string name="restore_mail">Restore</string>
+    <string name="report_mail">Spam</string>
+    <string name="unspam_mail">Not spam</string>
+
     <!-- Strings used in mail writing page -->
 
 </resources>

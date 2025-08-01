@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_delete_forever"
+        android:title="@string/delete_mail"
+        android:visible="false"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/action_trash"
+        android:title="@string/trash_mail"
+        android:icon="@drawable/ic_delete"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_spam"
+        android:title="@string/report_mail"
+        android:icon="@drawable/ic_report"
+        app:showAsAction="ifRoom" />
+
+
+</menu>

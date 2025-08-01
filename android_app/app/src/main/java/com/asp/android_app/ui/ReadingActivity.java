@@ -12,6 +12,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -20,15 +22,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.CompoundButtonCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
 import com.asp.android_app.model.Mail;
+import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.Attachment;
-import com.asp.android_app.model.response.StarStatus;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.utils.DateUtil;
 import com.asp.android_app.utils.Result;
@@ -36,6 +40,7 @@ import com.asp.android_app.viewmodel.MailViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ReadingActivity extends AppCompatActivity {
 
@@ -43,20 +48,21 @@ public class ReadingActivity extends AppCompatActivity {
     // sender info
     private TextView senderName, senderEmail;
     // mail contents
-    private TextView mailDate, mailSubject, mailBody, mailAttachments;
+    private TextView mailDate, mailSubject, mailBody;
     private LinearLayout attachmentsContainer, attachmentsLayout;
     private CheckBox starCheckbox;
     private boolean isMailStarred, suppressStarChange = false;
 
     private TextView toggleRecipients, allRecipients;
     private boolean recipientsExpanded = false;
-
+    private String lastEditAction = "";
+    private Mail mail = null;
+    private MailViewModel mailViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reading);
-
 
         // Init views
         senderAvatar = findViewById(R.id.sender_avatar);
@@ -66,13 +72,11 @@ public class ReadingActivity extends AppCompatActivity {
         mailSubject = findViewById(R.id.mail_subject);
         mailBody = findViewById(R.id.mail_body);
         attachmentsContainer = findViewById(R.id.attachments_container);
-        mailAttachments = findViewById(R.id.tvAttachments);
         attachmentsLayout = findViewById(R.id.attachmentsLayout);
         starCheckbox = findViewById(R.id.starCheckbox);
 
         toggleRecipients = findViewById(R.id.tv_toggle_recipients);
         allRecipients = findViewById(R.id.tv_all_recipients);
-
 
         Button btnReply = findViewById(R.id.btn_reply);
         Button btnForward = findViewById(R.id.btn_forward);
@@ -84,8 +88,8 @@ public class ReadingActivity extends AppCompatActivity {
             finish();
         }
         // initialize the mails view model
-        MailViewModel mailViewModel = new ViewModelProvider(this).get(MailViewModel.class);
-        observeMailViewModel(mailViewModel);
+        mailViewModel = new ViewModelProvider(this).get(MailViewModel.class);
+        initializeModelViewObservers();
         mailViewModel.fetchMailById(mailId);
 
         // initialize reply action buttons
@@ -102,27 +106,85 @@ public class ReadingActivity extends AppCompatActivity {
             if (mailId != -1) {
                 // Disable to prevent mass clicking while waiting for backend response
                 starCheckbox.setEnabled(false);
-                StarStatus status = new StarStatus(isChecked);
-                mailViewModel.toggleStar(mailId, status);
+                lastEditAction = "star";
+                mailViewModel.toggleStar(mailId, isChecked);
                 isMailStarred = isChecked;
-
             }
         });
+
+        // set the action bar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.reading_menu, menu);
+        MenuItem deleteRestoreItem = menu.findItem(R.id.action_trash);
+        MenuItem spamToggleItem = menu.findItem(R.id.action_spam);
+        MenuItem deleteForeverItem = menu.findItem(R.id.action_delete_forever);
+
+        // depending on the inbox, change the icons and titles to undo actions like deleting
+        String inboxType = getIntent().getStringExtra("inboxType"); // e.g. "trash", "spam"
+        if ("trash".equals(inboxType)) {
+            deleteRestoreItem.setTitle(R.string.restore_mail);
+            deleteRestoreItem.setIcon(R.drawable.ic_restore);
+            deleteForeverItem.setVisible(true);
+        } else {
+            deleteRestoreItem.setTitle(R.string.delete_mail);
+            deleteRestoreItem.setIcon(R.drawable.ic_delete);
+            deleteForeverItem.setVisible(false);
+        }
+        if ("spam".equals(inboxType)) {
+            spamToggleItem.setTitle(R.string.unspam_mail);
+            spamToggleItem.setIcon(R.drawable.ic_checkmark);
+        } else {
+            spamToggleItem.setTitle(R.string.spam_mails);
+            spamToggleItem.setIcon(R.drawable.ic_report);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_trash) {
+            if (mail.isTrashed()) {
+                lastEditAction = "restore";
+                mailViewModel.restoreMail(mail.getId());
+            } else {
+                lastEditAction = "delete";
+                mailViewModel.deleteMail(mail.getId());
+            }
+            return true;
+        }
+        if (id == R.id.action_spam) {
+            lastEditAction = "spam";
+            mailViewModel.toggleSpam(new SpamRequest(mail.getId(), mail.isSpam()));
+            return true;
+        }
+        if (id == R.id.action_delete_forever) {
+            lastEditAction = "delete";
+            mailViewModel.deleteMail(mail.getId());
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     /**
      * Observer for changes of the mail object data, when fetching successfully shows the mail's
      * contents and the sender info.
-     *
-     * @param viewModel view model that loads the mail
      */
-    private void observeMailViewModel(MailViewModel viewModel) {
+    private void initializeModelViewObservers() {
         // mail update
-        viewModel.getMailLiveData().observe(this,
+        mailViewModel.getMailLiveData().observe(this,
                 result -> {
                     if (result instanceof Result.Success) {
-                        Mail mail = ((Result.Success<Mail>) result).getData();
+                        mail = ((Result.Success<Mail>) result).getData();
                         showSenderAndRecipientsInfo(mail);
                         showMailContent(mail);
                         isMailStarred = mail.isStarred();
@@ -134,15 +196,28 @@ public class ReadingActivity extends AppCompatActivity {
                     }
                 });
 
-        // star update
-        viewModel.getStarStatus().observe(this, result -> {
-            starCheckbox.setEnabled(true);
+        // mail edit
+        mailViewModel.getEditMailStatus().observe(this, result -> {
             if (result instanceof Result.Error) {
-                Toast.makeText(
-                        this,
-                        getResources().getString(R.string.star_error),
-                        Toast.LENGTH_SHORT
-                ).show();
+                Toast.makeText(this, R.string.unexpected_error, Toast.LENGTH_SHORT).show();
+                Log.e("READING", ((Result.Error<Void>) result).getMessage());
+            }
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("refresh", true);
+            resultIntent.putExtra("inboxType", getIntent().getStringExtra("inboxType"));
+
+            switch (lastEditAction) {
+                case "star":
+                    starCheckbox.setEnabled(true);
+                    lastEditAction = "";
+                    break;
+                case "delete":
+                case "restore":
+                case "spam":
+                    setResult(RESULT_OK, resultIntent);
+                    lastEditAction = "";
+                    finish();
+                    break;
             }
         });
     }

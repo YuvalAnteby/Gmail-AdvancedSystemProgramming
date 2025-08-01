@@ -1,5 +1,7 @@
 package com.asp.android_app.ui.inbox_activity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -28,6 +32,18 @@ public class InboxFragment extends Fragment {
 
     private MailViewModel mailViewModel;
     private MailAdapter mailAdapter;
+    private final String inboxType = "incoming"; // default inbox is incoming mails
+
+    private final ActivityResultLauncher<Intent> readingLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    boolean shouldRefresh = result.getData().getBooleanExtra("refresh", false);
+                    String returnedInboxType = result.getData().getStringExtra("inboxType");
+                    if (shouldRefresh && returnedInboxType != null && returnedInboxType.equals(inboxType)) {
+                        mailViewModel.loadMails(inboxType); // refresh only if same inbox
+                    }
+                }
+            });
 
     @Nullable
     @Override
@@ -37,7 +53,7 @@ public class InboxFragment extends Fragment {
         View view = inflater.inflate(R.layout.inbox_fragment, container, false);
         // initialize the recycler view
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-        mailAdapter = new MailAdapter(requireContext());
+        mailAdapter = new MailAdapter(requireContext(), inboxType, readingLauncher);
         recyclerView.setAdapter(mailAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -45,15 +61,16 @@ public class InboxFragment extends Fragment {
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             // Trigger refresh from ViewModel
-            mailViewModel.loadMails("incoming");
+            String loadInbox = inboxType;
+            if (loadInbox == null || loadInbox.isBlank())
+                loadInbox = "incoming";
+            mailViewModel.loadMails(loadInbox);
         });
 
         // initialize the mails view model
         mailViewModel = new ViewModelProvider(this).get(MailViewModel.class);
         observeViewModel(swipeRefreshLayout);
-
-        mailViewModel.loadMails("incoming"); // default inbox is incoming mails
-
+        mailViewModel.loadMails(inboxType);
 
         return view;
     }
@@ -67,6 +84,7 @@ public class InboxFragment extends Fragment {
                 MailListResponse mails = ((Result.Success<MailListResponse>) result).getData();
                 mailAdapter.setMailList(mails.getMails());
                 swipeRefreshLayout.setRefreshing(false);
+
             } else if (result instanceof Result.Error) {
                 swipeRefreshLayout.setRefreshing(false);
                 String msg = ((Result.Error<?>) result).getMessage();
