@@ -13,6 +13,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- custom toolbar -->
         <LinearLayout
             android:id="@+id/custom_toolbar"
             android:layout_width="match_parent"
@@ -69,6 +70,75 @@
 
         </LinearLayout>
 
+        <!-- action bar -->
+        <LinearLayout
+            android:id="@+id/action_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="?attr/colorPrimary"
+            android:visibility="gone"
+            android:padding="8dp">
+
+            <!-- Back/Cancel icon -->
+            <ImageButton
+                android:id="@+id/btn_close_action_bar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_close"
+                android:contentDescription="@string/close_action_bar"
+                android:backgroundTint="@android:color/transparent"
+                app:tint="?attr/colorOnPrimary" />
+
+            <!-- Spacer to push the action buttons to the end -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btn_trash_restore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delete_mail"
+                android:backgroundTint="@android:color/transparent"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/btn_trash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_delete"
+                android:contentDescription="@string/delete_mail"
+                android:padding="8dp"
+                android:backgroundTint="@android:color/transparent"
+                app:tint="?attr/colorOnPrimary" />
+
+            <!-- Actions (e.g. mark read, trash, spam) -->
+            <ImageButton
+                android:id="@+id/btn_mark_read"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_read"
+                android:contentDescription="@string/mark_as_read"
+                android:padding="8dp"
+                android:backgroundTint="@android:color/transparent"
+                app:tint="?attr/colorOnPrimary" />
+
+            <ImageButton
+                android:id="@+id/btn_toggle_spam"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_report"
+                android:contentDescription="@string/report_mail"
+                android:padding="8dp"
+                android:backgroundTint="@android:color/transparent"
+                app:tint="?attr/colorOnPrimary" />
+
+
+        </LinearLayout>
+
 
         <!-- Fragment container -->
         <androidx.fragment.app.FragmentContainerView
@@ -85,6 +155,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:paddingTop="24dp"
         app:menu="@menu/drawer_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

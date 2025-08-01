@@ -5,6 +5,8 @@ import com.asp.android_app.model.request.EditMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -45,6 +47,6 @@ public interface MailApi {
     Call<Void> removeFromSpam(@Body SpamRequest spamRequest);
 
     @GET("mails/search/{query}")
-    Call<MailListResponse> searchMails(@Path("query") String query);
+    Call<List<Mail>> searchMails(@Path("query") String query);
 
 }

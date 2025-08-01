@@ -131,12 +131,8 @@ public class LoginFragment extends Fragment {
 
         // wait for results
         userViewModel.getAuthResult().observe(getViewLifecycleOwner(), result -> {
-            if (result instanceof Result.Loading) {
-                // TODO show loading
-                Toast.makeText(getContext(), "LOADING", Toast.LENGTH_SHORT).show();
-            } else if (result instanceof Result.Success) {
+            if (result instanceof Result.Success) {
                 AuthResponse auth = ((Result.Success<AuthResponse>) result).getData();
-
                 handleLoginSuccess(auth);
             } else if (result instanceof Result.Error) {
                 String msg = ((Result.Error<?>) result).getMessage();

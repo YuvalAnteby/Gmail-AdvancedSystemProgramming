@@ -1,32 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- TODO add icons android:icon="@drawable/ic_inbox" -->
 
-    <item
-        android:id="@+id/nav_all_mails"
-        android:title="@string/all_mails" />
+    <group
+        android:id="@+id/nav_group"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_all_mails"
+            android:icon="@drawable/ic_mail"
+            android:title="@string/all_mails" />
 
-    <item
-        android:id="@+id/nav_incoming"
-        android:title="@string/incoming_mails" />
+        <item
+            android:id="@+id/nav_incoming"
+            android:checked="true"
+            android:icon="@drawable/ic_incoming"
+            android:title="@string/incoming_mails" />
 
-    <item
-        android:id="@+id/nav_sent"
-        android:title="@string/sent_mails" />
+        <item
+            android:id="@+id/nav_sent"
+            android:icon="@drawable/ic_send"
+            android:title="@string/sent_mails" />
 
-    <item
-        android:id="@+id/nav_draft"
-        android:title="@string/draft_mails" />
+        <item
+            android:id="@+id/nav_draft"
+            android:icon="@drawable/ic_draft"
+            android:title="@string/draft_mails" />
 
-    <item
-        android:id="@+id/nav_star"
-        android:title="@string/star_mails" />
+        <item
+            android:id="@+id/nav_star"
+            android:icon="@drawable/ic_star_outline"
+            android:title="@string/star_mails" />
 
-    <item
-        android:id="@+id/nav_trash"
-        android:title="@string/trash_mails" />
+        <item
+            android:id="@+id/nav_trash"
+            android:icon="@drawable/ic_delete"
+            android:title="@string/trash_mails" />
 
-    <item
-        android:id="@+id/nav_spam"
-        android:title="@string/spam_mails" />
+        <item
+            android:id="@+id/nav_spam"
+            android:icon="@drawable/ic_report"
+            android:title="@string/spam_mails" />
+    </group>
 </menu>

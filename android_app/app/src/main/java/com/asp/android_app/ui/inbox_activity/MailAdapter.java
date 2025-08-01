@@ -1,9 +1,11 @@
 package com.asp.android_app.ui.inbox_activity;
 
 import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
+import static com.asp.android_app.utils.DateUtil.getFormattedDate;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.text.Html;
 import android.text.Spanned;
@@ -12,12 +14,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.CompoundButtonCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,16 +48,30 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
     private final String inboxType;
     private final ActivityResultLauncher<Intent> launcher;
     private final MailViewModel mailViewModel;
+    private final MailSelectionListener selectionListener;
 
-    public MailAdapter(Context context, LifecycleOwner lifecycle, String inboxType,
-                       ActivityResultLauncher<Intent> launcher, MailViewModel mailViewModel) {
+    public MailAdapter(
+            Context context,
+            LifecycleOwner lifecycle,
+            String inboxType,
+            ActivityResultLauncher<Intent> launcher,
+            MailViewModel mailViewModel,
+            MailSelectionListener selectionListener
+    ) {
         this.context = context;
         this.inboxType = inboxType;
         this.launcher = launcher;
         this.mailViewModel = mailViewModel;
+        this.selectionListener = selectionListener;
         mailViewModel.getEditMailStatus().observe(lifecycle, result -> {
             if (result instanceof Result.Error)
                 Log.i("ROW", ((Result.Error<Void>) result).getMessage());
+        });
+
+        mailViewModel.getEditMailStatus().observe(lifecycle, result -> {
+            if (result instanceof Result.Success) {
+                notifyDataSetChanged();
+            }
         });
     }
 
@@ -81,6 +99,9 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
             String plainText = Html.fromHtml(mail.getBody(), Html.FROM_HTML_MODE_LEGACY).toString();
             holder.previewText.setText(plainText);
         }
+        // show formatted date
+        if (mail.getSentAt() != null)
+            holder.dateText.setText(getFormattedDate(mail.getSentAt()));
         displayBase64Image(mail.getSender().getImageUrl(), holder.imageCheckbox);
 
         // set different style if the mail is unread
@@ -99,6 +120,9 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         // handle the image checkbox - shows V when selected, user's image when not
         handleImageCheckbox(holder, position);
 
+        selectionListener.onSelectionChanged(!selectedPositions.isEmpty());
+        // handle the star checkbox
+        handleStarCheckbox(holder, position);
         // handle clicks on anything else beside the checkbox
         holder.mailCard.setOnClickListener(view -> onContentClick(position));
     }
@@ -122,8 +146,16 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
             holder.imageContainer.setScaleX(0.9f);
             holder.imageContainer.setScaleY(0.9f);
         } else {
-            displayBase64Image(mail.getSender().getImageUrl(), holder.imageCheckbox);
+            if (mail.getSender().getImageUrl().isBlank()) {
+                holder.imageCheckbox.setImageResource(R.drawable.profile_default);
+            } else {
+                displayBase64Image(mail.getSender().getImageUrl(), holder.imageCheckbox);
+            }
             holder.imageContainer.setBackgroundResource(R.drawable.circle_background);
+            holder.imageCheckbox.setScaleX(1.0f);
+            holder.imageCheckbox.setScaleY(1.0f);
+            holder.imageContainer.setScaleX(1.0f);
+            holder.imageContainer.setScaleY(1.0f);
         }
         // listen to clicks on the image
         holder.imageCheckbox.setOnClickListener(v -> {
@@ -133,6 +165,7 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
                 selectedPositions.add(position);
             }
             notifyItemChanged(position);
+            selectionListener.onSelectionChanged(!selectedPositions.isEmpty());
         });
     }
 
@@ -152,16 +185,63 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         launcher.launch(intent);
     }
 
+    /**
+     * Returns the list of selected Mail objects.
+     *
+     * @return list of selected mails
+     */
+    public List<Mail> getSelectedMails() {
+        List<Mail> selectedMails = new java.util.ArrayList<>();
+        for (Integer pos : selectedPositions) {
+            if (pos >= 0 && pos < mailList.size()) {
+                selectedMails.add(mailList.get(pos));
+            }
+        }
+        return selectedMails;
+    }
+
+    /**
+     * Clears the mail selected list, notifies the adapter of the data changes
+     */
+    public void clearSelection() {
+        selectedPositions.clear();
+        notifyDataSetChanged();
+        selectionListener.onSelectionChanged(false);
+    }
+
+    /**
+     * Handles the toggle of the star flag and checkbox for a mail row
+     *
+     * @param holder   view
+     * @param position row index
+     */
+    private void handleStarCheckbox(@NonNull MailViewHolder holder, int position) {
+        Mail mail = mailList.get(position);
+
+        holder.starCheckbox.setOnCheckedChangeListener((v, isChecked) -> {
+            // Disable to prevent mass clicking while waiting for backend response
+            mailViewModel.toggleStar(mail.getId(), isChecked);
+            // set the star checkbox color
+            int color;
+            if (!isChecked)
+                color = ContextCompat.getColor(context, R.color.light_gray);
+            else
+                color = ContextCompat.getColor(context, R.color.star_fill);
+            CompoundButtonCompat.setButtonTintList(holder.starCheckbox, ColorStateList.valueOf(color));
+        });
+    }
+
     @Override
     public int getItemCount() {
         return mailList != null ? mailList.size() : 0;
     }
 
     static class MailViewHolder extends RecyclerView.ViewHolder {
-        TextView subjectText, senderText, previewText;
+        TextView subjectText, senderText, previewText, dateText;
         ShapeableImageView imageCheckbox;
         FrameLayout imageContainer;
         MaterialCardView mailCard;
+        CheckBox starCheckbox;
 
         public MailViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -169,8 +249,10 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
             subjectText = itemView.findViewById(R.id.text_subject);
             senderText = itemView.findViewById(R.id.text_sender);
             previewText = itemView.findViewById(R.id.text_preview);
+            dateText = itemView.findViewById(R.id.mail_date);
             imageCheckbox = itemView.findViewById(R.id.image_checkbox);
             imageContainer = itemView.findViewById(R.id.image_checkbox_container);
+            starCheckbox = itemView.findViewById(R.id.starCheckbox);
         }
     }
 }

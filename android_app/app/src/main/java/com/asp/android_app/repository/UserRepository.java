@@ -9,6 +9,7 @@ import com.asp.android_app.api.ApiClient;
 import com.asp.android_app.api.UserApi;
 import com.asp.android_app.model.User;
 import com.asp.android_app.model.request.LoginRequest;
+import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.AuthResponse;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.utils.Result;
@@ -43,6 +44,11 @@ public class UserRepository {
         userApi.fetchUserInfo(userId).enqueue(createCallback(resultLiveData));
     }
 
+    public void changeProfileImage(int userId, ProfileImageRequest request,
+                                   MutableLiveData<Result<UserInfo>> resultLiveData) {
+        resultLiveData.postValue(new Result.Loading<>());
+        userApi.changeProfileImage(userId, request).enqueue(createCallback(resultLiveData));
+    }
 
     /**
      * Helper class to centralize callback creation
