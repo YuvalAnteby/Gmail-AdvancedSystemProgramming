@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- TODO add icons android:icon="@drawable/ic_inbox" -->
+
+    <item
+        android:id="@+id/nav_all_mails"
+        android:title="@string/all_mails" />
+
+    <item
+        android:id="@+id/nav_incoming"
+        android:title="@string/incoming_mails" />
+
+    <item
+        android:id="@+id/nav_sent"
+        android:title="@string/sent_mails" />
+
+    <item
+        android:id="@+id/nav_draft"
+        android:title="@string/draft_mails" />
+
+    <item
+        android:id="@+id/nav_star"
+        android:title="@string/star_mails" />
+
+    <item
+        android:id="@+id/nav_trash"
+        android:title="@string/trash_mails" />
+
+    <item
+        android:id="@+id/nav_spam"
+        android:title="@string/spam_mails" />
+</menu>

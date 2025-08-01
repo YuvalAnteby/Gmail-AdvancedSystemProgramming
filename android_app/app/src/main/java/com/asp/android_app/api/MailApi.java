@@ -1,12 +1,11 @@
 package com.asp.android_app.api;
 
 import com.asp.android_app.model.Mail;
-import com.asp.android_app.model.response.ReadStatus;
 import com.asp.android_app.model.request.SpamRequest;
+import com.asp.android_app.model.response.MailListResponse;
+import com.asp.android_app.model.response.ReadStatus;
 import com.asp.android_app.model.response.StarStatus;
 import com.asp.android_app.model.response.TrashStatus;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -28,7 +27,7 @@ public interface MailApi {
     Call<Mail> fetchMail(@Path("id") int id);
 
     @GET("mails")
-    Call<List<Mail>> getMailsByType(
+    Call<MailListResponse> getMailsByType(
             @Query("inboxType") String inboxType,
             @Query("page") int page,
             @Query("limit") int limit
@@ -53,6 +52,5 @@ public interface MailApi {
     Call<Void> restoreMail(@Path("id") int id, @Body TrashStatus status);
 
     @GET("mails/search/{query}")
-    Call<List<Mail>> searchMails(@Path("query") String query);
+    Call<MailListResponse> searchMails(@Path("query") String query);
 }
-

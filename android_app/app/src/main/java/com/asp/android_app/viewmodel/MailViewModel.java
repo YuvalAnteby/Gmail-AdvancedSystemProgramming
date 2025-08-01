@@ -9,13 +9,12 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.SpamRequest;
+import com.asp.android_app.model.response.MailListResponse;
 import com.asp.android_app.model.response.ReadStatus;
 import com.asp.android_app.model.response.StarStatus;
 import com.asp.android_app.model.response.TrashStatus;
 import com.asp.android_app.repository.MailRepository;
 import com.asp.android_app.utils.Result;
-
-import java.util.List;
 
 /**
  * ViewModel class for handling mail-related logic and exposing LiveData to the UI.
@@ -25,7 +24,7 @@ public class MailViewModel extends AndroidViewModel {
 
     private final MailRepository mailRepository;
 
-    private final MutableLiveData<Result<List<Mail>>> mailsListLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Result<MailListResponse>> mailsListLiveData = new MutableLiveData<>();
     private final MutableLiveData<Result<Mail>> mailLiveData = new MutableLiveData<>();
     private final MutableLiveData<Result<Void>> deleteMailStatus = new MutableLiveData<>();
     private final MutableLiveData<Result<Void>> restoreMailStatus = new MutableLiveData<>();
@@ -41,7 +40,7 @@ public class MailViewModel extends AndroidViewModel {
         mailRepository = new MailRepository(application.getApplicationContext());
     }
 
-    public LiveData<Result<List<Mail>>> getMailsLiveData() {
+    public LiveData<Result<MailListResponse>> getMailsLiveData() {
         return mailsListLiveData;
     }
 

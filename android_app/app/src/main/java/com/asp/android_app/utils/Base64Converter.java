@@ -65,8 +65,25 @@ public class Base64Converter {
      * @param imageView    image view to show the image in
      */
     public static void displayBase64Image(String base64String, ImageView imageView) {
-        byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
-        Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-        imageView.setImageBitmap(decodedBitmap);
+        if (base64String == null || base64String.isEmpty()) return;
+
+        try {
+            // Strip prefix if it exists (e.g. "data:image/jpeg;base64,...")
+            if (base64String.contains(",")) {
+                base64String = base64String.substring(base64String.indexOf(",") + 1);
+            }
+
+            byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
+            Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+
+            if (decodedBitmap != null) {
+                imageView.setImageBitmap(decodedBitmap);
+            } else {
+                Log.e("Base64Converter", "Failed to decode Base64 image");
+            }
+        } catch (Exception e) {
+            Log.e("Base64Converter", "Exception while decoding image: " + e.getMessage());
+        }
     }
+
 }

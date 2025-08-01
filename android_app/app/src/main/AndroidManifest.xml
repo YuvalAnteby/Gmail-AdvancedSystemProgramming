@@ -19,7 +19,7 @@
             android:name=".ui.auth_activity.AuthActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.InboxActivity"
+            android:name=".ui.inbox_activity.InboxActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
             <intent-filter>

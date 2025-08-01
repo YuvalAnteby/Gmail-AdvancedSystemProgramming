@@ -20,7 +20,7 @@ import com.asp.android_app.R;
 import com.asp.android_app.model.request.LoginRequest;
 import com.asp.android_app.model.response.AuthResponse;
 import com.asp.android_app.repository.UserRepository;
-import com.asp.android_app.ui.InboxActivity;
+import com.asp.android_app.ui.inbox_activity.InboxActivity;
 import com.asp.android_app.utils.Result;
 import com.asp.android_app.utils.TokenManager;
 import com.asp.android_app.viewmodel.UserViewModel;
@@ -154,7 +154,9 @@ public class LoginFragment extends Fragment {
         TokenManager tokenManager = TokenManager.getInstance(requireContext());
         tokenManager.saveToken(auth.getToken());
         // navigate to the inbox screen
-        startActivity(new Intent(getContext(), InboxActivity.class));
+        Intent intent = new Intent(getContext(), InboxActivity.class);
+        intent.putExtra("user", auth.getUser());
+        startActivity(intent);
         requireActivity().finish();
         Toast.makeText(getContext(), "Welcome " + auth.getUser().getFullName(), Toast.LENGTH_SHORT).show();
     }
