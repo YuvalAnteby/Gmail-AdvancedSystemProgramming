@@ -50,4 +50,29 @@ public class DateUtil {
             return "";
         }
     }
+
+    /**
+     * Converts a timestamp string to a time in 24-hour format: HH:mm
+     *
+     * @param isoTimestamp timestamp string (e.g. "2025-06-04T17:08:00.000Z")
+     * @return formatted hour string like "17:08", or empty string if invalid
+     */
+    public static String getFormattedHour(String isoTimestamp) {
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        try {
+            Date date = isoFormat.parse(isoTimestamp);
+            if (date == null) return "";
+
+            // Format to 24-hour time: HH:mm
+            SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            hourFormat.setTimeZone(TimeZone.getDefault());
+            return hourFormat.format(date);
+
+        } catch (ParseException e) {
+            Log.i("DATE UTIL:", Objects.requireNonNull(e.getMessage()));
+            return "";
+        }
+    }
 }

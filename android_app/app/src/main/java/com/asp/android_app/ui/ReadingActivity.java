@@ -5,7 +5,9 @@ import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -27,6 +29,7 @@ import com.asp.android_app.utils.DateUtil;
 import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.MailViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReadingActivity extends AppCompatActivity {
@@ -39,6 +42,10 @@ public class ReadingActivity extends AppCompatActivity {
     private LinearLayout attachmentsContainer;
     private CheckBox starCheckbox;
     private boolean isMailStarred, suppressStarChange = false;
+
+    private TextView toField, toggleRecipients, allRecipients;
+    private boolean recipientsExpanded = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +63,11 @@ public class ReadingActivity extends AppCompatActivity {
         attachmentsContainer = findViewById(R.id.attachments_container);
         mailAttachments = findViewById(R.id.tvAttachments);
         starCheckbox = findViewById(R.id.starCheckbox);
+
+        toField = findViewById(R.id.tv_to_field);
+        toggleRecipients = findViewById(R.id.tv_toggle_recipients);
+        allRecipients = findViewById(R.id.tv_all_recipients);
+
 
         Button btnReply = findViewById(R.id.btn_reply);
         Button btnForward = findViewById(R.id.btn_forward);
@@ -106,7 +118,7 @@ public class ReadingActivity extends AppCompatActivity {
                 result -> {
                     if (result instanceof Result.Success) {
                         Mail mail = ((Result.Success<Mail>) result).getData();
-                        showSenderInfo(mail.getSender());
+                        showSenderAndRecipientsInfo(mail);
                         showMailContent(mail);
                         isMailStarred = mail.isStarred();
                         suppressStarChange = true;
@@ -131,15 +143,56 @@ public class ReadingActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets the activity's fields to show the sender's info
+     * Sets the activity's fields to show the sender's info and other recipients
      *
-     * @param sender user object of the sender
+     * @param mail mail object
      */
-    private void showSenderInfo(UserInfo sender) {
-        senderName.setText(sender.getFullName());
-        senderEmail.setText(sender.getMail());
-        displayBase64Image(sender.getImageUrl(), senderAvatar);
+    private void showSenderAndRecipientsInfo(Mail mail) {
+        // show sender's info
+        senderName.setText(mail.getSender().getFullName());
+        senderEmail.setText(mail.getSender().getMail());
+        displayBase64Image(mail.getSender().getImageUrl(), senderAvatar);
+
+        // show recipients info, toggle between showing a few and all recipients
+        List<UserInfo> recipients = mail.getSentTo();
+        if (recipients == null || recipients.isEmpty()) {
+            toField.setText(R.string.no_recipients);
+            toggleRecipients.setVisibility(View.GONE);
+            allRecipients.setVisibility(View.GONE);
+            return;
+        }
+
+        List<String> recipientMails = new ArrayList<>();
+        for (UserInfo recipient : recipients)
+            recipientMails.add(recipient.getMail());
+
+        // Join with comma and zero width space to allow safe line wrapping
+        String allMails = getString(
+                R.string.sent_to,
+                TextUtils.join(",\u200B ", recipientMails));
+        // Show in full list view
+        allRecipients.setText(allMails);
+        // Show abbreviated preview
+        int count = Math.min(2, recipientMails.size());
+        String preview = TextUtils.join(",\u200B ", recipientMails.subList(0, count));
+        toField.setText(getResources().getString(R.string.sent_to, preview));
+        toggleRecipients.setVisibility(recipientMails.size() > count ? View.VISIBLE : View.GONE);
+
+        // observe clicks on the hide/show text view
+        toggleRecipients.setOnClickListener(v -> {
+            recipientsExpanded = !recipientsExpanded;
+            if (recipientsExpanded) {
+                toField.setVisibility(View.GONE);
+                allRecipients.setVisibility(View.VISIBLE);
+                toggleRecipients.setText(R.string.hide_recipients);
+            } else {
+                toField.setVisibility(View.VISIBLE);
+                allRecipients.setVisibility(View.GONE);
+                toggleRecipients.setText(R.string.more_recipients);
+            }
+        });
     }
+
 
     /**
      * Sets the activity's fields to show the mail's contents (subject, body, time etc.)
@@ -148,8 +201,10 @@ public class ReadingActivity extends AppCompatActivity {
      */
     private void showMailContent(Mail mail) {
         if (mail.getSentAt() != null && !mail.getSentAt().isBlank()) {
-            String formattedTime = DateUtil.getFormattedDate(mail.getSentAt());
-            mailDate.setText(formattedTime);
+            String formattedDate = DateUtil.getFormattedDate(mail.getSentAt());
+            String formattedTime = DateUtil.getFormattedHour(mail.getSentAt());
+            String combined = formattedDate + "\n" + formattedTime;
+            mailDate.setText(combined);
         }
         mailSubject.setText(mail.getSubject());
         mailBody.setText(mail.getBody());

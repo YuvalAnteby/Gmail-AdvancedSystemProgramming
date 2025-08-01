@@ -51,6 +51,10 @@
     <string name="reply">Reply</string>
     <string name="forward">Forward</string>
     <string name="star_error">Failed to un/star</string>
+    <string name="sent_to">Sent to\n%s</string>
+    <string name="more_recipients">(show more)</string>
+    <string name="hide_recipients">(hide)</string>
+    <string name="no_recipients">to nobody</string>
 
     <!-- Strings used in mail writing page -->
 
