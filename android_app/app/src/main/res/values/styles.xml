@@ -39,7 +39,10 @@
     </style>
 
     <!-- mail list styles -->
-
+    <style name="drawer_header_item">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+    </style>
 
     <!-- mail row styles -->
     <style name="cardMail">

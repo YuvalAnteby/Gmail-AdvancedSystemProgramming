@@ -32,7 +32,7 @@ public class InboxFragment extends Fragment {
 
     private MailViewModel mailViewModel;
     private MailAdapter mailAdapter;
-    private final String inboxType = "incoming"; // default inbox is incoming mails
+    private final String inboxType = "all"; // default inbox is incoming mails
 
     private final ActivityResultLauncher<Intent> readingLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -51,9 +51,16 @@ public class InboxFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.inbox_fragment, container, false);
+
+        // initialize the mails view model
+        mailViewModel = new ViewModelProvider(this).get(MailViewModel.class);
+        mailViewModel.loadMails(inboxType);
+
         // initialize the recycler view
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-        mailAdapter = new MailAdapter(requireContext(), inboxType, readingLauncher);
+        mailAdapter = new MailAdapter(
+                requireContext(), getViewLifecycleOwner(), inboxType, readingLauncher, mailViewModel
+        );
         recyclerView.setAdapter(mailAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -66,11 +73,7 @@ public class InboxFragment extends Fragment {
                 loadInbox = "incoming";
             mailViewModel.loadMails(loadInbox);
         });
-
-        // initialize the mails view model
-        mailViewModel = new ViewModelProvider(this).get(MailViewModel.class);
         observeViewModel(swipeRefreshLayout);
-        mailViewModel.loadMails(inboxType);
 
         return view;
     }

@@ -4,6 +4,7 @@ import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +14,15 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.asp.android_app.R;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.ui.ReadingActivity;
+import com.asp.android_app.utils.Result;
+import com.asp.android_app.viewmodel.MailViewModel;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -35,11 +40,18 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
     private final Context context;
     private final String inboxType;
     private final ActivityResultLauncher<Intent> launcher;
+    private final MailViewModel mailViewModel;
 
-    public MailAdapter(Context context, String inboxType, ActivityResultLauncher<Intent> launcher) {
+    public MailAdapter(Context context, LifecycleOwner lifecycle, String inboxType,
+                       ActivityResultLauncher<Intent> launcher, MailViewModel mailViewModel) {
         this.context = context;
         this.inboxType = inboxType;
         this.launcher = launcher;
+        this.mailViewModel = mailViewModel;
+        mailViewModel.getEditMailStatus().observe(lifecycle, result -> {
+            if (result instanceof Result.Error)
+                Log.i("ROW", ((Result.Error<Void>) result).getMessage());
+        });
     }
 
     public void setMailList(List<Mail> mailList) {
@@ -64,7 +76,18 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         holder.previewText.setText(mail.getBody());
         displayBase64Image(mail.getSender().getImageUrl(), holder.imageCheckbox);
 
-        // TODO change style to unread if needed
+        // set different style if the mail is unread
+        if (!mail.isRead()) {
+            holder.subjectText.setTypeface(null, Typeface.BOLD);
+            holder.senderText.setTypeface(null, Typeface.BOLD);
+            holder.mailCard.setCardBackgroundColor(
+                    ContextCompat.getColor(holder.itemView.getContext(), R.color.unread_mail));
+        } else {
+            holder.subjectText.setTypeface(null, Typeface.NORMAL);
+            holder.senderText.setTypeface(null, Typeface.NORMAL);
+            holder.mailCard.setCardBackgroundColor(
+                    ContextCompat.getColor(holder.itemView.getContext(), R.color.read_mail));
+        }
 
         // handle the image checkbox - shows V when selected, user's image when not
         handleImageCheckbox(holder, position);
@@ -108,14 +131,18 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
 
     private void onContentClick(int position) {
         Mail m = mailList.get(position);
+
+        // update the read flag in the backend
+        if (!m.isRead()) {
+            mailViewModel.markAsRead(m.getId());
+            m.setIsRead(true);
+            notifyItemChanged(position);
+        }
+        // navigate to read the mail
         Intent intent = new Intent(context, ReadingActivity.class);
         intent.putExtra("inboxType", inboxType);
         intent.putExtra("mailId", m.getId());
         launcher.launch(intent);
-        // TODO remove logs
-        String msg =
-                "id: " + m.getId() + ", sender: " + m.getSender().getFullName() + ", subject:" + m.getSubject();
-        Log.i("ROW CLICK: ", msg);
     }
 
     @Override

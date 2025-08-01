@@ -32,7 +32,7 @@ public interface MailApi {
             @Query("limit") int limit
     );
 
-    @PATCH("/mails/{id}")
+    @PATCH("mails/{id}")
     Call<Void> editMail(@Path("id") int mailId, @Body EditMailRequest request);
 
     @DELETE("mails/{id}")

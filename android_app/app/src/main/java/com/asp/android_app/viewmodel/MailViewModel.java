@@ -81,6 +81,12 @@ public class MailViewModel extends AndroidViewModel {
         mailRepository.fetchMail(mailId, mailLiveData);
     }
 
+    /**
+     * Edits a sent mail with the allowed attributes
+     *
+     * @param mailId  id of a mail to edit
+     * @param request object containing the allowed fields
+     */
     public void editMail(int mailId, EditMailRequest request) {
         mailRepository.editMail(mailId, request, editMailStatus);
     }
