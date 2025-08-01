@@ -3,20 +3,25 @@ package com.asp.android_app.ui;
 import static android.view.View.GONE;
 import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.CompoundButtonCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.response.Attachment;
+import com.asp.android_app.model.response.StarStatus;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.utils.DateUtil;
 import com.asp.android_app.utils.Result;
@@ -32,6 +37,8 @@ public class ReadingActivity extends AppCompatActivity {
     // mail contents
     private TextView mailDate, mailSubject, mailBody, mailAttachments;
     private LinearLayout attachmentsContainer;
+    private CheckBox starCheckbox;
+    private boolean isMailStarred, suppressStarChange = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +55,8 @@ public class ReadingActivity extends AppCompatActivity {
         mailBody = findViewById(R.id.mail_body);
         attachmentsContainer = findViewById(R.id.attachments_container);
         mailAttachments = findViewById(R.id.tvAttachments);
+        starCheckbox = findViewById(R.id.starCheckbox);
+
         Button btnReply = findViewById(R.id.btn_reply);
         Button btnForward = findViewById(R.id.btn_forward);
 
@@ -65,6 +74,23 @@ public class ReadingActivity extends AppCompatActivity {
         // initialize reply action buttons
         btnReply.setOnClickListener(view -> onReplyClick());
         btnForward.setOnClickListener(view -> onForwardClick());
+
+        // initialize the star checkbox
+        int color = ContextCompat.getColor(this, R.color.star_fill);
+        CompoundButtonCompat.setButtonTintList(starCheckbox, ColorStateList.valueOf(color));
+        starCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // prevent extra calls when setting manually
+            if (suppressStarChange)
+                return;
+            if (mailId != -1) {
+                // Disable to prevent mass clicking while waiting for backend response
+                starCheckbox.setEnabled(false);
+                StarStatus status = new StarStatus(isChecked);
+                mailViewModel.toggleStar(mailId, status);
+                isMailStarred = isChecked;
+
+            }
+        });
     }
 
 
@@ -75,16 +101,33 @@ public class ReadingActivity extends AppCompatActivity {
      * @param viewModel view model that loads the mail
      */
     private void observeMailViewModel(MailViewModel viewModel) {
+        // mail update
         viewModel.getMailLiveData().observe(this,
                 result -> {
                     if (result instanceof Result.Success) {
                         Mail mail = ((Result.Success<Mail>) result).getData();
                         showSenderInfo(mail.getSender());
                         showMailContent(mail);
+                        isMailStarred = mail.isStarred();
+                        suppressStarChange = true;
+                        starCheckbox.setChecked(isMailStarred);
+                        suppressStarChange = false;
                     } else if (result instanceof Result.Error) {
                         Log.i("ERROR READING", ((Result.Error<Mail>) result).getMessage());
                     }
                 });
+
+        // star update
+        viewModel.getStarStatus().observe(this, result -> {
+            starCheckbox.setEnabled(true);
+            if (result instanceof Result.Error) {
+                Toast.makeText(
+                        this,
+                        getResources().getString(R.string.star_error),
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
     }
 
     /**

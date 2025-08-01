@@ -25,8 +25,8 @@
                 style="@style/cardMail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_gravity="center_horizontal">
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp">
 
 
                 <LinearLayout
@@ -84,8 +84,8 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginHorizontal="8dp">
+                android:layout_marginHorizontal="8dp"
+                android:gravity="center_vertical">
 
                 <!-- Subject -->
                 <TextView
@@ -106,7 +106,6 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:button="@drawable/star_selector"
                     android:padding="8dp" />
 
@@ -118,11 +117,11 @@
                 android:id="@+id/mail_body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
                 android:layout_marginBottom="16dp"
                 android:text="Mail content here"
                 android:textSize="16sp"
-                tools:ignore="HardcodedText"
-                android:layout_marginHorizontal="8dp" />
+                tools:ignore="HardcodedText" />
 
             <LinearLayout
                 android:id="@+id/attachments_container"
@@ -134,7 +133,6 @@
                 android:gravity="start"
                 android:layoutDirection="ltr"
                 android:orientation="horizontal">
-                <!-- TODO add list here -->
 
                 <!-- Divider -->
                 <View
@@ -151,6 +149,9 @@
                     android:layout_marginBottom="8dp"
                     android:text="@string/attachments"
                     android:textStyle="bold" />
+
+                <!-- TODO add list here -->
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
@@ -159,9 +160,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:layout_marginTop="6dp">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_reply"

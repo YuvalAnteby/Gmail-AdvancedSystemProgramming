@@ -50,6 +50,7 @@
     <string name="attachments">Attachments:</string>
     <string name="reply">Reply</string>
     <string name="forward">Forward</string>
+    <string name="star_error">Failed to un/star</string>
 
     <!-- Strings used in mail writing page -->
 
