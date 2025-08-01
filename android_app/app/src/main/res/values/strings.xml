@@ -47,6 +47,9 @@
     <string name="search_bar_hint">Search mail</string>
 
     <!-- Strings used in mail reading page -->
+    <string name="attachments">Attachments:</string>
+    <string name="reply">Reply</string>
+    <string name="forward">Forward</string>
 
     <!-- Strings used in mail writing page -->
 

@@ -37,7 +37,7 @@ public class InboxFragment extends Fragment {
         View view = inflater.inflate(R.layout.inbox_fragment, container, false);
         // initialize the recycler view
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-        mailAdapter = new MailAdapter();
+        mailAdapter = new MailAdapter(requireContext());
         recyclerView.setAdapter(mailAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

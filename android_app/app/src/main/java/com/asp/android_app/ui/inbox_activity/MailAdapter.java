@@ -2,6 +2,8 @@ package com.asp.android_app.ui.inbox_activity;
 
 import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.asp.android_app.R;
 import com.asp.android_app.model.Mail;
+import com.asp.android_app.ui.ReadingActivity;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -28,7 +31,11 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
 
     private List<Mail> mailList;
     private final Set<Integer> selectedPositions = new HashSet<>();
+    private final Context context;
 
+    public MailAdapter(Context context) {
+        this.context = context;
+    }
 
     public void setMailList(List<Mail> mailList) {
         this.mailList = mailList;
@@ -95,8 +102,11 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
     }
 
     private void onContentClick(int position) {
-        // TODO implement reading page
         Mail m = mailList.get(position);
+        Intent intent = new Intent(context, ReadingActivity.class);
+        intent.putExtra("mailId", m.getId());
+        context.startActivity(intent);
+        // TODO remove logs
         String msg =
                 "id: " + m.getId() + ", sender: " + m.getSender().getFullName() + ", subject:" + m.getSubject();
         Log.i("ROW CLICK: ", msg);

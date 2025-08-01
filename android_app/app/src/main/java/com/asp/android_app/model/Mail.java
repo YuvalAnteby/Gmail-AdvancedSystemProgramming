@@ -132,4 +132,11 @@ public class Mail {
     public void setSpam(boolean spam) {
         isSpam = spam;
     }
+
+    /**
+     * @return list of files attached to mail
+     */
+    public List<Attachment> getAttachments() {
+        return files;
+    }
 }

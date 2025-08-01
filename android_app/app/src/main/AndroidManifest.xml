@@ -14,10 +14,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
-        <!-- TODO make MainActivity the launcher activity -->
+
         <activity
             android:name=".ui.auth_activity.AuthActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.ReadingActivity"
+            android:exported="false" />
+
         <activity
             android:name=".ui.inbox_activity.InboxActivity"
             android:exported="true"
