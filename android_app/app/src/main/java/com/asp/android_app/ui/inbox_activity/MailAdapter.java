@@ -44,13 +44,21 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
     private final String inboxType;
     private final ActivityResultLauncher<Intent> launcher;
     private final MailViewModel mailViewModel;
+    private final MailSelectionListener selectionListener;
 
-    public MailAdapter(Context context, LifecycleOwner lifecycle, String inboxType,
-                       ActivityResultLauncher<Intent> launcher, MailViewModel mailViewModel) {
+    public MailAdapter(
+            Context context,
+            LifecycleOwner lifecycle,
+            String inboxType,
+            ActivityResultLauncher<Intent> launcher,
+            MailViewModel mailViewModel,
+            MailSelectionListener selectionListener
+    ) {
         this.context = context;
         this.inboxType = inboxType;
         this.launcher = launcher;
         this.mailViewModel = mailViewModel;
+        this.selectionListener = selectionListener;
         mailViewModel.getEditMailStatus().observe(lifecycle, result -> {
             if (result instanceof Result.Error)
                 Log.i("ROW", ((Result.Error<Void>) result).getMessage());
@@ -99,6 +107,8 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         // handle the image checkbox - shows V when selected, user's image when not
         handleImageCheckbox(holder, position);
 
+        selectionListener.onSelectionChanged(!selectedPositions.isEmpty());
+
         // handle clicks on anything else beside the checkbox
         holder.mailCard.setOnClickListener(view -> onContentClick(position));
     }
@@ -122,8 +132,16 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
             holder.imageContainer.setScaleX(0.9f);
             holder.imageContainer.setScaleY(0.9f);
         } else {
-            displayBase64Image(mail.getSender().getImageUrl(), holder.imageCheckbox);
+            if (mail.getSender().getImageUrl().isBlank()) {
+                holder.imageCheckbox.setImageResource(R.drawable.profile_default);
+            } else {
+                displayBase64Image(mail.getSender().getImageUrl(), holder.imageCheckbox);
+            }
             holder.imageContainer.setBackgroundResource(R.drawable.circle_background);
+            holder.imageCheckbox.setScaleX(1.0f);
+            holder.imageCheckbox.setScaleY(1.0f);
+            holder.imageContainer.setScaleX(1.0f);
+            holder.imageContainer.setScaleY(1.0f);
         }
         // listen to clicks on the image
         holder.imageCheckbox.setOnClickListener(v -> {
@@ -133,6 +151,7 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
                 selectedPositions.add(position);
             }
             notifyItemChanged(position);
+            selectionListener.onSelectionChanged(!selectedPositions.isEmpty());
         });
     }
 
@@ -150,6 +169,30 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         intent.putExtra("inboxType", inboxType);
         intent.putExtra("mailId", m.getId());
         launcher.launch(intent);
+    }
+
+    /**
+     * Returns the list of selected Mail objects.
+     *
+     * @return list of selected mails
+     */
+    public List<Mail> getSelectedMails() {
+        List<Mail> selectedMails = new java.util.ArrayList<>();
+        for (Integer pos : selectedPositions) {
+            if (pos >= 0 && pos < mailList.size()) {
+                selectedMails.add(mailList.get(pos));
+            }
+        }
+        return selectedMails;
+    }
+
+    /**
+     * Clears the mail selected list, notifies the adapter of the data changes
+     */
+    public void clearSelection() {
+        selectedPositions.clear();
+        notifyDataSetChanged();
+        selectionListener.onSelectionChanged(false);
     }
 
     @Override
