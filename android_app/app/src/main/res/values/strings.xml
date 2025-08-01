@@ -1,7 +1,15 @@
 <resources>
     <string name="app_name">Mail ASP</string>
     <!-- Strings used in login & signup pages -->
-
+    <string name="invalid_email">Invalid email</string>
+    <string name="empty_password">No password given</string>
+    <string name="empty_birth_date">No birth date given</string>
+    <string name="invalid_birth_date">No way you\'re %d years old and signing up 🙄</string>
+    <string name="avatar_description">Profile Image</string>
+    <string name="signup">Sign Up</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="birth_date">Date of Birth (YYYY/MM/DD)</string>
     <!-- Strings used in mail list page -->
     <string name="compose_mail">Compose mail</string>
 
