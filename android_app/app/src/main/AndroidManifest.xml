@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -26,7 +27,7 @@
         </provider>
 
         <activity
-            android:name=".ui.auth_activity.AuthActivity"
+            android:name=".ui.inbox_activity.InboxActivity"
             android:exported="false" />
 
         <activity
@@ -34,7 +35,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.inbox_activity.InboxActivity"
+            android:name=".ui.auth_activity.AuthActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
             <intent-filter>

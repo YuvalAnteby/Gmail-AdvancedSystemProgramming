@@ -136,6 +136,7 @@ public class LoginFragment extends Fragment {
                 Toast.makeText(getContext(), "LOADING", Toast.LENGTH_SHORT).show();
             } else if (result instanceof Result.Success) {
                 AuthResponse auth = ((Result.Success<AuthResponse>) result).getData();
+
                 handleLoginSuccess(auth);
             } else if (result instanceof Result.Error) {
                 String msg = ((Result.Error<?>) result).getMessage();

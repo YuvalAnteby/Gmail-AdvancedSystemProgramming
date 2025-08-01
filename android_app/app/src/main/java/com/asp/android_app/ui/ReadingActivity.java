@@ -9,8 +9,12 @@ import static com.asp.android_app.utils.Base64Converter.saveBase64FileToCache;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -279,7 +283,16 @@ public class ReadingActivity extends AppCompatActivity {
             mailDate.setText(combined);
         }
         mailSubject.setText(mail.getSubject());
-        mailBody.setText(mail.getBody());
+
+        // display formatted mail content
+        if (mail.getBody() != null && !mail.getBody().isEmpty()) {
+            Spanned formatted;
+            formatted = Html.fromHtml(mail.getBody(), Html.FROM_HTML_MODE_LEGACY);
+            mailBody.setText(formatted);
+            // Clickable <a href="..."> links
+            mailBody.setMovementMethod(LinkMovementMethod.getInstance());
+        }
+
         // if there are no attachments - hide the header
         List<Attachment> attachments = mail.getAttachments();
         if (attachments.isEmpty()) {

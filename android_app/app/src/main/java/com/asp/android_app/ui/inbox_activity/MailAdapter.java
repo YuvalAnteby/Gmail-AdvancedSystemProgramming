@@ -5,6 +5,9 @@ import static com.asp.android_app.utils.Base64Converter.displayBase64Image;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,7 +76,11 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         Mail mail = mailList.get(position);
         holder.subjectText.setText(mail.getSubject());
         holder.senderText.setText(mail.getSender().getFullName());
-        holder.previewText.setText(mail.getBody());
+        // remove HTML formatting in preview
+        if (mail.getBody() != null && !mail.getBody().isEmpty()) {
+            String plainText = Html.fromHtml(mail.getBody(), Html.FROM_HTML_MODE_LEGACY).toString();
+            holder.previewText.setText(plainText);
+        }
         displayBase64Image(mail.getSender().getImageUrl(), holder.imageCheckbox);
 
         // set different style if the mail is unread
