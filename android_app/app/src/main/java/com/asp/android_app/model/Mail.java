@@ -27,6 +27,7 @@ public class Mail {
     private boolean isTrashed;
     private boolean isSpam;
     private List<Attachment> files;
+    private List<Label> labels;
 
     /**
      * @return the unique ID of the mail
@@ -152,5 +153,12 @@ public class Mail {
      */
     public List<Attachment> getAttachments() {
         return files;
+    }
+
+    /**
+     * @return list of labels objects the mail is marked with
+     */
+    public List<Label> getLabels() {
+        return labels;
     }
 }

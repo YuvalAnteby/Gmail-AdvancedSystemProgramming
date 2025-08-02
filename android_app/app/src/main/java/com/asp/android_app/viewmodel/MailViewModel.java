@@ -128,10 +128,10 @@ public class MailViewModel extends AndroidViewModel {
     /**
      * Marks the read flag of a mail as true
      *
-     * @param mailId id of the mail to mark the read flag as true
+     * @param m mail to mark as read
      */
-    public void markAsRead(int mailId) {
-        editMail(mailId, new EditMailRequest(true, null, null, null));
+    public void markAsRead(Mail m) {
+        editMail(m.getId(), new EditMailRequest(true, m.isStarred(), m.isTrashed(), m.getLabels()));
     }
 
     /**

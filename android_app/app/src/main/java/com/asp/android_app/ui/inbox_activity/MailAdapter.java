@@ -174,7 +174,7 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
 
         // update the read flag in the backend
         if (!m.isRead()) {
-            mailViewModel.markAsRead(m.getId());
+            mailViewModel.markAsRead(m);
             m.setIsRead(true);
             notifyItemChanged(position);
         }

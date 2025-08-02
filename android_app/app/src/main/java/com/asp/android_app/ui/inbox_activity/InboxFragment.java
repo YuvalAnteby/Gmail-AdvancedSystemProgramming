@@ -41,7 +41,7 @@ public class InboxFragment extends Fragment {
 
     private MailViewModel mailViewModel;
     private MailAdapter mailAdapter;
-    private String inboxType = "all"; // default inbox is incoming mails
+    private String inboxType = "incoming"; // default inbox is incoming mails
     private final ActivityResultLauncher<Intent> readingLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
@@ -108,6 +108,7 @@ public class InboxFragment extends Fragment {
         // mails load observer
         mailViewModel.getMailsLiveData().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Loading) {
+                Log.i("loadMails", inboxType);
                 swipeRefreshLayout.setRefreshing(true);
             } else if (result instanceof Result.Success) {
                 MailListResponse mails = ((Result.Success<MailListResponse>) result).getData();
@@ -168,7 +169,7 @@ public class InboxFragment extends Fragment {
             for (Mail mail : selected)
                 if (!mail.isRead()) {
                     mail.setIsRead(true);
-                    mailViewModel.markAsRead(mail.getId());
+                    mailViewModel.markAsRead(mail);
                 }
         });
 
