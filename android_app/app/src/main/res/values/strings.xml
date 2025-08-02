@@ -78,6 +78,7 @@
     <string name="hide_recipients">Sent to ▲</string>
     <string name="no_recipients">to nobody</string>
     <string name="attachment_desc">attachment</string>
+    <string name="label">Label</string>
 
     <!-- Strings used in mail reading menus -->
     <string name="delete_mail">Delete forever</string>

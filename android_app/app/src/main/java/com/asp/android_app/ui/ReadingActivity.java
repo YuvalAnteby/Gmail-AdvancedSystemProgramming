@@ -6,10 +6,10 @@ import static com.asp.android_app.utils.Base64Converter.getFileIconResource;
 import static com.asp.android_app.utils.Base64Converter.getMimeType;
 import static com.asp.android_app.utils.Base64Converter.saveBase64FileToCache;
 
+
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -34,30 +36,29 @@ import androidx.core.widget.CompoundButtonCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
+import com.asp.android_app.model.Label;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.Attachment;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.utils.DateUtil;
 import com.asp.android_app.utils.Result;
+import com.asp.android_app.viewmodel.LabelViewModel;
 import com.asp.android_app.viewmodel.MailViewModel;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class ReadingActivity extends AppCompatActivity {
 
-    private ImageView senderAvatar;
-    // sender info
-    private TextView senderName, senderEmail;
-    // mail contents
-    private TextView mailDate, mailSubject, mailBody;
-    private LinearLayout attachmentsContainer, attachmentsLayout;
     private CheckBox starCheckbox;
     private boolean isMailStarred, suppressStarChange = false;
 
-    private TextView toggleRecipients, allRecipients;
     private boolean recipientsExpanded = false;
     private String lastEditAction = "";
     private Mail mail = null;
@@ -67,23 +68,6 @@ public class ReadingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reading);
-
-        // Init views
-        senderAvatar = findViewById(R.id.sender_avatar);
-        senderName = findViewById(R.id.sender_name);
-        senderEmail = findViewById(R.id.sender_email);
-        mailDate = findViewById(R.id.mail_date);
-        mailSubject = findViewById(R.id.mail_subject);
-        mailBody = findViewById(R.id.mail_body);
-        attachmentsContainer = findViewById(R.id.attachments_container);
-        attachmentsLayout = findViewById(R.id.attachmentsLayout);
-        starCheckbox = findViewById(R.id.starCheckbox);
-
-        toggleRecipients = findViewById(R.id.tv_toggle_recipients);
-        allRecipients = findViewById(R.id.tv_all_recipients);
-
-        Button btnReply = findViewById(R.id.btn_reply);
-        Button btnForward = findViewById(R.id.btn_forward);
 
         // get mail id and fetch the mail from server
         int mailId = getIntent().getIntExtra("mailId", -1);
@@ -97,10 +81,13 @@ public class ReadingActivity extends AppCompatActivity {
         mailViewModel.fetchMailById(mailId);
 
         // initialize reply action buttons
+        Button btnReply = findViewById(R.id.btn_reply);
         btnReply.setOnClickListener(view -> onReplyClick());
+        Button btnForward = findViewById(R.id.btn_forward);
         btnForward.setOnClickListener(view -> onForwardClick());
 
         // initialize the star checkbox
+        starCheckbox = findViewById(R.id.starCheckbox);
         starCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             // prevent extra calls when setting manually
             if (suppressStarChange)
@@ -181,6 +168,11 @@ public class ReadingActivity extends AppCompatActivity {
             mailViewModel.deleteMail(mail.getId());
             return true;
         }
+        if (id == R.id.action_label) {
+            lastEditAction = "label";
+            showLabelPickerDialog();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -224,6 +216,7 @@ public class ReadingActivity extends AppCompatActivity {
                 case "delete":
                 case "restore":
                 case "spam":
+                case "label":
                     setResult(RESULT_OK, resultIntent);
                     lastEditAction = "";
                     finish();
@@ -239,6 +232,11 @@ public class ReadingActivity extends AppCompatActivity {
      */
     private void showSenderAndRecipientsInfo(Mail mail) {
         // show sender's info
+        ImageView senderAvatar = findViewById(R.id.sender_avatar);
+        TextView toggleRecipients = findViewById(R.id.tv_toggle_recipients);
+        TextView allRecipients = findViewById(R.id.tv_all_recipients);
+        TextView senderName = findViewById(R.id.sender_name);
+        TextView senderEmail = findViewById(R.id.sender_email);
         senderName.setText(mail.getSender().getFullName());
         senderEmail.setText(mail.getSender().getMail());
         displayBase64Image(mail.getSender().getImageUrl(), senderAvatar);
@@ -282,6 +280,12 @@ public class ReadingActivity extends AppCompatActivity {
      * @param mail mail object
      */
     private void showMailContent(Mail mail) {
+        // mail contents
+        TextView mailDate = findViewById(R.id.mail_date);
+        TextView mailSubject = findViewById(R.id.mail_subject);
+        TextView mailBody = findViewById(R.id.mail_body);
+        LinearLayout attachmentsContainer = findViewById(R.id.attachments_container);
+
         if (mail.getSentAt() != null && !mail.getSentAt().isBlank()) {
             String formattedDate = DateUtil.getFormattedDate(mail.getSentAt());
             String formattedTime = DateUtil.getFormattedHour(mail.getSentAt());
@@ -315,6 +319,7 @@ public class ReadingActivity extends AppCompatActivity {
      * @param attachments list of attachments in mail
      */
     private void showAttachments(List<Attachment> attachments) {
+        LinearLayout attachmentsLayout = findViewById(R.id.attachmentsLayout);
         attachmentsLayout.removeAllViews(); // Clear any previous ones
         for (Attachment attachment : attachments) {
             View attachmentView = getLayoutInflater().inflate(R.layout.attachment_item, attachmentsLayout, false);
@@ -359,6 +364,64 @@ public class ReadingActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "No app found to open this file type", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Shows a dialog to un/mark the current mail with labels
+     */
+    private void showLabelPickerDialog() {
+        LabelViewModel labelVM = new ViewModelProvider(this).get(LabelViewModel.class);
+        labelVM.fetchAllLabels();
+        labelVM.getAllLabels().observe(this, allLabels -> {
+            if (mail == null) {
+                Toast.makeText(this, R.string.err_mails_load, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (allLabels == null || allLabels.isEmpty()) {
+                Toast.makeText(this, R.string.labels_not_found, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String[] labelNames = allLabels.stream().map(Label::getName).toArray(String[]::new);
+            boolean[] checked = new boolean[allLabels.size()];
+
+            // mark as checked the labels already set for the mail
+            Set<Label> common = new HashSet<>(mail.getLabels());
+            for (int i = 0; i < allLabels.size(); i++)
+                if (common.contains(allLabels.get(i)))
+                    checked[i] = true;
+
+            AlertDialog alertDialog = new MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.choose_label)
+                    .setMultiChoiceItems(labelNames, checked, (dialogInterface, indexSelected, isChecked) -> {
+                        checked[indexSelected] = isChecked;
+                    })
+                    .setPositiveButton(R.string.apply, null)
+                    .setNegativeButton(R.string.cancel, null)
+                    .create();
+            // Prevent outside touch from dismissing or passing through
+            alertDialog.setCanceledOnTouchOutside(true);
+            alertDialog.setCancelable(true);
+            // Block swipe gestures from passing through
+            alertDialog.getWindow().setFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+            );
+
+            alertDialog.show();
+            // set click listeners
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> alertDialog.dismiss());
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                List<Label> selectedLabels = new ArrayList<>();
+                for (int i = 0; i < checked.length; i++)
+                    if (checked[i])
+                        selectedLabels.add(allLabels.get(i));
+                // update locally
+                mail.setLabels(selectedLabels);
+                mailViewModel.updateMailLabels(Collections.singletonList(mail), selectedLabels);
+                alertDialog.dismiss();
+            });
+        });
     }
 
     // TODO handle replying to mail sender
