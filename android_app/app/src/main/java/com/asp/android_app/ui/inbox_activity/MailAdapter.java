@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.text.Html;
-import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -174,7 +172,7 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
 
         // update the read flag in the backend
         if (!m.isRead()) {
-            mailViewModel.markAsRead(m.getId());
+            mailViewModel.markAsRead(m);
             m.setIsRead(true);
             notifyItemChanged(position);
         }

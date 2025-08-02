@@ -45,6 +45,20 @@ public class MailRepository {
     }
 
     /**
+     * Fetch mails by label ID.
+     *
+     * @param labelId         the label ID to filter by
+     * @param page            page number (for pagination)
+     * @param resultLiveData  LiveData object to observe result
+     */
+    public void getMailsByLabel(int labelId, int page, MutableLiveData<Result<MailListResponse>> resultLiveData) {
+        final int MAIL_LIMIT = 50;
+        resultLiveData.postValue(new Result.Loading<>());
+        mailApi.getMailsByLabel(labelId, page, MAIL_LIMIT).enqueue(createCallback(resultLiveData));
+    }
+
+
+    /**
      * Fetch a mail by it's id.
      *
      * @param id             id of the mail

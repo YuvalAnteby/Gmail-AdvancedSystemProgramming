@@ -42,6 +42,23 @@
     <string name="star_mails">Starred</string>
     <string name="trash_mails">Trash</string>
     <string name="spam_mails">Spam</string>
+    <string name="create_new_label">Create Label</string>
+
+    <!-- String related to labels -->
+    <string name="label_hint">Label name</string>
+    <string name="new_label">Create new label</string>
+    <string name="next">Next</string>
+    <string name="cancel">Cancel</string>
+    <string name="name_required_error">name is required</string>
+    <string name="create_label_as">Create as</string>
+    <string-array name="label_options">
+        <item>Root label</item>
+        <item>Choose parent</item>
+    </string-array>
+    <string name="pick_parent_label">Choose parent label</string>
+    <string name="apply">Apply</string>
+    <string name="choose_label">Choose labels</string>
+    <string name="labels_not_found">No labels found</string>
 
     <!-- Strings used in toolbar -->
     <string name="search_bar_hint">Search mail</string>
@@ -61,6 +78,7 @@
     <string name="hide_recipients">Sent to ▲</string>
     <string name="no_recipients">to nobody</string>
     <string name="attachment_desc">attachment</string>
+    <string name="label">Label</string>
 
     <!-- Strings used in mail reading menus -->
     <string name="delete_mail">Delete forever</string>

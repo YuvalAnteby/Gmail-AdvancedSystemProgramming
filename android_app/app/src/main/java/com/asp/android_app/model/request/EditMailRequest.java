@@ -1,12 +1,14 @@
 package com.asp.android_app.model.request;
 
+import com.asp.android_app.model.Label;
+
 import java.util.List;
 
 public class EditMailRequest {
     private final Boolean isRead;
     private final Boolean isStarred;
     private final Boolean isTrashed;
-    private final List<Integer> labels;
+    private final List<Label> labels;
 
     public Boolean getRead() {
         return isRead;
@@ -20,7 +22,7 @@ public class EditMailRequest {
         return isTrashed;
     }
 
-    public List<Integer> getLabels() {
+    public List<Label> getLabels() {
         return labels;
     }
 
@@ -33,7 +35,7 @@ public class EditMailRequest {
      * @param isTrash true if should move to trash/ delete forever, false if restoring mail
      * @param labels  list of labels new ids to replace the old values
      */
-    public EditMailRequest(Boolean isRead, Boolean isStar, Boolean isTrash, List<Integer> labels) {
+    public EditMailRequest(Boolean isRead, Boolean isStar, Boolean isTrash, List<Label> labels) {
         this.isRead = isRead;
         this.isStarred = isStar;
         this.isTrashed = isTrash;

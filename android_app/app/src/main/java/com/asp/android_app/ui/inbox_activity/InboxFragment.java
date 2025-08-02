@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,13 +27,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.asp.android_app.R;
+import com.asp.android_app.model.Label;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
 import com.asp.android_app.utils.Result;
+import com.asp.android_app.viewmodel.LabelViewModel;
 import com.asp.android_app.viewmodel.MailViewModel;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Fragment containing the inbox, responsible on the showing the mails list, handling clicks,
@@ -41,7 +50,7 @@ public class InboxFragment extends Fragment {
 
     private MailViewModel mailViewModel;
     private MailAdapter mailAdapter;
-    private String inboxType = "all"; // default inbox is incoming mails
+    private String inboxType = "incoming"; // default inbox is incoming mails
     private final ActivityResultLauncher<Intent> readingLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
@@ -108,6 +117,7 @@ public class InboxFragment extends Fragment {
         // mails load observer
         mailViewModel.getMailsLiveData().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Loading) {
+                Log.i("loadMails", inboxType);
                 swipeRefreshLayout.setRefreshing(true);
             } else if (result instanceof Result.Success) {
                 MailListResponse mails = ((Result.Success<MailListResponse>) result).getData();
@@ -168,7 +178,7 @@ public class InboxFragment extends Fragment {
             for (Mail mail : selected)
                 if (!mail.isRead()) {
                     mail.setIsRead(true);
-                    mailViewModel.markAsRead(mail.getId());
+                    mailViewModel.markAsRead(mail);
                 }
         });
 
@@ -198,6 +208,12 @@ public class InboxFragment extends Fragment {
                 mailViewModel.restoreMail(mail.getId());
         });
 
+        // labels un/marking
+        ImageButton btnLabel = requireActivity().findViewById(R.id.btn_labels);
+        btnLabel.setOnClickListener(v -> {
+            showLabelPickerDialog(mailAdapter.getSelectedMails());
+        });
+
     }
 
     /**
@@ -208,9 +224,14 @@ public class InboxFragment extends Fragment {
     public void setInbox(String newInboxType) {
         if (newInboxType == null)
             return;
-
+        Log.i("setInbox: ", newInboxType); //todo remove
         this.inboxType = newInboxType;
-        mailViewModel.loadMails(inboxType);
+        if (inboxType.startsWith("label:")) {
+            int labelId = Integer.parseInt(inboxType.substring("label:".length()));
+            mailViewModel.loadMailsByLabel(labelId);
+        } else {
+            mailViewModel.loadMails(inboxType);
+        }
     }
 
     /**
@@ -226,5 +247,65 @@ public class InboxFragment extends Fragment {
         } else {
             mailViewModel.searchMail(query);
         }
+    }
+
+    /**
+     * Shows a dialog to un/mark mails with labels
+     *
+     * @param selectedMails list of selected mails to change for
+     */
+    private void showLabelPickerDialog(List<Mail> selectedMails) {
+        LabelViewModel labelVM = new ViewModelProvider(this).get(LabelViewModel.class);
+        labelVM.fetchAllLabels();
+        labelVM.getAllLabels().observe(getViewLifecycleOwner(), allLabels -> {
+            if (allLabels == null || allLabels.isEmpty()) {
+                Toast.makeText(getContext(), R.string.labels_not_found, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String[] labelNames = allLabels.stream().map(Label::getName).toArray(String[]::new);
+            boolean[] checked = new boolean[allLabels.size()];
+
+            // Pre select labels common across all selected mails
+            Set<Label> common = new HashSet<>(selectedMails.get(0).getLabels());
+            for (Mail m : selectedMails)
+                common.retainAll(m.getLabels());
+
+            for (int i = 0; i < allLabels.size(); i++)
+                if (common.contains(allLabels.get(i)))
+                    checked[i] = true;
+
+            AlertDialog alertDialog = new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.choose_label)
+                    .setMultiChoiceItems(labelNames, checked, (dialogInterface, indexSelected, isChecked) -> {
+                        checked[indexSelected] = isChecked;
+                    })
+                    .setPositiveButton(R.string.apply, null)
+                    .setNegativeButton(R.string.cancel, null)
+                    .create();
+            // Prevent outside touch from dismissing or passing through
+            alertDialog.setCanceledOnTouchOutside(true);
+            alertDialog.setCancelable(true);
+            // Block swipe gestures from passing through
+            alertDialog.getWindow().setFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+            );
+            alertDialog.show();
+            // set click listeners
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> alertDialog.dismiss());
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                List<Label> selectedLabels = new ArrayList<>();
+                // create a list of selected labels
+                for (int i = 0; i < checked.length; i++)
+                    if (checked[i])
+                        selectedLabels.add(allLabels.get(i));
+                // update each mail locally
+                for (Mail m : selectedMails)
+                    m.setLabels(selectedLabels);
+                // update labels in the backend
+                mailViewModel.updateMailLabels(selectedMails, selectedLabels);
+                alertDialog.dismiss();
+            });
+        });
     }
 }

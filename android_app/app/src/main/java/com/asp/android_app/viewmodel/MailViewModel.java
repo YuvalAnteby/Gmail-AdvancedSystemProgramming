@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.asp.android_app.model.Label;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.EditMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
@@ -89,6 +90,15 @@ public class MailViewModel extends AndroidViewModel {
     }
 
     /**
+     * Loads mails associated with a specific label.
+     *
+     * @param labelId the label ID
+     */
+    public void loadMailsByLabel(int labelId) {
+        mailRepository.getMailsByLabel(labelId, currentPage, mailsListLiveData);
+    }
+
+    /**
      * Edits a sent mail with the allowed attributes
      *
      * @param mailId  id of a mail to edit
@@ -96,6 +106,17 @@ public class MailViewModel extends AndroidViewModel {
      */
     public void editMail(int mailId, EditMailRequest request) {
         mailRepository.editMail(mailId, request, editMailStatus);
+    }
+
+    /**
+     * Updates the labels assigned to mails
+     *
+     * @param mails list of mails to update
+     * @param labels list of labels to assign
+     */
+    public void updateMailLabels(List<Mail> mails, List<Label> labels) {
+        for (Mail m : mails)
+            editMail(m.getId(), new EditMailRequest(null, null, null, labels));
     }
 
     /**
@@ -119,10 +140,10 @@ public class MailViewModel extends AndroidViewModel {
     /**
      * Marks the read flag of a mail as true
      *
-     * @param mailId id of the mail to mark the read flag as true
+     * @param m mail to mark as read
      */
-    public void markAsRead(int mailId) {
-        editMail(mailId, new EditMailRequest(true, null, null, null));
+    public void markAsRead(Mail m) {
+        editMail(m.getId(), new EditMailRequest(true, m.isStarred(), m.isTrashed(), m.getLabels()));
     }
 
     /**
