@@ -208,9 +208,14 @@ public class InboxFragment extends Fragment {
     public void setInbox(String newInboxType) {
         if (newInboxType == null)
             return;
-
+        Log.i("setInbox: ", newInboxType); //todo remove
         this.inboxType = newInboxType;
-        mailViewModel.loadMails(inboxType);
+        if (inboxType.startsWith("label:")) {
+            int labelId = Integer.parseInt(inboxType.substring("label:".length()));
+            mailViewModel.loadMailsByLabel(labelId);
+        } else {
+            mailViewModel.loadMails(inboxType);
+        }
     }
 
     /**

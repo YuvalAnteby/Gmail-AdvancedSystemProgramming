@@ -275,7 +275,7 @@ public class InboxActivity extends AppCompatActivity {
             MenuItem item = menu.add(R.id.nav_dynamic_labels_group, Menu.NONE, baseOrder + i, label.getName());
             item.setIcon(R.drawable.ic_label);
             item.setOnMenuItemClickListener(menuItem -> {
-                // TODO set label click
+                // TODO set label clicks
                 inboxFragment.setInbox("label:" + label.getId());
                 DrawerLayout drawerLayout = findViewById(R.id.main);
                 drawerLayout.closeDrawer(GravityCompat.START);

@@ -89,6 +89,15 @@ public class MailViewModel extends AndroidViewModel {
     }
 
     /**
+     * Loads mails associated with a specific label.
+     *
+     * @param labelId the label ID
+     */
+    public void loadMailsByLabel(int labelId) {
+        mailRepository.getMailsByLabel(labelId, currentPage, mailsListLiveData);
+    }
+
+    /**
      * Edits a sent mail with the allowed attributes
      *
      * @param mailId  id of a mail to edit

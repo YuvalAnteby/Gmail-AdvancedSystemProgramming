@@ -34,6 +34,13 @@ public interface MailApi {
             @Query("limit") int limit
     );
 
+    @GET("mails")
+    Call<MailListResponse> getMailsByLabel(
+            @Query("label") int labelId,
+            @Query("page") int page,
+            @Query("limit") int limit
+    );
+    
     @PATCH("mails/{id}")
     Call<Void> editMail(@Path("id") int mailId, @Body EditMailRequest request);
 
