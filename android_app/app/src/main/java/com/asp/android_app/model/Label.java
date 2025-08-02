@@ -1,5 +1,7 @@
 package com.asp.android_app.model;
 
+import androidx.annotation.Nullable;
+
 /**
  * Represents a label returned from the backend.
  * Includes ID, name, and an optional parent's ID.
@@ -29,5 +31,15 @@ public class Label {
      */
     public Integer getParent() {
         return parent;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return obj instanceof Label && this.getId() == ((Label) obj).getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(getId());
     }
 }

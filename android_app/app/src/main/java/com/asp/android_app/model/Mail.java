@@ -161,4 +161,11 @@ public class Mail {
     public List<Label> getLabels() {
         return labels;
     }
+
+    /**
+     * @param labels new list of labels to set for a mail
+     */
+    public void setLabels(List<Label> labels) {
+        this.labels = labels;
+    }
 }

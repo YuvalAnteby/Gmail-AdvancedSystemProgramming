@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.asp.android_app.model.Label;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.EditMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
@@ -105,6 +106,17 @@ public class MailViewModel extends AndroidViewModel {
      */
     public void editMail(int mailId, EditMailRequest request) {
         mailRepository.editMail(mailId, request, editMailStatus);
+    }
+
+    /**
+     * Updates the labels assigned to mails
+     *
+     * @param mails list of mails to update
+     * @param labels list of labels to assign
+     */
+    public void updateMailLabels(List<Mail> mails, List<Label> labels) {
+        for (Mail m : mails)
+            editMail(m.getId(), new EditMailRequest(null, null, null, labels));
     }
 
     /**

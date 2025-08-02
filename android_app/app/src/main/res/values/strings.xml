@@ -56,6 +56,9 @@
         <item>Choose parent</item>
     </string-array>
     <string name="pick_parent_label">Choose parent label</string>
+    <string name="apply">Apply</string>
+    <string name="choose_label">Choose labels</string>
+    <string name="labels_not_found">No labels found</string>
 
     <!-- Strings used in toolbar -->
     <string name="search_bar_hint">Search mail</string>
