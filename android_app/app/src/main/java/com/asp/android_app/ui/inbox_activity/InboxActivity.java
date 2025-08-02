@@ -33,7 +33,10 @@ import com.asp.android_app.viewmodel.UserViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InboxActivity extends AppCompatActivity {
     private InboxFragment inboxFragment;
@@ -295,31 +298,70 @@ public class InboxActivity extends AppCompatActivity {
         if (createLabelItem != null)
             menu.removeItem(R.id.nav_create_label);
 
-        // Add dynamic labels with a mid-range order value (after inboxes, before "create label")
-        int baseOrder = 100; // avoid conflicting with static items
-        for (int i = 0; i < labels.size(); i++) {
-            Label label = labels.get(i);
-            MenuItem item = menu.add(R.id.nav_dynamic_labels_group, Menu.NONE, baseOrder + i, label.getName());
-            item.setIcon(R.drawable.ic_label);
-            item.setOnMenuItemClickListener(menuItem -> {
-                clearAllMenuSelection();
-                menuItem.setChecked(true);
-                inboxFragment.setInbox("label:" + label.getId());
-                DrawerLayout drawerLayout = findViewById(R.id.main);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            });
+        Map<Integer, List<Label>> childrenMap = new HashMap<>();
+        List<Label> rootLabels = new ArrayList<>();
+
+        for (Label label : labels) {
+            if (label.getParent() == null) {
+                rootLabels.add(label);
+                continue;
+            }
+            childrenMap
+                    .computeIfAbsent(label.getParent(), k -> new ArrayList<>())
+                    .add(label);
         }
 
-        // Re-add "Create Label" with a higher order
+        // Add dynamic labels with a mid-range order value (after inboxes, before "create label")
+        int[] orderCounter = {0}; // use array to allow mutation inside lambda
+        for (Label parent : rootLabels) {
+            addLabelToMenu(menu, parent, 0, orderCounter, childrenMap);
+        }
+
+        // Re-add "Create Label" with a higher order so it would be last
         if (createLabelItem != null) {
             menu.add(
                             Menu.NONE,
                             R.id.nav_create_label,
-                            baseOrder + labels.size() + 10,
+                            orderCounter[0] + labels.size() + 10,
                             createLabelItem.getTitle())
                     .setIcon(R.drawable.ic_add);
         }
+    }
+
+    /**
+     * Adds a new label to the drawer menu
+     *
+     * @param menu         menu to be inserted to
+     * @param label        label object to insert
+     * @param level        indentation level of the label (0 for root)
+     * @param orderCounter counter to place labels in correct order (sub label after parent)
+     * @param childrenMap  map to track sub labels correctly
+     */
+    private void addLabelToMenu(
+            Menu menu,
+            Label label,
+            int level,
+            int[] orderCounter,
+            Map<Integer, List<Label>> childrenMap
+    ) {
+        String indent = "       ".repeat(level);
+        String labelName = indent + label.getName();
+
+        MenuItem item = menu.add(R.id.nav_dynamic_labels_group, Menu.NONE, 100 + orderCounter[0]++, labelName);
+        item.setIcon(R.drawable.ic_label);
+        item.setOnMenuItemClickListener(menuItem -> {
+            clearAllMenuSelection();
+            menuItem.setChecked(true);
+            inboxFragment.setInbox("label:" + label.getId());
+            DrawerLayout drawerLayout = findViewById(R.id.main);
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        });
+
+        List<Label> children = childrenMap.get(label.getId());
+        if (children != null)
+            for (Label child : children)
+                addLabelToMenu(menu, child, level + 1, orderCounter, childrenMap);
     }
 
     /**
@@ -338,7 +380,6 @@ public class InboxActivity extends AppCompatActivity {
                     item.getSubMenu().getItem(j).setChecked(false);
         }
     }
-
 
     /**
      * Shows a dialog to create a new label
