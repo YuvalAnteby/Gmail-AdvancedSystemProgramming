@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -48,7 +49,7 @@ public class InboxActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inbox);
         UserInfo user = getIntent().getParcelableExtra("user");
-        // initialize the mail list
+
         if (savedInstanceState == null) {
             inboxFragment = new InboxFragment();
             getSupportFragmentManager()
@@ -59,9 +60,14 @@ public class InboxActivity extends AppCompatActivity {
             inboxFragment = (InboxFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.fragment_container);
         }
+
+        // initialize user related observers and data sources
+        UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        initializeUserObservers(userViewModel);
+
         // initialize the profile image
         userImageView = findViewById(R.id.user_avatar);
-        loadProfileImage(userImageView, user);
+        loadProfileImage(userImageView, user, userViewModel);
         userImageView.setOnClickListener(view -> showProfileOptionsDialog(user));
         // initialize the drawer menu and labels
         LabelViewModel labelViewModel = new ViewModelProvider(this).get(LabelViewModel.class);
@@ -71,10 +77,6 @@ public class InboxActivity extends AppCompatActivity {
         EditText searchInput = findViewById(R.id.search_input);
         searchInput.setSelected(false); // on creation - don't show as focused
         handleMailSearch(searchInput);
-
-        // initialize user related observers and data sources
-        UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        initializeUserObservers(userViewModel);
     }
 
     /**
@@ -83,6 +85,15 @@ public class InboxActivity extends AppCompatActivity {
      * @param userViewModel view model containing the single source of truth
      */
     private void initializeUserObservers(UserViewModel userViewModel) {
+        userViewModel.getUserInfoResult().observe(this, result -> {
+            if (result instanceof Result.Success) {
+                UserInfo updatedUser = ((Result.Success<UserInfo>) result).getData();
+                displayBase64Image(updatedUser.getImageUrl(), userImageView);
+            } else if (result instanceof Result.Error) {
+                Toast.makeText(this, ((Result.Error<?>) result).getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         userViewModel.getImageUpdateStatus().observe(this, result -> {
             if (result instanceof Result.Success) {
                 UserInfo updatedUser = ((Result.Success<UserInfo>) result).getData();
@@ -115,10 +126,9 @@ public class InboxActivity extends AppCompatActivity {
      *
      * @param userImageView image view instance to show on
      */
-    private void loadProfileImage(ImageView userImageView, UserInfo user) {
-        if (user != null && user.getImageUrl() != null) {
-            String imageBase64 = user.getImageUrl();
-            displayBase64Image(imageBase64, userImageView);
+    private void loadProfileImage(ImageView userImageView, UserInfo user, UserViewModel userVM) {
+        if (user != null) {
+            userVM.fetchUserInfo(user.getId());
         } else {
             userImageView.setImageResource(R.drawable.profile_default);
         }
