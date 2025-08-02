@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -19,15 +21,19 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
+import com.asp.android_app.model.Label;
 import com.asp.android_app.utils.TokenManager;
 import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.ui.auth_activity.AuthActivity;
 import com.asp.android_app.utils.ImagePicker;
 import com.asp.android_app.utils.Result;
+import com.asp.android_app.viewmodel.LabelViewModel;
 import com.asp.android_app.viewmodel.UserViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.List;
 
 public class InboxActivity extends AppCompatActivity {
     private InboxFragment inboxFragment;
@@ -54,15 +60,28 @@ public class InboxActivity extends AppCompatActivity {
         userImageView = findViewById(R.id.user_avatar);
         loadProfileImage(userImageView, user);
         userImageView.setOnClickListener(view -> showProfileOptionsDialog(user));
-        // initialize the drawer menu
-        initializeDrawerMenu();
+        // initialize the drawer menu and labels
+        LabelViewModel labelViewModel = new ViewModelProvider(this).get(LabelViewModel.class);
+        initializeDrawerMenu(labelViewModel);
 
         // initialize the search bar
         EditText searchInput = findViewById(R.id.search_input);
         searchInput.setSelected(false); // on creation - don't show as focused
         handleMailSearch(searchInput);
 
+        // initialize user related observers and data sources
         UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        initializeUserObservers(userViewModel);
+
+
+    }
+
+    /**
+     * Initializes user related observers like the user view model and image picker click listeners
+     *
+     * @param userViewModel view model containing the single source of truth
+     */
+    private void initializeUserObservers(UserViewModel userViewModel) {
         userViewModel.getImageUpdateStatus().observe(this, result -> {
             if (result instanceof Result.Success) {
                 UserInfo updatedUser = ((Result.Success<UserInfo>) result).getData();
@@ -88,7 +107,6 @@ public class InboxActivity extends AppCompatActivity {
                         Toast.makeText(InboxActivity.this, message, Toast.LENGTH_SHORT).show();
                     }
                 });
-
     }
 
     /**
@@ -128,8 +146,10 @@ public class InboxActivity extends AppCompatActivity {
 
     /**
      * Initializes the drawer layout and listens to clicks to show the type of inbox
+     *
+     * @param labelViewModel view model containing the single source of truth
      */
-    private void initializeDrawerMenu() {
+    private void initializeDrawerMenu(LabelViewModel labelViewModel) {
         DrawerLayout drawerLayout = findViewById(R.id.main);
         ImageView hamburgerIcon = findViewById(R.id.hamburger_icon);
         hamburgerIcon.setOnClickListener(v -> {
@@ -170,12 +190,11 @@ public class InboxActivity extends AppCompatActivity {
                 inboxFragment.setInbox("spam");
                 return true;
             }
-
-            // TODO add view by labels
-
             return false;
         });
-
+        // init labels
+        labelViewModel.fetchAllLabels();
+        initializeLabels(labelViewModel);
     }
 
     /**
@@ -214,4 +233,64 @@ public class InboxActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Initializes the labels in the drawer menu
+     *
+     * @param labelViewModel view model containing the single source of truth
+     */
+    private void initializeLabels(LabelViewModel labelViewModel) {
+        labelViewModel.getAllLabels().observe(this, result -> {
+            if (result == null) {
+                return;
+            }
+            populateLabelsInDrawer(result);
+        });
+    }
+
+    /**
+     * Adds the given labels to the drawer menu
+     *
+     * @param labels list of labels from the backend
+     */
+    private void populateLabelsInDrawer(List<Label> labels) {
+        NavigationView navView = findViewById(R.id.navigation_view);
+        Menu menu = navView.getMenu();
+
+        // Remove any previous dynamic labels
+        for (int i = menu.size() - 1; i >= 0; i--) {
+            MenuItem item = menu.getItem(i);
+            if (item.getGroupId() == R.id.nav_dynamic_labels_group)
+                menu.removeItem(item.getItemId());
+        }
+
+        // Use a high `order` value for the "Create Label" item to ensure it's always last
+        MenuItem createLabelItem = menu.findItem(R.id.nav_create_label);
+        if (createLabelItem != null)
+            menu.removeItem(R.id.nav_create_label);
+
+        // Add dynamic labels with a mid-range order value (after inboxes, before "create label")
+        int baseOrder = 100; // avoid conflicting with static items
+        for (int i = 0; i < labels.size(); i++) {
+            Label label = labels.get(i);
+            MenuItem item = menu.add(R.id.nav_dynamic_labels_group, Menu.NONE, baseOrder + i, label.getName());
+            item.setIcon(R.drawable.ic_label);
+            item.setOnMenuItemClickListener(menuItem -> {
+                // TODO set label click
+                inboxFragment.setInbox("label:" + label.getId());
+                DrawerLayout drawerLayout = findViewById(R.id.main);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            });
+        }
+
+        // Re-add "Create Label" with a higher order
+        if (createLabelItem != null) {
+            menu.add(
+                            Menu.NONE,
+                            R.id.nav_create_label,
+                            baseOrder + labels.size() + 10,
+                            createLabelItem.getTitle())
+                    .setIcon(R.drawable.ic_add);
+        }
+    }
 }

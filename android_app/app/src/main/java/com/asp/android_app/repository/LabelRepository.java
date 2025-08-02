@@ -1,6 +1,7 @@
 package com.asp.android_app.repository;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -35,9 +36,10 @@ public class LabelRepository {
      */
     public LiveData<List<Label>> getAllLabels() {
         MutableLiveData<List<Label>> labelsLiveData = new MutableLiveData<>();
-        labelApi.getAllLabels().enqueue(new Callback<List<Label>>() {
+        labelApi.getAllLabels().enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<List<Label>> call, Response<List<Label>> response) {
+                Log.i("LABELS ALL", response.code() + " " + response.errorBody());
                 if (response.isSuccessful()) {
                     labelsLiveData.setValue(response.body());
                 } else {

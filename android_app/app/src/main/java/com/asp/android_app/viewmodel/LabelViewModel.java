@@ -3,6 +3,7 @@ package com.asp.android_app.viewmodel;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -16,7 +17,7 @@ import java.util.List;
  * ViewModel class for handling label-related logic and exposing LiveData to the UI.
  * Acts as a bridge between the Repository and UI layer.
  */
-public class LabelViewModel extends ViewModel {
+public class LabelViewModel extends AndroidViewModel {
 
     private final LabelRepository repository;
 
@@ -27,6 +28,7 @@ public class LabelViewModel extends ViewModel {
     private final MutableLiveData<Boolean> labelDeleted = new MutableLiveData<>();
 
     public LabelViewModel(@NonNull Application application) {
+        super(application);
         this.repository = new LabelRepository(application.getApplicationContext());
     }
 

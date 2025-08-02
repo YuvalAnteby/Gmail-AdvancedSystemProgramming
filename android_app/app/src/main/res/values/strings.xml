@@ -42,6 +42,7 @@
     <string name="star_mails">Starred</string>
     <string name="trash_mails">Trash</string>
     <string name="spam_mails">Spam</string>
+    <string name="create_new_label">Create Label</string>
 
     <!-- Strings used in toolbar -->
     <string name="search_bar_hint">Search mail</string>
