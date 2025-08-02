@@ -24,7 +24,7 @@ public interface LabelApi {
      * Fetch all labels belonging to the authenticated user.
      * @return A list of LabelResponse objects.
      */
-    @GET("/labels/")
+    @GET("labels/")
     Call<List<Label>> getAllLabels();
 
     /**
@@ -32,7 +32,7 @@ public interface LabelApi {
      * @param labelRequest The request body containing the label name.
      * @return The newly created LabelResponse.
      */
-    @POST("/labels/")
+    @POST("labels/")
     Call<Label> createLabel(@Body LabelRequest labelRequest);
 
     /**
@@ -41,7 +41,7 @@ public interface LabelApi {
      * @param labelRequest The request body containing the sub-label name.
      * @return The newly created sub-label.
      */
-    @POST("/labels/{id}/sublabel")
+    @POST("labels/{id}/sublabel")
     Call<Label> createSublabel(@Path("id") int parentId, @Body LabelRequest labelRequest);
 
     /**
@@ -50,7 +50,7 @@ public interface LabelApi {
      * @param labelRequest The new name.
      * @return An empty response with status 204 on success.
      */
-    @PATCH("/labels/{id}")
+    @PATCH("labels/{id}")
     Call<Void> editLabel(@Path("id") int labelId, @Body LabelRequest labelRequest);
 
     /**
@@ -58,6 +58,6 @@ public interface LabelApi {
      * @param labelId The ID of the label to delete.
      * @return An empty response with status 204 on success.
      */
-    @DELETE("/labels/{id}")
+    @DELETE("labels/{id}")
     Call<Void> deleteLabel(@Path("id") int labelId);
 }
