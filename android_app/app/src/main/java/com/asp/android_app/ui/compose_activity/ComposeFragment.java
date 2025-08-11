@@ -33,6 +33,7 @@ import com.asp.android_app.model.response.Attachment;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.model.response.UserSearchResult;
 import com.asp.android_app.utils.Base64Converter;
+import com.asp.android_app.utils.ComposeParams;
 import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.MailViewModel;
 import com.asp.android_app.viewmodel.UserViewModel;
@@ -88,6 +89,13 @@ public class ComposeFragment extends Fragment {
      * Tracks whether the last mail action was a send or a save draft
      */
     private boolean lastActionWasDraft = false;
+
+    // incoming prefill
+    @Nullable
+    private ComposeParams prefill;
+    // reply/forward HTML block
+    @Nullable
+    private String quotedHtml;
 
     /**
      * Launcher for the system document picker. I use ACTION_OPEN_DOCUMENT so the user can
@@ -201,10 +209,31 @@ public class ComposeFragment extends Fragment {
             lastActionWasDraft = true;
             SendMailRequest req = buildRequest(true);
             if (req == null) return;
-            if (draftId != -1) mailVm.updateDraft((int) draftId, req);
+            if (draftId != -1)
+                mailVm.updateDraft((int) draftId, req);
             else
                 mailVm.sendNewMail(req); // backend supports creating a new draft via POST with saveAsDraft=true
         });
+
+        // update fields using the prefill params
+        Intent host = requireActivity().getIntent();
+        prefill = host.getParcelableExtra(ComposeMailActivity.EXTRA_PREFILL);
+        if (prefill != null) {
+            // recipients are UserInfo objects → use your existing addRecipient(UserInfo)
+            if (prefill.recipients != null)
+                for (UserInfo u : prefill.recipients)
+                    if (u != null && u.getMail() != null) addRecipient(u);
+
+            if (prefill.subject != null) etSubject.setText(prefill.subject);
+            quotedHtml = prefill.quotedHtml;
+
+            if (prefill.attachments != null && !prefill.attachments.isEmpty())
+                for (Attachment a : prefill.attachments) {
+                    attachments.add(a);
+                    addAttachmentChip(a);
+                }
+        }
+
     }
 
     /**
@@ -373,11 +402,12 @@ public class ComposeFragment extends Fragment {
     /**
      * Builds the send/save request with current fields and the selected attachments.
      * Very basic validation - at least 1 recipient when sending (not required for drafts).
+     * if we have quotedHtml (reply/forward) we will send as: typed text + quoted block (HTML)
      */
     @Nullable
     private SendMailRequest buildRequest(boolean saveAsDraft) {
         String subject = safeText(etSubject);
-        String body = safeText(etBody);
+        String typed = safeText(etBody);
 
         if (!saveAsDraft && selectedRecipients.isEmpty()) {
             Toast.makeText(requireContext(), R.string.err_min_recipients, Toast.LENGTH_SHORT).show();
@@ -385,7 +415,14 @@ public class ComposeFragment extends Fragment {
         }
 
         List<String> sentTo = new ArrayList<>();
-        for (UserInfo u : selectedRecipients) sentTo.add(u.getMail());
+        for (UserInfo u : selectedRecipients)
+            sentTo.add(u.getMail());
+        // If any raw emails were added (selectedMails), include them too (guards edge-cases)
+        for (String m : selectedMails)
+            if (!sentTo.contains(m)) sentTo.add(m);
+
+        // Final HTML body
+        String body = com.asp.android_app.utils.MailHtmlUtil.mergeTypedWithQuote(typed, quotedHtml);
 
         // pass the attachments that were added
         return new SendMailRequest(subject, body, sentTo, saveAsDraft, new ArrayList<>(attachments));

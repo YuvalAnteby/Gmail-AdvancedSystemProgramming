@@ -47,6 +47,8 @@ public class InboxActivity extends AppCompatActivity {
     private ActivityResultLauncher<String> imagePickerLauncher;
     private ImageView userImageView;
 
+    private ActivityResultLauncher<Intent> readLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
