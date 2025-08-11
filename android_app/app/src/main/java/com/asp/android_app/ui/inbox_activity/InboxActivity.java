@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -23,6 +24,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
 import com.asp.android_app.model.Label;
+import com.asp.android_app.ui.compose_activity.ComposeFragment;
+import com.asp.android_app.ui.compose_activity.ComposeMailActivity;
 import com.asp.android_app.utils.TokenManager;
 import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.UserInfo;
@@ -32,6 +35,7 @@ import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.LabelViewModel;
 import com.asp.android_app.viewmodel.UserViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
@@ -77,6 +81,30 @@ public class InboxActivity extends AppCompatActivity {
         EditText searchInput = findViewById(R.id.search_input);
         searchInput.setSelected(false); // on creation - don't show as focused
         handleMailSearch(searchInput);
+
+        // initialize the floating compose button
+        initializeComposeButton();
+    }
+
+
+    /**
+     * initializes and sets the click listener for the compose floating action button
+     */
+    private void initializeComposeButton() {
+        ActivityResultLauncher<Intent> composeLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // if RESULT_OK - we sent the draft, so we got to refresh the inbox
+                    if (result.getResultCode() == RESULT_OK)
+                        inboxFragment.setInbox("draft");
+                });
+
+        FloatingActionButton fab = findViewById(R.id.fabCompose);
+        fab.setOnClickListener(v -> {
+            // TODO ensure correct navigation to compose
+            Intent i = ComposeMailActivity.newIntent(this, -1);
+            composeLauncher.launch(i);
+        });
     }
 
     /**

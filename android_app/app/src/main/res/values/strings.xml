@@ -88,5 +88,10 @@
     <string name="unspam_mail">Not spam</string>
 
     <!-- Strings used in mail writing page -->
-
+    <string name="compose">Compose</string>
+    <string name="send_to">To</string>
+    <string name="compose_subject">Subject</string>
+    <string name="compose_body">Type message here</string>
+    <string name="compose_send">Send</string>
+    <string name="compose_save_draft">Save draft</string>
 </resources>
