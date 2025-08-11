@@ -37,6 +37,7 @@ import com.asp.android_app.viewmodel.UserViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,13 +96,22 @@ public class InboxActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     // if RESULT_OK - we sent the draft, so we got to refresh the inbox
-                    if (result.getResultCode() == RESULT_OK)
-                        inboxFragment.setInbox("draft");
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        String action = result.getData().getStringExtra("compose_result_action");
+                        if ("sent".equals(action)) {
+                            if (inboxFragment != null) inboxFragment.setInbox("sent");
+                            Snackbar.make(findViewById(android.R.id.content),
+                                    R.string.compose_sent_success, Snackbar.LENGTH_SHORT).show();
+                        } else if ("saved".equals(action)) {
+                            if (inboxFragment != null) inboxFragment.setInbox("draft");
+                            Snackbar.make(findViewById(android.R.id.content),
+                                    R.string.compose_saved_success, Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
                 });
 
         FloatingActionButton fab = findViewById(R.id.fabCompose);
         fab.setOnClickListener(v -> {
-            // TODO ensure correct navigation to compose
             Intent i = ComposeMailActivity.newIntent(this, -1);
             composeLauncher.launch(i);
         });

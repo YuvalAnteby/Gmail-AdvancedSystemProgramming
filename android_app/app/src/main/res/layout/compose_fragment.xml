@@ -66,6 +66,43 @@
                 android:minLines="8" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Attachments header + add button -->
+        <LinearLayout
+            android:id="@+id/attachments_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp"
+            android:paddingHorizontal="8dp">
+
+            <Button
+                android:id="@+id/btn_add_attachment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/compose_add_attachment" />
+
+            <!-- Optional little hint -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:text="@string/compose_attachment_hint" />
+        </LinearLayout>
+
+        <!-- Selected attachments as removable chips -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips_attachments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            app:singleLine="false"
+            app:singleSelection="false"
+            app:chipSpacingHorizontal="8dp"
+            app:chipSpacingVertical="8dp" />
+
+
         <!-- Buttons -->
         <LinearLayout
             android:layout_width="match_parent"

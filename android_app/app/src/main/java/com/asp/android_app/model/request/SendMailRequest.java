@@ -4,7 +4,9 @@ import com.asp.android_app.model.response.Attachment;
 
 import java.util.List;
 
-// TODO
+/**
+ * Minimal request we use for saving drafts or sending mails (using POST)
+ */
 public class SendMailRequest {
     private String subject;
     private String body;
