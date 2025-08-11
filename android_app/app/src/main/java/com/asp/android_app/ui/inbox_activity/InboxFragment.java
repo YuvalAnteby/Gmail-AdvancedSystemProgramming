@@ -243,7 +243,6 @@ public class InboxFragment extends Fragment {
     public void setInbox(String newInboxType) {
         if (newInboxType == null)
             return;
-        Log.i("setInbox: ", newInboxType); //todo remove
         this.inboxType = newInboxType;
         if (inboxType.startsWith("label:")) {
             int labelId = Integer.parseInt(inboxType.substring("label:".length()));
