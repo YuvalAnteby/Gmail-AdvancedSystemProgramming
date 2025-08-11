@@ -34,7 +34,7 @@ public interface UserApi {
     Call<AuthResponse> validateToken();
 
     @GET("users/search")
-    Call<List<UserSearchResult>> searchByEmail(@Query("email") String query);
+    Call<List<UserSearchResult>> searchByEmail(@Query("q") String query);
 
     @GET("users/{id}")
     Call<UserInfo> fetchUserInfo(@Path("id") int userId);

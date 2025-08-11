@@ -2,6 +2,7 @@ package com.asp.android_app.api;
 
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.EditMailRequest;
+import com.asp.android_app.model.request.SendMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
 
@@ -40,7 +41,7 @@ public interface MailApi {
             @Query("page") int page,
             @Query("limit") int limit
     );
-    
+
     @PATCH("mails/{id}")
     Call<Void> editMail(@Path("id") int mailId, @Body EditMailRequest request);
 
@@ -56,4 +57,9 @@ public interface MailApi {
     @GET("mails/search/{query}")
     Call<List<Mail>> searchMails(@Path("query") String query);
 
+    @POST("mails")
+    Call<Void> sendMail(@Body SendMailRequest request);
+
+    @PATCH("mails/{id}")
+    Call<Void> updateDraft(@Path("id") int mailId, @Body SendMailRequest request);
 }

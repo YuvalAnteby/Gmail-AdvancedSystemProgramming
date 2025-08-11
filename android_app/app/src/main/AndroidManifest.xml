@@ -44,6 +44,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.compose_activity.ComposeMailActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:exported="true">
+            <!-- Optional deep link for editing drafts: myapp://draft/123 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="myapp" android:host="draft"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

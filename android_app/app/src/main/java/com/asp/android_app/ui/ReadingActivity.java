@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,7 +42,11 @@ import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.Attachment;
 import com.asp.android_app.model.response.UserInfo;
+import com.asp.android_app.ui.compose_activity.ComposeMailActivity;
+import com.asp.android_app.utils.ComposeNavigation;
+import com.asp.android_app.utils.ComposeParams;
 import com.asp.android_app.utils.DateUtil;
+import com.asp.android_app.utils.MailHtmlUtil;
 import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.LabelViewModel;
 import com.asp.android_app.viewmodel.MailViewModel;
@@ -63,6 +68,8 @@ public class ReadingActivity extends AppCompatActivity {
     private String lastEditAction = "";
     private Mail mail = null;
     private MailViewModel mailViewModel;
+
+    private ActivityResultLauncher<Intent> replyForwardLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,12 +115,25 @@ public class ReadingActivity extends AppCompatActivity {
             }
         });
 
-
         // set the action bar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        replyForwardLauncher = ComposeNavigation.register(this, new ComposeNavigation.ResultListener() {
+            @Override
+            public void onSent() {
+                setResult(RESULT_OK, new Intent().putExtra("refresh", true));
+                finish();
+            }
+
+            @Override
+            public void onSaved() {
+                setResult(RESULT_OK, new Intent().putExtra("refresh", true));
+                finish();
+            }
+        });
     }
 
     @Override
@@ -424,13 +444,41 @@ public class ReadingActivity extends AppCompatActivity {
         });
     }
 
-    // TODO handle replying to mail sender
+    /**
+     * Reply to the sender only
+     */
     private void onReplyClick() {
-        Toast.makeText(this, "TODO reply mail", Toast.LENGTH_SHORT).show();
+        if (mail == null) {
+            Toast.makeText(this, R.string.err_mails_load, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ComposeParams params = new ComposeParams();
+        if (mail.getSender() != null)
+            params.recipients.add(mail.getSender());
+        params.subject = MailHtmlUtil.subjectForReply(mail.getSubject());
+        params.quotedHtml = MailHtmlUtil.buildReplyQuotedHtml(mail);
+        params.isReply = true;
+
+        Intent i = ComposeMailActivity.newIntent(this, params);
+        replyForwardLauncher.launch(i);
     }
 
-    // TODO handle forwarding mail
+    /**
+     * Forward the mail (no recipients pre filled), will keep the original attachments
+     */
     private void onForwardClick() {
-        Toast.makeText(this, "TODO forward mail", Toast.LENGTH_SHORT).show();
+        if (mail == null) {
+            Toast.makeText(this, R.string.err_mails_load, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ComposeParams params = new ComposeParams();
+        params.subject = MailHtmlUtil.subjectForForward(mail.getSubject());
+        params.quotedHtml = MailHtmlUtil.buildForwardQuotedHtml(mail);
+        if (mail.getAttachments() != null)
+            params.attachments.addAll(mail.getAttachments());
+        params.isForward = true;
+
+        Intent i = ComposeMailActivity.newIntent(this, params);
+        replyForwardLauncher.launch(i);
     }
 }

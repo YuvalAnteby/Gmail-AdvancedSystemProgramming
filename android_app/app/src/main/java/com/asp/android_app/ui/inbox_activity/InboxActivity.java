@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -23,6 +22,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
 import com.asp.android_app.model.Label;
+import com.asp.android_app.ui.compose_activity.ComposeMailActivity;
+import com.asp.android_app.utils.ComposeNavigation;
 import com.asp.android_app.utils.TokenManager;
 import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.UserInfo;
@@ -32,7 +33,9 @@ import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.LabelViewModel;
 import com.asp.android_app.viewmodel.UserViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +46,8 @@ public class InboxActivity extends AppCompatActivity {
     private InboxFragment inboxFragment;
     private ActivityResultLauncher<String> imagePickerLauncher;
     private ImageView userImageView;
+
+    private ActivityResultLauncher<Intent> readLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +82,37 @@ public class InboxActivity extends AppCompatActivity {
         EditText searchInput = findViewById(R.id.search_input);
         searchInput.setSelected(false); // on creation - don't show as focused
         handleMailSearch(searchInput);
+
+        // initialize the floating compose button
+        initializeComposeButton();
+    }
+
+
+    /**
+     * initializes and sets the click listener for the compose floating action button
+     */
+    private void initializeComposeButton() {
+        ActivityResultLauncher<Intent> composeLauncher = ComposeNavigation.register(this, new ComposeNavigation.ResultListener() {
+            @Override
+            public void onSent() {
+                if (inboxFragment != null) inboxFragment.setInbox("incoming");
+                Snackbar.make(findViewById(android.R.id.content),
+                        R.string.compose_sent_success, Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSaved() {
+                if (inboxFragment != null) inboxFragment.setInbox("draft");
+                Snackbar.make(findViewById(android.R.id.content),
+                        R.string.compose_saved_success, Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        FloatingActionButton fab = findViewById(R.id.fabCompose);
+        fab.setOnClickListener(v -> {
+            Intent i = ComposeMailActivity.newIntent(this, -1);
+            composeLauncher.launch(i);
+        });
     }
 
     /**

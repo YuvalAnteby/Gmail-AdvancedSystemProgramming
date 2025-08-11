@@ -3,6 +3,8 @@ package com.asp.android_app.model.response;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 /**
  * Represents basic public profile information for a user.
  * Used in:
@@ -35,6 +37,21 @@ public class UserInfo implements Parcelable {
      */
     private final String dateOfBirth;
 
+    public UserInfo(String mail, String fullName) {
+        this.id = -1;
+        this.mail = mail;
+        this.fullName = fullName;
+        this.image = "";
+        this.dateOfBirth = "";
+    }
+
+    public UserInfo(UserSearchResult u) {
+        this.id = u.getId();
+        this.mail = u.getMail();
+        this.fullName = u.getName();
+        dateOfBirth = "";
+        image = "";
+    }
 
     // Constructor from Parcel
     protected UserInfo(Parcel in) {
@@ -120,6 +137,12 @@ public class UserInfo implements Parcelable {
         parcel.writeString(dateOfBirth);
     }
 
-    // Optional: default constructor if needed elsewhere
+    @NonNull
+    @Override
+    public String toString() {
+        // Used if the view tries to setText after selection.
+        // We immediately clear the field on selection, but keep this clean.
+        return fullName + " <" + mail + ">";
+    }
 
 }

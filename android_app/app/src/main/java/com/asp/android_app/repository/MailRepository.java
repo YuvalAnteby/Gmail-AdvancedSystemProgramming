@@ -9,6 +9,7 @@ import com.asp.android_app.api.ApiClient;
 import com.asp.android_app.api.MailApi;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.EditMailRequest;
+import com.asp.android_app.model.request.SendMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
 import com.asp.android_app.utils.Result;
@@ -47,9 +48,9 @@ public class MailRepository {
     /**
      * Fetch mails by label ID.
      *
-     * @param labelId         the label ID to filter by
-     * @param page            page number (for pagination)
-     * @param resultLiveData  LiveData object to observe result
+     * @param labelId        the label ID to filter by
+     * @param page           page number (for pagination)
+     * @param resultLiveData LiveData object to observe result
      */
     public void getMailsByLabel(int labelId, int page, MutableLiveData<Result<MailListResponse>> resultLiveData) {
         final int MAIL_LIMIT = 50;
@@ -96,6 +97,7 @@ public class MailRepository {
 
     /**
      * Edits a mail
+     *
      * @param mailId the ID of the mail to edit
      * @param req    request object containing all data to edit
      * @param result result live data to observe success or error
@@ -117,8 +119,28 @@ public class MailRepository {
         mailApi.searchMails(query).enqueue(createCallback(resultLiveData));
     }
 
-    // TODO Additional methods: sendNewMail
+    /**
+     * Sends a specific mail to other users
+     *
+     * @param req    request object containing mail's data to be sent
+     * @param result result live data to observe success or error
+     */
+    public void sendMail(SendMailRequest req, MutableLiveData<Result<Void>> result) {
+        result.postValue(new Result.Loading<>());
+        mailApi.sendMail(req).enqueue(createCallback(result));
+    }
 
+    /**
+     * Updates a specific draft
+     *
+     * @param mailId id of the draft we edited
+     * @param req    request object containing all data to edit
+     * @param result result live data to observe success or error
+     */
+    public void updateDraft(int mailId, SendMailRequest req, MutableLiveData<Result<Void>> result) {
+        result.postValue(new Result.Loading<>());
+        mailApi.updateDraft(mailId, req).enqueue(createCallback(result));
+    }
 
     /**
      * Helper class to centralize callback creation

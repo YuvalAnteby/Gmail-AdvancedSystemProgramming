@@ -31,10 +31,12 @@ import com.asp.android_app.model.Label;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
+import com.asp.android_app.utils.ComposeNavigation;
 import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.LabelViewModel;
 import com.asp.android_app.viewmodel.MailViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,6 +77,22 @@ public class InboxFragment extends Fragment {
 
         initializeActionBar();
 
+        ActivityResultLauncher<Intent> composeLauncher = ComposeNavigation.register(this, new ComposeNavigation.ResultListener() {
+            @Override
+            public void onSent() {
+                setInbox("incoming");
+                Snackbar.make(view.findViewById(android.R.id.content),
+                        R.string.compose_sent_success, Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSaved() {
+                setInbox("draft");
+                Snackbar.make(view.findViewById(android.R.id.content),
+                        R.string.compose_saved_success, Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
         // initialize the recycler view
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         MailSelectionListener selectionListener = hasSelection -> {
@@ -91,7 +109,8 @@ public class InboxFragment extends Fragment {
                 inboxType,
                 readingLauncher,
                 mailViewModel,
-                selectionListener
+                selectionListener,
+                composeLauncher
         );
         recyclerView.setAdapter(mailAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -224,7 +243,6 @@ public class InboxFragment extends Fragment {
     public void setInbox(String newInboxType) {
         if (newInboxType == null)
             return;
-        Log.i("setInbox: ", newInboxType); //todo remove
         this.inboxType = newInboxType;
         if (inboxType.startsWith("label:")) {
             int labelId = Integer.parseInt(inboxType.substring("label:".length()));

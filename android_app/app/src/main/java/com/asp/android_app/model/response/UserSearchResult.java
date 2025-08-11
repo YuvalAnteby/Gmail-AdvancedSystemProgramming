@@ -15,7 +15,7 @@ public class UserSearchResult {
     /**
      * Full name of the user.
      */
-    private String fullName;
+    private String name;
 
     /**
      * Email address of the user.
@@ -39,15 +39,15 @@ public class UserSearchResult {
     /**
      * @return full name of the user
      */
-    public String getFullName() {
-        return fullName;
+    public String getName() {
+        return name;
     }
 
     /**
      * @param fullName full name to assign
      */
     public void setFullName(String fullName) {
-        this.fullName = fullName;
+        this.name = fullName;
     }
 
     /**

@@ -88,5 +88,17 @@
     <string name="unspam_mail">Not spam</string>
 
     <!-- Strings used in mail writing page -->
-
+    <string name="compose">Compose</string>
+    <string name="send_to">To</string>
+    <string name="compose_subject">Subject</string>
+    <string name="compose_body">Type message here</string>
+    <string name="compose_send">Send</string>
+    <string name="compose_save_draft">Save draft</string>
+    <string name="compose_add_attachment">Add attachment</string>
+    <string name="compose_attachment_hint">You can pick multiple files</string>
+    <string name="err_file_too_large">One of the files is too large</string>
+    <string name="err_attachment_failed">Failed to read an attachment</string>
+    <string name="err_min_recipients">Need at least 1 recipient!</string>
+    <string name="compose_saved_success">Draft saved!</string>
+    <string name="compose_sent_success">Mail sent!</string>
 </resources>

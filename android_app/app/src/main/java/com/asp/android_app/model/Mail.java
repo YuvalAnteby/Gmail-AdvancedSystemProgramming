@@ -149,6 +149,13 @@ public class Mail {
     }
 
     /**
+     * @return true if the mail is marked as a draft, otherwise false
+     */
+    public boolean isDraft() {
+        return isDraft;
+    }
+
+    /**
      * @return list of files attached to mail
      */
     public List<Attachment> getAttachments() {
