@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -16,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -24,8 +22,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.asp.android_app.R;
 import com.asp.android_app.model.Label;
-import com.asp.android_app.ui.compose_activity.ComposeFragment;
 import com.asp.android_app.ui.compose_activity.ComposeMailActivity;
+import com.asp.android_app.utils.ComposeNavigation;
 import com.asp.android_app.utils.TokenManager;
 import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.UserInfo;
@@ -92,23 +90,21 @@ public class InboxActivity extends AppCompatActivity {
      * initializes and sets the click listener for the compose floating action button
      */
     private void initializeComposeButton() {
-        ActivityResultLauncher<Intent> composeLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    // if RESULT_OK - we sent the draft, so we got to refresh the inbox
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        String action = result.getData().getStringExtra("compose_result_action");
-                        if ("sent".equals(action)) {
-                            if (inboxFragment != null) inboxFragment.setInbox("sent");
-                            Snackbar.make(findViewById(android.R.id.content),
-                                    R.string.compose_sent_success, Snackbar.LENGTH_SHORT).show();
-                        } else if ("saved".equals(action)) {
-                            if (inboxFragment != null) inboxFragment.setInbox("draft");
-                            Snackbar.make(findViewById(android.R.id.content),
-                                    R.string.compose_saved_success, Snackbar.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        ActivityResultLauncher<Intent> composeLauncher = ComposeNavigation.register(this, new ComposeNavigation.ResultListener() {
+            @Override
+            public void onSent() {
+                if (inboxFragment != null) inboxFragment.setInbox("incoming");
+                Snackbar.make(findViewById(android.R.id.content),
+                        R.string.compose_sent_success, Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSaved() {
+                if (inboxFragment != null) inboxFragment.setInbox("draft");
+                Snackbar.make(findViewById(android.R.id.content),
+                        R.string.compose_saved_success, Snackbar.LENGTH_SHORT).show();
+            }
+        });
 
         FloatingActionButton fab = findViewById(R.id.fabCompose);
         fab.setOnClickListener(v -> {

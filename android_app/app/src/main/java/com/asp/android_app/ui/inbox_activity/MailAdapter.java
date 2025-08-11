@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.asp.android_app.R;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.ui.ReadingActivity;
+import com.asp.android_app.ui.compose_activity.ComposeMailActivity;
 import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.MailViewModel;
 import com.google.android.material.card.MaterialCardView;
@@ -47,6 +48,8 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
     private final ActivityResultLauncher<Intent> launcher;
     private final MailViewModel mailViewModel;
     private final MailSelectionListener selectionListener;
+    private final ActivityResultLauncher<Intent> composeLauncher;
+
 
     public MailAdapter(
             Context context,
@@ -54,13 +57,16 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
             String inboxType,
             ActivityResultLauncher<Intent> launcher,
             MailViewModel mailViewModel,
-            MailSelectionListener selectionListener
+            MailSelectionListener selectionListener,
+            ActivityResultLauncher<Intent> composeLauncher
     ) {
         this.context = context;
         this.inboxType = inboxType;
         this.launcher = launcher;
         this.mailViewModel = mailViewModel;
         this.selectionListener = selectionListener;
+        this.composeLauncher = composeLauncher;
+
         mailViewModel.getEditMailStatus().observe(lifecycle, result -> {
             if (result instanceof Result.Error)
                 Log.i("ROW", ((Result.Error<Void>) result).getMessage());
@@ -170,17 +176,25 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
     private void onContentClick(int position) {
         Mail m = mailList.get(position);
 
-        // update the read flag in the backend
-        if (!m.isRead()) {
-            mailViewModel.markAsRead(m);
-            m.setIsRead(true);
-            notifyItemChanged(position);
+        // if we clicking on a draft - edit it, otherwise we will read it
+        if (m.isDraft()) {
+            Intent i = ComposeMailActivity.newIntent(context, m.getId());
+            composeLauncher.launch(i);
+            return;
+
+        } else {
+            // update the read flag in the backend
+            if (!m.isRead()) {
+                mailViewModel.markAsRead(m);
+                m.setIsRead(true);
+                notifyItemChanged(position);
+            }
+            // navigate to read the mail
+            Intent intent = new Intent(context, ReadingActivity.class);
+            intent.putExtra("inboxType", inboxType);
+            intent.putExtra("mailId", m.getId());
+            launcher.launch(intent);
         }
-        // navigate to read the mail
-        Intent intent = new Intent(context, ReadingActivity.class);
-        intent.putExtra("inboxType", inboxType);
-        intent.putExtra("mailId", m.getId());
-        launcher.launch(intent);
     }
 
     /**
