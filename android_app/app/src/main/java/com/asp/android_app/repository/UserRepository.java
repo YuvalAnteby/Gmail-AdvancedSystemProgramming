@@ -1,6 +1,8 @@
 package com.asp.android_app.repository;
 
 import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -12,7 +14,10 @@ import com.asp.android_app.model.request.LoginRequest;
 import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.AuthResponse;
 import com.asp.android_app.model.response.UserInfo;
+import com.asp.android_app.model.response.UserSearchResult;
 import com.asp.android_app.utils.Result;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,6 +58,22 @@ public class UserRepository {
                                    MutableLiveData<Result<UserInfo>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
         userApi.changeProfileImage(userId, request).enqueue(createCallback(resultLiveData));
+    }
+
+    public void searchUsers(String q, MutableLiveData<Result<List<UserSearchResult>>> result) {
+        result.postValue(new Result.Loading<>());
+        userApi.searchByEmail(q).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<List<UserSearchResult>> call, @NonNull Response<List<UserSearchResult>> resp) {
+                if (resp.isSuccessful()) result.postValue(new Result.Success<>(resp.body()));
+                else result.postValue(new Result.Error<>("Search error: " + resp.code()));
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<UserSearchResult>> call, @NonNull Throwable t) {
+                result.postValue(new Result.Error<>(t.getMessage()));
+            }
+        });
     }
 
 

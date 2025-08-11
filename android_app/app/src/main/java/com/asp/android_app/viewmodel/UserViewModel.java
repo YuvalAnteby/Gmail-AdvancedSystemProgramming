@@ -12,8 +12,11 @@ import com.asp.android_app.model.request.LoginRequest;
 import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.AuthResponse;
 import com.asp.android_app.model.response.UserInfo;
+import com.asp.android_app.model.response.UserSearchResult;
 import com.asp.android_app.repository.UserRepository;
 import com.asp.android_app.utils.Result;
+
+import java.util.List;
 
 /**
  * ViewModel class for handling user authentication and profile management.
@@ -24,6 +27,7 @@ public class UserViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Result<AuthResponse>> authResult = new MutableLiveData<>();
     private final MutableLiveData<Result<UserInfo>> userInfoResult = new MutableLiveData<>();
+    private final MutableLiveData<Result<List<UserSearchResult>>> searchResults = new MutableLiveData<>();
 
 
     public UserViewModel(@NonNull Application application) {
@@ -38,6 +42,9 @@ public class UserViewModel extends AndroidViewModel {
     public LiveData<Result<UserInfo>> getUserInfoResult() {
         return userInfoResult;
     }
+
+    public LiveData<Result<List<UserSearchResult>>> getSearchResults() { return searchResults; }
+
 
     public void login(LoginRequest request) {
         userRepository.login(request, authResult);
@@ -62,5 +69,9 @@ public class UserViewModel extends AndroidViewModel {
 
     public LiveData<Result<UserInfo>> getImageUpdateStatus() {
         return userInfoResult;
+    }
+
+    public void searchUsers(String q) {
+        userRepository.searchUsers(q, searchResults);
     }
 }

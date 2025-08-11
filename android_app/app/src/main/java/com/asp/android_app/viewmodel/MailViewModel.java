@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.asp.android_app.model.Label;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.EditMailRequest;
+import com.asp.android_app.model.request.SendMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
 import com.asp.android_app.repository.MailRepository;
@@ -29,6 +30,7 @@ public class MailViewModel extends AndroidViewModel {
     private final MutableLiveData<Result<Mail>> mailLiveData = new MutableLiveData<>();
     private final MutableLiveData<Result<Void>> editMailStatus = new MutableLiveData<>();
     private final MutableLiveData<Result<List<Mail>>> searchMailLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Result<Void>> sendMailStatus = new MutableLiveData<>();
 
     private int currentPage = 1;
 
@@ -51,6 +53,10 @@ public class MailViewModel extends AndroidViewModel {
 
     public LiveData<Result<List<Mail>>> getSearchData() {
         return searchMailLiveData;
+    }
+
+    public LiveData<Result<Void>> getSendMailStatus() {
+        return sendMailStatus;
     }
 
     /**
@@ -174,6 +180,20 @@ public class MailViewModel extends AndroidViewModel {
         mailRepository.searchMails(query, searchMailLiveData);
     }
 
-    // TODO Additional methods: sendNewMail
+    /**
+     *
+     * @param req
+     */
+    public void sendNewMail(SendMailRequest req) {
+       mailRepository.sendMail(req, sendMailStatus);
+    }
 
+    /**
+     *
+     * @param mailId
+     * @param req
+     */
+    public void updateDraft(int mailId, SendMailRequest req) {
+        mailRepository.updateDraft(mailId, req, sendMailStatus);
+    }
 }

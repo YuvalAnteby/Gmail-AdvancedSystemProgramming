@@ -94,4 +94,5 @@
     <string name="compose_body">Type message here</string>
     <string name="compose_send">Send</string>
     <string name="compose_save_draft">Save draft</string>
+    <string name="err_min_recipients">Need at least 1 recipient!</string>
 </resources>
