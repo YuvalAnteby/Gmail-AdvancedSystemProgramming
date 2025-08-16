@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ import com.asp.android_app.R;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.ui.ReadingActivity;
 import com.asp.android_app.ui.compose_activity.ComposeMailActivity;
+import com.asp.android_app.utils.NetworkUtil;
 import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.MailViewModel;
 import com.google.android.material.card.MaterialCardView;
@@ -231,6 +233,10 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
         Mail mail = mailList.get(position);
 
         holder.starCheckbox.setOnCheckedChangeListener((v, isChecked) -> {
+            if (!NetworkUtil.isOnline(context)) {
+                Toast.makeText(context, R.string.no_connection, Toast.LENGTH_SHORT).show();
+                return;
+            }
             // Disable to prevent mass clicking while waiting for backend response
             mailViewModel.toggleStar(mail.getId(), isChecked);
             // set the star checkbox color

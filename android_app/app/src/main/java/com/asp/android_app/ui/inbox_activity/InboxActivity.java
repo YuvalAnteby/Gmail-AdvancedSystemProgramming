@@ -24,6 +24,7 @@ import com.asp.android_app.R;
 import com.asp.android_app.model.Label;
 import com.asp.android_app.ui.compose_activity.ComposeMailActivity;
 import com.asp.android_app.utils.ComposeNavigation;
+import com.asp.android_app.utils.NetworkUtil;
 import com.asp.android_app.utils.TokenManager;
 import com.asp.android_app.model.request.ProfileImageRequest;
 import com.asp.android_app.model.response.UserInfo;
@@ -110,6 +111,10 @@ public class InboxActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.fabCompose);
         fab.setOnClickListener(v -> {
+            if (!NetworkUtil.isOnline(this)) {
+                Toast.makeText(this, R.string.no_connection, Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent i = ComposeMailActivity.newIntent(this, -1);
             composeLauncher.launch(i);
         });
@@ -163,6 +168,11 @@ public class InboxActivity extends AppCompatActivity {
      * @param userImageView image view instance to show on
      */
     private void loadProfileImage(ImageView userImageView, UserInfo user, UserViewModel userVM) {
+        if (!NetworkUtil.isOnline(this)) {
+            Toast.makeText(this, R.string.no_connection, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (user != null) {
             userVM.fetchUserInfo(user.getId());
         } else {
@@ -239,6 +249,10 @@ public class InboxActivity extends AppCompatActivity {
                 return true;
             }
             if (id == R.id.nav_create_label) {
+                if (!NetworkUtil.isOnline(this)) {
+                    Toast.makeText(this, R.string.no_connection, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
                 showCreateLabelDialog(labelViewModel);
                 return true;
             }

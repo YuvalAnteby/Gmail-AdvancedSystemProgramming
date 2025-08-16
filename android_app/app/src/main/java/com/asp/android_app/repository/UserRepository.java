@@ -46,7 +46,24 @@ public class UserRepository {
 
     public void validateToken(MutableLiveData<Result<AuthResponse>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-        userApi.validateToken().enqueue(createCallback(resultLiveData));
+        userApi.validateToken().enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<AuthResponse> call, @NonNull Response<AuthResponse> resp) {
+                if (resp.isSuccessful() && resp.body() != null) {
+                    resultLiveData.postValue(new Result.Success<>(resp.body()));
+                } else if (resp.code() == 401) {
+                    // special case: token invalid/expired
+                    resultLiveData.postValue(new Result.Error<>("UNAUTHORIZED"));
+                } else {
+                    resultLiveData.postValue(new Result.Error<>("Error: " + resp.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<AuthResponse> call, @NonNull Throwable t) {
+                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
+            }
+        });
     }
 
     public void fetchUserInfo(int userId, MutableLiveData<Result<UserInfo>> resultLiveData) {

@@ -3,6 +3,9 @@ package com.asp.android_app.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.asp.android_app.model.response.UserInfo;
+import com.google.gson.Gson;
+
 /**
  * Singleton utility class for saving and retrieving the JWT token using SharedPreferences.
  * Used for attaching Authorization header to every Retrofit request.
@@ -10,9 +13,12 @@ import android.content.SharedPreferences;
 public class TokenManager {
     private static final String PREF_NAME = "GmailPrefs";
     private static final String KEY_TOKEN = "jwt_token";
+    private static final String KEY_USER = "last_user_json";
 
     private static TokenManager instance;
     private final SharedPreferences prefs;
+    private final Gson gson = new Gson();
+
 
     private TokenManager(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -47,5 +53,33 @@ public class TokenManager {
      */
     public void clearToken() {
         prefs.edit().remove(KEY_TOKEN).apply();
+    }
+
+    /**
+     * Saves the user we got from AuthResponse.
+     */
+    public void saveUser(UserInfo user) {
+        prefs.edit().putString(KEY_USER, gson.toJson(user)).apply();
+    }
+
+    /**
+     * Retrieve last user or null if never logged in.
+     */
+    public UserInfo getUser() {
+        String json = prefs.getString(KEY_USER, null);
+        if (json == null)
+            return null;
+        try {
+            return gson.fromJson(json, UserInfo.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Clear on logout.
+     */
+    public void clearUser() {
+        prefs.edit().remove(KEY_USER).apply();
     }
 }

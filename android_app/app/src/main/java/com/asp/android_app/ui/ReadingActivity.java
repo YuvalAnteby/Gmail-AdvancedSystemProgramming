@@ -47,6 +47,7 @@ import com.asp.android_app.utils.ComposeNavigation;
 import com.asp.android_app.utils.ComposeParams;
 import com.asp.android_app.utils.DateUtil;
 import com.asp.android_app.utils.MailHtmlUtil;
+import com.asp.android_app.utils.NetworkUtil;
 import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.LabelViewModel;
 import com.asp.android_app.viewmodel.MailViewModel;
@@ -96,6 +97,10 @@ public class ReadingActivity extends AppCompatActivity {
         // initialize the star checkbox
         starCheckbox = findViewById(R.id.starCheckbox);
         starCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (!NetworkUtil.isOnline(this)) {
+                Toast.makeText(this, R.string.no_connection, Toast.LENGTH_SHORT).show();
+                return;
+            }
             // prevent extra calls when setting manually
             if (suppressStarChange)
                 return;
@@ -167,6 +172,11 @@ public class ReadingActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
+        // no connection - disable features
+        if (!NetworkUtil.isOnline(this)) {
+            Toast.makeText(this, R.string.no_connection, Toast.LENGTH_SHORT).show();
+            return true;
+        }
 
         if (id == R.id.action_trash) {
             if (mail.isTrashed()) {
@@ -325,7 +335,7 @@ public class ReadingActivity extends AppCompatActivity {
 
         // if there are no attachments - hide the header
         List<Attachment> attachments = mail.getAttachments();
-        if (attachments.isEmpty()) {
+        if (attachments == null || attachments.isEmpty()) {
             attachmentsContainer.setVisibility(GONE);
         } else {
             attachmentsContainer.setVisibility(View.VISIBLE);
@@ -452,6 +462,11 @@ public class ReadingActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.err_mails_load, Toast.LENGTH_SHORT).show();
             return;
         }
+        if (!NetworkUtil.isOnline(this)) {
+            Toast.makeText(this, R.string.no_connection, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ComposeParams params = new ComposeParams();
         if (mail.getSender() != null)
             params.recipients.add(mail.getSender());
@@ -471,6 +486,11 @@ public class ReadingActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.err_mails_load, Toast.LENGTH_SHORT).show();
             return;
         }
+        if (!NetworkUtil.isOnline(this)) {
+            Toast.makeText(this, R.string.no_connection, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ComposeParams params = new ComposeParams();
         params.subject = MailHtmlUtil.subjectForForward(mail.getSubject());
         params.quotedHtml = MailHtmlUtil.buildForwardQuotedHtml(mail);
