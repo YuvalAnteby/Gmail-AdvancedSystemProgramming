@@ -8,18 +8,24 @@ import androidx.lifecycle.MutableLiveData;
 import com.asp.android_app.api.ApiClient;
 import com.asp.android_app.api.MailApi;
 import com.asp.android_app.caching.MailLocalDataSource;
+import com.asp.android_app.caching.entities.LabelEntity;
 import com.asp.android_app.caching.entities.MailEntity;
 import com.asp.android_app.caching.entities.MailLabelCrossRef;
+import com.asp.android_app.caching.utils.LabelMappers;
 import com.asp.android_app.caching.utils.MailMappers;
+import com.asp.android_app.model.Label;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.EditMailRequest;
 import com.asp.android_app.model.request.SendMailRequest;
 import com.asp.android_app.model.request.SpamRequest;
 import com.asp.android_app.model.response.MailListResponse;
 import com.asp.android_app.model.response.UserInfo;
+import com.asp.android_app.utils.NetworkUtil;
 import com.asp.android_app.utils.Result;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,8 +45,10 @@ public class MailRepository {
     private final MailApi mailApi;
     private final MailLocalDataSource localData;
     private final ExecutorService io;
+    private final Context context;
 
     public MailRepository(Context context) {
+        this.context = context;
         io = Executors.newSingleThreadExecutor();
         mailApi = ApiClient.getClient(context).create(MailApi.class);
         localData = new MailLocalDataSource(context);
@@ -136,10 +144,10 @@ public class MailRepository {
         List<MailEntity> entities = new ArrayList<>();
         List<MailLabelCrossRef> refs = new ArrayList<>();
 
-        // 1) collect UNIQUE labels from all mails (by id)
-        java.util.LinkedHashMap<Integer, com.asp.android_app.model.Label> uniq = new java.util.LinkedHashMap<>();
+        // collect UNIQUE labels from all mails (by id)
+        LinkedHashMap<Integer, Label> uniq = new LinkedHashMap<>();
         for (Mail m : mails) {
-            // map mail -> entity
+            // map mail to entity
             MailEntity e = MailMappers.toEntity(m);
             entities.add(e);
 
@@ -153,15 +161,12 @@ public class MailRepository {
             }
         }
 
-        // 2) UPSERT LABELS **BEFORE** cross-refs (this removes the FK crash)
-        List<com.asp.android_app.caching.entities.LabelEntity> labelEntities =
-                com.asp.android_app.caching.utils.LabelMappers.toEntities(new ArrayList<>(uniq.values()));
+        // upsert labels **BEFORE** cross refs (this prevents a crash don't touch!)
+        List<LabelEntity> labelEntities = LabelMappers.toEntities(new ArrayList<>(uniq.values()));
         localData.upsertLabels(labelEntities);
-
-        // 3) now it's safe to upsert mails + cross-refs
+        // now it's safe to upsert mails + cross refs thank god
         localData.upsertMails(entities, refs);
     }
-
 
     /**
      * Fetch mails by inbox type and page number.
@@ -179,9 +184,16 @@ public class MailRepository {
                 localData.touchMails(idsOf(cached));  // also Room -> keep in background
                 resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(cached)));
             } else {
-                resultLiveData.postValue(new Result.Loading<>());
+                if (NetworkUtil.isOnline(context))
+                    resultLiveData.postValue(new Result.Loading<>());
+                else
+                    resultLiveData.postValue(new Result.Success<>(
+                            mapLocalToListResponse(Collections.emptyList())));
             }
         });
+        // skip if not connected to internet
+        if (!NetworkUtil.isOnline(context))
+            return;
         // attempt calling the backend
         mailApi.getMailsByType(inboxType, page, MAIL_LIMIT).enqueue(new Callback<>() {
             @Override
@@ -230,9 +242,15 @@ public class MailRepository {
                 localData.touchMails(idsOf(cached));
                 resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(cached)));
             } else {
-                resultLiveData.postValue(new Result.Loading<>());
+                if (NetworkUtil.isOnline(context))
+                    resultLiveData.postValue(new Result.Loading<>());
+                else
+                    resultLiveData.postValue(new Result.Loading<>());
             }
         });
+        // skip if not connected to internet
+        if (!NetworkUtil.isOnline(context))
+            return;
         // attempt calling the backend
         mailApi.getMailsByLabel(labelId, page, MAIL_LIMIT).enqueue(new Callback<>() {
             @Override
@@ -282,7 +300,9 @@ public class MailRepository {
                 resultLiveData.postValue(new Result.Loading<>());
             }
         });
-
+        // skip if not connected to internet
+        if (!NetworkUtil.isOnline(context))
+            return;
         // then try network to refresh
         mailApi.fetchMail(id).enqueue(new Callback<>() {
             @Override
@@ -346,7 +366,6 @@ public class MailRepository {
         result.postValue(new Result.Loading<>());
         mailApi.editMail(mailId, req).enqueue(createCallback(result));
     }
-
 
     /**
      * Search mails using a query from the user.
