@@ -155,7 +155,12 @@ public class LoginFragment extends Fragment {
         intent.putExtra("user", auth.getUser());
         startActivity(intent);
         requireActivity().finish();
-        Toast.makeText(getContext(), "Welcome " + auth.getUser().getFullName(), Toast.LENGTH_SHORT).show();
+        try {
+            Log.i("loginFrag", "welcome " + auth.getUser().getFullName());
+            Toast.makeText(getContext(), "Welcome " + auth.getUser().getFullName(), Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.i("loginFrag", "user null");
+        }
     }
 
     /**
