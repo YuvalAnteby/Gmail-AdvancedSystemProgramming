@@ -107,6 +107,7 @@ public class MailRepository {
             m.setStarred(e.isStarred);
             m.setTrashed(e.isTrashed);
             m.setSpam(e.isSpam);
+            m.setIsDraft(e.isDraft);
             // we skip recipients/attachments for list; detail fetch can fill them
             out.add(m);
         }
