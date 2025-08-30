@@ -155,6 +155,10 @@ public class Mail {
         return isDraft;
     }
 
+    public void setIsDraft(boolean isDraft) {
+        this.isDraft = isDraft;
+    }
+
     /**
      * @return list of files attached to mail
      */

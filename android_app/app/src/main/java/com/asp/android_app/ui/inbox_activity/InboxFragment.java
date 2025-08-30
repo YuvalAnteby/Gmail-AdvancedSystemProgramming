@@ -81,15 +81,13 @@ public class InboxFragment extends Fragment {
             @Override
             public void onSent() {
                 setInbox("incoming");
-                Snackbar.make(view.findViewById(android.R.id.content),
-                        R.string.compose_sent_success, Snackbar.LENGTH_SHORT).show();
+                showSnack(R.string.compose_sent_success);
             }
 
             @Override
             public void onSaved() {
                 setInbox("draft");
-                Snackbar.make(view.findViewById(android.R.id.content),
-                        R.string.compose_saved_success, Snackbar.LENGTH_SHORT).show();
+                showSnack(R.string.compose_saved_success);
             }
         });
 
@@ -127,6 +125,17 @@ public class InboxFragment extends Fragment {
         observeViewModel(swipeRefreshLayout);
 
         return view;
+    }
+
+    private void showSnack(@androidx.annotation.StringRes int resId) {
+        if (!isAdded()) return; // fragment not attached
+        View root = getView();
+        if (root != null) {
+            Snackbar.make(root, resId, Snackbar.LENGTH_SHORT).show();
+        } else {
+            // Fallback if view is gone (e.g., after rotation/detach)
+            Toast.makeText(requireContext(), resId, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**

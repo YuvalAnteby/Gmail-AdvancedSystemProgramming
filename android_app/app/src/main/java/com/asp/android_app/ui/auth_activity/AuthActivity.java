@@ -52,8 +52,8 @@ public class AuthActivity extends AppCompatActivity {
             }
         });
 
-        // Entry decision
-        if (token == null || token.isBlank()) {
+        // Entry decision - make sure the token exists, and still fresh
+        if (token == null || token.isBlank() || !tokenManager.isFreshToken()) {
             showLoginFragment();
             return;
         }

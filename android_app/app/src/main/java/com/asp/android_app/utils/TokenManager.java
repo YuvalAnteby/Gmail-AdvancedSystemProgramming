@@ -13,7 +13,14 @@ import com.google.gson.Gson;
 public class TokenManager {
     private static final String PREF_NAME = "GmailPrefs";
     private static final String KEY_TOKEN = "jwt_token";
+    private static final String KEY_EXPIRE = "jwt_expire";
     private static final String KEY_USER = "last_user_json";
+
+    /**
+     * in hours - 24 is the default
+     * TODO change this value if changing the JWT expiration time in the server!!!!
+     */
+    private static final int JWT_EXPIRATION_TIME = 24;
 
     private static TokenManager instance;
     private final SharedPreferences prefs;
@@ -29,7 +36,9 @@ public class TokenManager {
      */
     public static synchronized TokenManager getInstance(Context context) {
         if (instance == null) {
-            instance = new TokenManager(context);
+            synchronized (TokenManager.class) {
+                instance = new TokenManager(context);
+            }
         }
         return instance;
     }
@@ -38,7 +47,14 @@ public class TokenManager {
      * Saves the JWT token to SharedPreferences.
      */
     public void saveToken(String token) {
-        prefs.edit().putString(KEY_TOKEN, token).apply();
+        long now = System.currentTimeMillis();
+        long skew = 2 * 60 * 1000; // 2 minutes in ms
+        // converts the validation time to ms and calculates last time of use
+        long validUntil = now + (JWT_EXPIRATION_TIME * 60L * 60L * 1000) - skew;
+        prefs.edit()
+                .putString(KEY_TOKEN, token)
+                .putLong(KEY_EXPIRE, validUntil)
+                .commit();
     }
 
     /**
@@ -52,8 +68,20 @@ public class TokenManager {
      * Clears the saved JWT token (e.g., on logout).
      */
     public void clearToken() {
-        prefs.edit().remove(KEY_TOKEN).apply();
+        prefs.edit().remove(KEY_TOKEN).remove(KEY_EXPIRE).apply();
     }
+
+    /**
+     * @return true if the JWT token is still valid by last time of use, otherwise false
+     * IMPORTANT: this doesn't check the JWT validation itself, only expiry time
+     */
+    public boolean isFreshToken() {
+        String tok = getToken();
+        if (tok == null || tok.isBlank()) return false;
+        long validUntil = prefs.getLong(KEY_EXPIRE, 0L);
+        return System.currentTimeMillis() < validUntil;
+    }
+
 
     /**
      * Saves the user we got from AuthResponse.

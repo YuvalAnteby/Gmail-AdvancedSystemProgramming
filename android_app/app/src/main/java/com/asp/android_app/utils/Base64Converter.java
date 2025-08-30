@@ -93,11 +93,12 @@ public class Base64Converter {
 
             if (decodedBitmap != null) {
                 imageView.setImageBitmap(decodedBitmap);
+                Log.i("Base64Display", "Given photo set");
             } else {
-                Log.e("Base64Converter", "Failed to decode Base64 image");
+                Log.e("Base64Display", "Failed to decode Base64 image");
             }
         } catch (Exception e) {
-            Log.e("Base64Converter", "Exception while decoding image: " + e.getMessage());
+            Log.e("Base64Display", "Exception while decoding image: " + e.getMessage());
         }
     }
 

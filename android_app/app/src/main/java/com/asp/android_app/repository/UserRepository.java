@@ -104,6 +104,10 @@ public class UserRepository {
         return new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<T> call, @NonNull Response<T> response) {
+                try {
+                    Log.i("UserRepo", "" + response.raw());
+                } catch (Exception ignored) {
+                }
                 if (response.isSuccessful()) {
                     liveData.postValue(new Result.Success<>(response.body()));
                 } else {
