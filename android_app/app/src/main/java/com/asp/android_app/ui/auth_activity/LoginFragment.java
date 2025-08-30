@@ -6,6 +6,8 @@ import static com.asp.android_app.utils.InputValidation.isPasswordValid;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,7 +65,7 @@ public class LoginFragment extends Fragment {
 
         // Handle login button clicks - navigate to the inbox activity
         btnLogin.setOnClickListener(view1 -> {
-            onLoginCLick(emailLayout, etAddress, passwordLayout, etPassword, userRepository);
+            onLoginCLick(emailLayout, etAddress, passwordLayout, etPassword);
         });
 
         return view;
@@ -112,14 +114,12 @@ public class LoginFragment extends Fragment {
      * @param etEmail        edit text of the email
      * @param passwordLayout layout containing the password input
      * @param etPassword     edit text of the password
-     * @param repo           user repository class instance
      */
     private void onLoginCLick(
             TextInputLayout emailLayout,
             TextInputEditText etEmail,
             TextInputLayout passwordLayout,
-            TextInputEditText etPassword,
-            UserRepository repo) {
+            TextInputEditText etPassword) {
         String mail = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
@@ -150,17 +150,22 @@ public class LoginFragment extends Fragment {
         // save the token
         TokenManager tokenManager = TokenManager.getInstance(requireContext());
         tokenManager.saveToken(auth.getToken());
-        // navigate to the inbox screen
-        Intent intent = new Intent(getContext(), InboxActivity.class);
-        intent.putExtra("user", auth.getUser());
-        startActivity(intent);
-        requireActivity().finish();
-        try {
-            Log.i("loginFrag", "welcome " + auth.getUser().getFullName());
-            Toast.makeText(getContext(), "Welcome " + auth.getUser().getFullName(), Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Log.i("loginFrag", "user null");
-        }
+        tokenManager.saveUser(auth.getUser());
+
+        // added small delay to let the data be saved locally
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            // navigate to the inbox screen
+            Intent intent = new Intent(getContext(), InboxActivity.class);
+            intent.putExtra("user", auth.getUser());
+            startActivity(intent);
+            requireActivity().finish();
+            try {
+                Log.i("loginFrag", "welcome " + auth.getUser().getFullName());
+                Toast.makeText(getContext(), "Welcome " + auth.getUser().getFullName(), Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Log.i("loginFrag", "user null");
+            }
+        }, 100);
     }
 
     /**

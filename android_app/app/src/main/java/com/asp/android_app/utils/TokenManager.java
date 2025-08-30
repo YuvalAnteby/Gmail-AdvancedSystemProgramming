@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import com.asp.android_app.model.response.UserInfo;
 import com.google.gson.Gson;
 
-import java.util.Date;
-
 /**
  * Singleton utility class for saving and retrieving the JWT token using SharedPreferences.
  * Used for attaching Authorization header to every Retrofit request.
@@ -38,7 +36,9 @@ public class TokenManager {
      */
     public static synchronized TokenManager getInstance(Context context) {
         if (instance == null) {
-            instance = new TokenManager(context);
+            synchronized (TokenManager.class) {
+                instance = new TokenManager(context);
+            }
         }
         return instance;
     }
@@ -54,7 +54,7 @@ public class TokenManager {
         prefs.edit()
                 .putString(KEY_TOKEN, token)
                 .putLong(KEY_EXPIRE, validUntil)
-                .apply();
+                .commit();
     }
 
     /**
