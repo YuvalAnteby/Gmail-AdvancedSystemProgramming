@@ -13,6 +13,7 @@ Roee's miluim service documents are uploaded to `Issues` tab if needed, Tzvika w
   - [Testing bloom filter server and python client](#to-test-the-python-client-and-bloom-filter-server) 
   - [Running as web application project](#running-the-entire-web-app)
   - [env variables](#env-variables)
+  - [Running the android app](#running-the-android-app)
 - [Screenshots](#screenshots)
 - [Useful links](#useful-links)
   - [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Exe/server_cpp) 
