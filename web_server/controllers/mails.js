@@ -12,7 +12,7 @@ const {convertLabelsToIds, labelsToFullElement} = require("../utils/labels");
  * - code 200 and list of ordered by the time sent mails objects
  * - code 400 if user isn't authenticated
  */
-const getLastMailsOrdered = (req, res) => {
+const getLastMailsOrdered = async (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
     const userId = Number(req.user.id);
     if (!userId)
@@ -23,7 +23,7 @@ const getLastMailsOrdered = (req, res) => {
     const limit = Number(req.query.limit) || 50;
 
     const labelIdFilter = Number(req.query.label);
-    let {paged, total} = Mails.getUserMails(userId, limit, inboxType, page);
+    let {paged, total} = await Mails.getUserMails(userId, limit, inboxType, page);
 
     // Filter by label id if provided
     if (!isNaN(labelIdFilter)) {
@@ -32,14 +32,14 @@ const getLastMailsOrdered = (req, res) => {
     }
 
     // replace in the mails the user ids and labels ids with user and label elements so we can show names and emails
-    const fullMails = paged.map(m => {
+    const fullMails = await Promise.all(paged.map(async (m) => {
         return {
             ...m,
-            from: usersToFullElement([m.from])[0],
-            sentTo: usersToFullElement(m.sentTo || []),
-            labels: labelsToFullElement(userId, m.labels || [])
+            from: (await usersToFullElement([m.from]))[0],
+            sentTo: await usersToFullElement(m.sentTo || []),
+            labels: await labelsToFullElement(userId, m.labels || [])
         }
-    })
+    }))
     // we weren't instructed to return 404 if mails is empty, just do a 200 code one
     return res.status(200).json(
         {
@@ -58,7 +58,7 @@ const getLastMailsOrdered = (req, res) => {
  * - code 400 if there's no id in input
  * - code 404 if there's no mail with the id
  */
-const getMailById = (req, res) => {
+const getMailById = async (req, res) => {
     // Make sure we got an id in the request
     const id = parseInt(req.params.id);
     if (isNaN(id))
@@ -68,7 +68,7 @@ const getMailById = (req, res) => {
     if (!userId)
         return res.status(400).json({error: 'No valid user ID was given'});
     // Find the mail with the given id
-    const mail = Mails.getMail(id);
+    const mail = await Mails.getMail(id);
     // Return 404 if not found, or a 200 with the mail as a json object
     if (!mail)
         return res.status(404).json({error: `No mail found with ID: ${id}`});
@@ -77,9 +77,9 @@ const getMailById = (req, res) => {
         return res.status(403).json({error: 'mail do not belong to user'});
     return res.status(200).json({
         ...mail,
-        from: usersToFullElement([mail.from])[0],
-        sentTo: usersToFullElement(mail.sentTo || []),
-        labels: labelsToFullElement(userId, mail.labels || [])
+        from: (await usersToFullElement([mail.from]))[0],
+        sentTo: await usersToFullElement(mail.sentTo || []),
+        labels: await labelsToFullElement(userId, mail.labels || [])
     });
 }
 
@@ -103,10 +103,10 @@ const createNewMail = async (req, res) => {
     try {
         // Fetch the mail object's attributes from the request, for later use
         const {subject, body, sentTo = [], saveAsDraft = false, files = []} = req.body;
-        const sentToIds = convertMailsToIds(sentTo);
+        const sentToIds = await convertMailsToIds(sentTo);
         // handle this as a draft
         if (saveAsDraft) {
-            const draftMail = Mails.saveDraft(userId, subject, body, sentToIds, files)
+            const draftMail = await Mails.saveDraft(userId, subject, body, sentToIds, files)
             return res.status(201).location(`/mails/${draftMail.id}`).json(draftMail);
         }
         // handle this as sending a mail
@@ -116,7 +116,7 @@ const createNewMail = async (req, res) => {
         if (blacklisted)
             return res.status(403).json({error: 'Mail contains blacklisted URLs - failed creating a new mail'});
         // No blacklisted URLs found, send the new mail
-        const newMail = Mails.sendNewMail(userId, subject, body, sentToIds, files);
+        const newMail = await Mails.sendNewMail(userId, subject, body, sentToIds, files);
         if (newMail === false)
             return res.status(500).json({error: 'Failed to create new mail'});
         return res.status(201).location(`/mails/${newMail.id}`).json(newMail);
@@ -136,7 +136,7 @@ const createNewMail = async (req, res) => {
  * - code 400 is user isn't authenticated
  * - code 500 if any other error occurred
  */
-const updateMail = (req, res) => {
+const updateMail = async (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
     const userId = Number(req.user.id);
     if (!userId)
@@ -145,8 +145,8 @@ const updateMail = (req, res) => {
     const mailId = Number(req.params.id);
     if (isNaN(mailId))
         return res.status(400).json({error: 'error no valid mail id was given'});
-    const mail = Mails.getMail(mailId);
-    if (!mailId || mail.owner != userId)
+    const mail = await Mails.getMail(mailId);
+    if (!mail || mail.owner != userId)
         return res.status(404).json({error: 'error mail not found'});
     // edit it as a draft
     if (mail.isDraft)
@@ -155,7 +155,7 @@ const updateMail = (req, res) => {
     // otherwise it’s a mail already sent - only allow flags & labels
     const {isRead, isStarred, isTrashed, isSpam, labels} = req.body || {};
     const labelsIds = convertLabelsToIds(userId, labels || []);
-    const updated = Mails.editSentMail(mailId, isRead, isStarred, isTrashed, isSpam, labelsIds);
+    const updated = await Mails.editSentMail(mailId, isRead, isStarred, isTrashed, isSpam, labelsIds);
     if (updated)
         return res.status(200).json(updated);
     if (updated === 404)
@@ -181,11 +181,11 @@ const editDraft = async (req, res, userId, mail) => {
         return res.status(400).json({error: 'error only drafts can be updated'});
     // Get the input params and edit the mail
     const {subject, body, sentTo = [], saveAsDraft = true, files = []} = req.body;
-    const sentToIds = convertMailsToIds(sentTo);
+    const sentToIds = await convertMailsToIds(sentTo);
 
     // just update the fields in this draft
     if (saveAsDraft) {
-        const updated = Mails.updateDraft(mail.id, subject, body, sentToIds, files);
+        const updated = await Mails.updateDraft(mail.id, subject, body, sentToIds, files);
         return res.status(200).json(updated);
     }
     // turn the draft to a new mail
@@ -193,9 +193,9 @@ const editDraft = async (req, res, userId, mail) => {
     const blacklisted = await Blacklist.isInBlacklist(urls);
     if (blacklisted)
         return res.status(403).json({error: 'error mail contains blacklisted URLs'});
-    // delete the draft and send a new mail
-    Mails.deleteMail(userId, mail.id);
-    const ownerMail = Mails.sendNewMail(userId, subject, body, sentToIds, files);
+    // send a new mail and then delete the draft
+    const ownerMail = await Mails.sendNewMail(userId, subject, body, sentToIds, files);
+    await Mails.deleteMail(userId, mail.id);
     return res.status(201).location(`/mails/${ownerMail.id}`).json(ownerMail);
 }
 
@@ -209,7 +209,7 @@ const editDraft = async (req, res, userId, mail) => {
  * - 404 if mail not found
  * - 400 if missing input or user isn't authenticated or has no access to the mail
  */
-const deleteMailById = (req, res) => {
+const deleteMailById = async (req, res) => {
     // Make sure we got an id in the request
     const mailId = Number(req.params.id);
     if (isNaN(mailId))
@@ -219,7 +219,7 @@ const deleteMailById = (req, res) => {
     if (isNaN(userId))
         return res.status(400).json({error: 'User not authenticated'});
     // Delete the desired mail and return matching result
-    const mail = Mails.deleteMail(userId, mailId);
+    const mail = await Mails.deleteMail(userId, mailId);
     if (mail === 404)
         return res.status(404).json({error: 'mail was not found'});
     if (mail === 400)
@@ -235,7 +235,7 @@ const deleteMailById = (req, res) => {
  * @returns {*} array of mails objects that contains the query, if encountered a problem returns code 400
  * with the description.
  */
-const getMailsByQuery = (req, res) => {
+const getMailsByQuery = async (req, res) => {
     // Make sure the user is authenticated, if not - a bad request (400)
     const userId = Number(req.user.id);
     if (!userId)
@@ -245,15 +245,15 @@ const getMailsByQuery = (req, res) => {
     if (!query)
         return res.status(400).json({error: 'Empty query'});
     // Find the mails and return them, if there are no mails returns an empty array
-    const rawMails = Mails.searchInInbox(query, userId);
-    const fullMails = rawMails.map(m => {
+    const rawMails = await Mails.searchInInbox(query, userId);
+    const fullMails = await Promise.all(rawMails.map(async (m) => {
         return {
             ...m,
-            from: usersToFullElement([m.from])[0],
-            sentTo: usersToFullElement(m.sentTo || []),
-            labels: labelsToFullElement(userId, m.labels || [])
+            from: (await usersToFullElement([m.from]))[0],
+            sentTo: await usersToFullElement(m.sentTo || []),
+            labels: await labelsToFullElement(userId, m.labels || [])
         }
-    })
+    }))
     return res.status(200).json(fullMails);
 }
 

@@ -5,10 +5,14 @@ const Users = require('../models/users');
  * @param addresses of mails of users
  * @returns {number[]} array of user ids
  */
-function convertMailsToIds(addresses) {
-    return addresses.map(mailAdd => {
-        return Users.getUserByMail(mailAdd).id;
-    });
+async function convertMailsToIds(addresses) {
+    const results = await Promise.all(
+        (addresses || []).map(async (mailAdd) => {
+            const u = await Users.getUserByMail(mailAdd);
+            return u ? u.id : undefined;
+        })
+    );
+    return results.filter((v) => typeof v === 'number');
 }
 
 /**
@@ -16,10 +20,11 @@ function convertMailsToIds(addresses) {
  * @param {number[]} usersIds array of users' ids
  * @returns {*} array of safe user elements
  */
-const usersToFullElement = (usersIds) => {
-    return usersIds.map(uid => {
-        return Users.getSafeUserById(uid);
-    });
+const usersToFullElement = async (usersIds) => {
+    const results = await Promise.all(
+        (usersIds || []).map(async (uid) => Users.getSafeUserById(uid))
+    );
+    return results.filter(Boolean);
 }
 
 /**
@@ -30,14 +35,14 @@ const usersToFullElement = (usersIds) => {
  *   - each recipient name
  *   - each recipient email
  */
-const mailUserFields = (mail) => {
-    const sender = Users.getSafeUserById(mail.from);
-    const recipients = (mail.sentTo || [])
-        .map(id => Users.getSafeUserById(id));
-    const all = [sender, ...recipients];
-    return all.flatMap(u => [u.name, u.mail])
+const mailUserFields = async (mail) => {
+    const sender = await Users.getSafeUserById(mail.from);
+    const recipients = await Promise.all((mail.sentTo || []).map((id) => Users.getSafeUserById(id)));
+    const all = [sender, ...recipients].filter(Boolean);
+    return all
+        .flatMap((u) => [u.name, u.mail])
         .filter(Boolean)
-        .map(s => s.toLowerCase());
+        .map((s) => s.toLowerCase());
 };
 
 

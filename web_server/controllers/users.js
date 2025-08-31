@@ -21,7 +21,7 @@ const signupUser = async (req, res) => {
     }
 
     // Don't create if the mail is already taken
-    if (Users.userExist(mail)) {
+    if (await Users.userExist(mail)) {
         return res.status(400).json({ error: 'mail already exists' });
     }
 
@@ -50,13 +50,13 @@ const signupUser = async (req, res) => {
  *   - 400 if invalid id
  *   - 404 if no user found
  */
-const getUser = (req, res) => {
+const getUser = async (req, res) => {
     const id = Number(req.params.id);
     if (!id || isNaN(id)) {
         return res.status(400).json({ error: 'Invalid user ID' });
     }
 
-    const user = Users.getUserById(id);
+    const user = await Users.getUserById(id);
     if (!user) {
         return res.status(404).json({ error: 'User not found' });
     }
@@ -81,13 +81,13 @@ const loginUser = async (req, res) => {
         return res.status(400).json({ error: 'mail and password required' });
     }
 
-    const user = Users.isAuthorizeUser(mail, password);
+    const user = await Users.isAuthorizeUser(mail, password);
     if (!user) {
         return res.status(401).json({ error: 'wrong mail or password' });
     }
 
     const token = signToken(user);
-    return res.status(200).json({ token });
+    return res.status(200).json({ token, user });
 };
 
 /**
@@ -143,13 +143,14 @@ const isTokenValid = (req, res) => {
  *   - 200 and an array of `{ id, name, mail }` (max 10)
  *   - 400 if missing query parameter `q`
  */
-const searchUsers = (req, res) => {
+const searchUsers = async (req, res) => {
     const query = req.query.q?.toLowerCase();
     if (!query) {
         return res.status(400).json({ error: 'Missing query parameter' });
     }
 
-    const matched = Users.getAllUsers()
+    const all = await Users.getAllUsers();
+    const matched = all
         .filter(user =>
             user.fullName.toLowerCase().includes(query) ||
             user.mail.toLowerCase().includes(query)
