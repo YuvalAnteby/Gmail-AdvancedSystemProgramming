@@ -34,4 +34,7 @@ public interface LabelDao {
 
     @Query("DELETE FROM labels")
     void clearLabels();
+
+    @Query("DELETE FROM mail_label WHERE labelId = :labelId")
+    void clearRefsForLabel(int labelId);
 }

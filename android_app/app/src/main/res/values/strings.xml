@@ -102,4 +102,36 @@
     <string name="err_min_recipients">Need at least 1 recipient!</string>
     <string name="compose_saved_success">Draft saved!</string>
     <string name="compose_sent_success">Mail sent!</string>
+
+        <!-- Empty state strings -->
+        <string name="empty_inbox_icon">Empty inbox illustration</string>
+        <string name="empty_inbox_title">Your inbox is empty</string>
+        <string name="empty_inbox_subtitle">When you receive new emails, they\'ll appear here.</string>
+
+        <string name="empty_sent_title">No sent emails</string>
+        <string name="empty_sent_subtitle">Emails you send will appear here.</string>
+
+        <string name="empty_draft_title">No drafts</string>
+        <string name="empty_draft_subtitle">Draft emails you save will be stored here.</string>
+
+        <string name="empty_starred_title">No starred emails</string>
+        <string name="empty_starred_subtitle">Star important emails to find them quickly here.</string>
+
+        <string name="empty_trash_title">Trash is empty</string>
+        <string name="empty_trash_subtitle">Deleted emails will be moved here for 30 days before permanent deletion.</string>
+
+        <string name="empty_spam_title">No spam emails</string>
+        <string name="empty_spam_subtitle">Suspicious emails are automatically moved here.</string>
+
+        <string name="empty_all_title">No emails found</string>
+        <string name="empty_all_subtitle">All your emails from all folders will appear here.</string>
+
+        <string name="empty_label_title">No labeled emails</string>
+        <string name="empty_label_subtitle">Emails with this label will appear here.</string>
+
+        <string name="no_search_results">No results found</string>
+        <string name="no_search_results_subtitle">Try adjusting your search terms or check spelling.</string>
+
+        <string name="compose_new_mail">Compose</string>
+        <string name="refresh">Refresh</string>
 </resources>

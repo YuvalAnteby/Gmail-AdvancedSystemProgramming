@@ -4,7 +4,6 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.asp.android_app.caching.entities.MailEntity;
@@ -23,7 +22,7 @@ public interface MailDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsertAll(List<MailEntity> mails);
 
-    /** Upsert a single mail (open mail details caching). */
+    /** Upsert a single mail (used for open mail details caching). */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsertOne(MailEntity mail);
 
@@ -35,11 +34,15 @@ public interface MailDao {
     @Query("SELECT * FROM mails WHERE id = :mailId LIMIT 1")
     MailEntity getById(int mailId);
 
+    /** Delete a single mail by ID. */
+    @Query("DELETE FROM mails WHERE id = :mailId")
+    void deleteById(int mailId);
+
     // ---- inbox list queries (flags drive membership) ----
 
     @Query("SELECT * FROM mails WHERE isTrashed = 0 AND isSpam = 0 AND isDraft = 0 ORDER BY " +
             "CASE WHEN sentAtEpoch > 0 THEN sentAtEpoch ELSE createdAtEpoch END DESC")
-    List<MailEntity> getIncoming(); // 'incoming' here = general inbox (not sent/star/drafts/spam/trash)
+    List<MailEntity> getIncoming();
 
     @Query("SELECT * FROM mails WHERE isDraft = 0 AND ownerId = fromId ORDER BY " +
             "CASE WHEN sentAtEpoch > 0 THEN sentAtEpoch ELSE createdAtEpoch END DESC")
@@ -59,6 +62,39 @@ public interface MailDao {
     @Query("SELECT * FROM mails WHERE isTrashed = 1 ORDER BY " +
             "CASE WHEN sentAtEpoch > 0 THEN sentAtEpoch ELSE createdAtEpoch END DESC")
     List<MailEntity> getTrash();
+
+    // ---- Clear methods for cache invalidation ----
+
+    /** Clear mails by inbox type for cache invalidation */
+    @Query("DELETE FROM mails WHERE isTrashed = 0 AND isSpam = 0 AND isDraft = 0")
+    void deleteIncoming();
+
+    @Query("DELETE FROM mails WHERE isDraft = 0 AND ownerId = fromId")
+    void deleteSent();
+
+    @Query("DELETE FROM mails WHERE isStarred = 1 AND isTrashed = 0")
+    void deleteStarred();
+
+    @Query("DELETE FROM mails WHERE isDraft = 1")
+    void deleteDrafts();
+
+    @Query("DELETE FROM mails WHERE isSpam = 1")
+    void deleteSpam();
+
+    @Query("DELETE FROM mails WHERE isTrashed = 1")
+    void deleteTrash();
+
+    // Generic delete by type method
+    @Query("DELETE FROM mails WHERE " +
+            "CASE :type " +
+            "WHEN 'incoming' THEN (isTrashed = 0 AND isSpam = 0 AND isDraft = 0) " +
+            "WHEN 'sent' THEN (isDraft = 0 AND ownerId = fromId) " +
+            "WHEN 'starred' THEN (isStarred = 1 AND isTrashed = 0) " +
+            "WHEN 'draft' THEN (isDraft = 1) " +
+            "WHEN 'spam' THEN (isSpam = 1) " +
+            "WHEN 'trash' THEN (isTrashed = 1) " +
+            "ELSE 0 END")
+    void deleteByType(String type);
 
     // ---- label filter (join is maintained in repository to keep DAO simple) ----
     @Query("SELECT * FROM mails WHERE id IN (:mailIds) ORDER BY " +

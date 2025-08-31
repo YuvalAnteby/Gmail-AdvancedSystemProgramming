@@ -24,7 +24,6 @@ import com.asp.android_app.utils.NetworkUtil;
 import com.asp.android_app.utils.Result;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -60,7 +59,6 @@ public class MailRepository {
     private MailListResponse mapLocalToListResponse(List<MailEntity> entities) {
         MailListResponse r = new MailListResponse();
         r.setMails(mapEntitiesToNetwork(entities));
-        //r.setTotal(entities.size());
         return r;
     }
 
@@ -145,18 +143,15 @@ public class MailRepository {
         List<MailEntity> entities = new ArrayList<>();
         List<MailLabelCrossRef> refs = new ArrayList<>();
 
-        // collect UNIQUE labels from all mails (by id)
         LinkedHashMap<Integer, Label> uniq = new LinkedHashMap<>();
         for (Mail m : mails) {
-            // map mail to entity
             MailEntity e = MailMappers.toEntity(m);
             entities.add(e);
 
-            // build cross-refs and collect labels
             if (m.getLabels() != null) {
-                for (com.asp.android_app.model.Label l : m.getLabels()) {
+                for (Label l : m.getLabels()) {
                     if (l == null) continue;
-                    uniq.put(l.getId(), l); // keep unique by id
+                    uniq.put(l.getId(), l);
                     refs.add(new MailLabelCrossRef(m.getId(), l.getId()));
                 }
             }
@@ -178,53 +173,101 @@ public class MailRepository {
      */
     public void getMailsByType(String inboxType, int page, MutableLiveData<Result<MailListResponse>> resultLiveData) {
         final int MAIL_LIMIT = 50;
-        // fetch cached mails
-        io.execute(() -> {
-            List<MailEntity> cached = getLocalByType(inboxType);
-            if (!cached.isEmpty()) {
-                localData.touchMails(idsOf(cached));  // also Room -> keep in background
-                resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(cached)));
-            } else {
-                if (NetworkUtil.isOnline(context))
-                    resultLiveData.postValue(new Result.Loading<>());
-                else
-                    resultLiveData.postValue(new Result.Success<>(
-                            mapLocalToListResponse(Collections.emptyList())));
-            }
-        });
-        // skip if not connected to internet
-        if (!NetworkUtil.isOnline(context))
-            return;
-        // attempt calling the backend
-        mailApi.getMailsByType(inboxType, page, MAIL_LIMIT).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<MailListResponse> call, @NonNull Response<MailListResponse> resp) {
-                if (!resp.isSuccessful() || resp.body() == null) {
-                    // we already emitted cache - only error if there was none
-                    io.execute(() -> {
-                        if (getLocalByType(inboxType).isEmpty())
-                            resultLiveData.postValue(new Result.Error<>("Error: " + resp.code()));
-                    });
-                    return;
-                }
-                // Room writes/reads off main
-                io.execute(() -> {
-                    upsertServerMails(resp.body().getMails());
-                    List<MailEntity> now = getLocalByType(inboxType);
-                    localData.touchMails(idsOf(now));
-                    resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(now)));
-                });
-            }
+        if (NetworkUtil.isOnline(context)) { // online - use backend
+            resultLiveData.postValue(new Result.Loading<>());
 
-            @Override
-            public void onFailure(@NonNull Call<MailListResponse> call, @NonNull Throwable t) {
-                io.execute(() -> {
-                    if (getLocalByType(inboxType).isEmpty()) {
-                        resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-                    }
-                });
-            }
-        });
+            mailApi.getMailsByType(inboxType, page, MAIL_LIMIT).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<MailListResponse> call, @NonNull Response<MailListResponse> resp) {
+                    io.execute(() -> {
+                        if (resp.isSuccessful() && resp.body() != null) {
+                            // Update cache with fresh network data
+                            updateCacheWithNetworkData(resp.body().getMails(), inboxType);
+                            List<MailEntity> freshData = getLocalByType(inboxType);
+                            resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(freshData)));
+                        } else {
+                            // Network failed, fall back to cache
+                            handleNetworkFailureWithCacheFallback(inboxType, resultLiveData, "Error: " + resp.code());
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<MailListResponse> call, @NonNull Throwable t) {
+                    io.execute(() -> handleNetworkFailureWithCacheFallback(inboxType, resultLiveData, t.getMessage()));
+                }
+            });
+        } else { // offline - use cached mails
+            io.execute(() -> {
+                List<MailEntity> cached = getLocalByType(inboxType);
+                if (!cached.isEmpty()) {
+                    resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(cached)));
+                } else {
+                    resultLiveData.postValue(new Result.Error<>("No cached data available offline"));
+                }
+            });
+        }
+    }
+
+    /**
+     * Handle network failure by falling back to cache
+     */
+    private void handleNetworkFailureWithCacheFallback(
+            String inboxType,
+            MutableLiveData<Result<MailListResponse>> resultLiveData,
+            String errorMessage) {
+        List<MailEntity> cached = getLocalByType(inboxType);
+        if (!cached.isEmpty()) {
+            // Show cached data but indicate it might be stale
+            resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(cached)));
+        } else {
+            resultLiveData.postValue(new Result.Error<>(errorMessage));
+        }
+    }
+
+    /**
+     * Update cache with fresh network data and handle conflicts properly
+     */
+    private void updateCacheWithNetworkData(List<Mail> networkMails, String inboxType) {
+        if (networkMails == null || networkMails.isEmpty()) {
+            // If network returns empty, consider clearing stale cache for this inbox type
+            clearCacheForInboxType(inboxType);
+            return;
+        }
+
+        // Clear existing cache for this inbox type to avoid stale data
+        clearCacheForInboxType(inboxType);
+
+        // Insert fresh network data
+        upsertServerMails(networkMails);
+    }
+
+    /**
+     * Clear cache entries for specific inbox type to prevent stale data
+     */
+    private void clearCacheForInboxType(String inboxType) {
+        switch ((inboxType == null ? "incoming" : inboxType).toLowerCase()) {
+            case "sent":
+                localData.clearSent();
+                break;
+            case "star":
+                localData.clearStarred();
+                break;
+            case "draft":
+                localData.clearDrafts();
+                break;
+            case "spam":
+                localData.clearSpam();
+                break;
+            case "trash":
+                localData.clearTrash();
+                break;
+            case "incoming":
+            case "all":
+            default:
+                localData.clearIncoming();
+                break;
+        }
     }
 
     /**
@@ -236,49 +279,56 @@ public class MailRepository {
      */
     public void getMailsByLabel(int labelId, int page, MutableLiveData<Result<MailListResponse>> resultLiveData) {
         final int MAIL_LIMIT = 50;
-        // cache first
-        io.execute(() -> {
-            List<MailEntity> cached = localData.getByLabel(labelId);
-            if (!cached.isEmpty()) {
-                localData.touchMails(idsOf(cached));
-                resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(cached)));
-            } else {
-                if (NetworkUtil.isOnline(context))
-                    resultLiveData.postValue(new Result.Loading<>());
-                else
-                    resultLiveData.postValue(new Result.Loading<>());
-            }
-        });
-        // skip if not connected to internet
-        if (!NetworkUtil.isOnline(context))
-            return;
-        // attempt calling the backend
-        mailApi.getMailsByLabel(labelId, page, MAIL_LIMIT).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<MailListResponse> call, @NonNull Response<MailListResponse> resp) {
-                if (!resp.isSuccessful() || resp.body() == null) {
-                    io.execute(() -> {
-                        if (localData.getByLabel(labelId).isEmpty())
-                            resultLiveData.postValue(new Result.Error<>("Error: " + resp.code()));
-                    });
-                    return;
-                }
-                io.execute(() -> {
-                    upsertServerMails(resp.body().getMails());
-                    List<MailEntity> now = localData.getByLabel(labelId);
-                    localData.touchMails(idsOf(now));
-                    resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(now)));
-                });
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<MailListResponse> call, @NonNull Throwable t) {
-                io.execute(() -> {
-                    if (localData.getByLabel(labelId).isEmpty())
-                        resultLiveData.postValue(new Result.Error<>(t.getMessage()));
-                });
-            }
-        });
+        if (NetworkUtil.isOnline(context)) {
+            resultLiveData.postValue(new Result.Loading<>());
+
+            mailApi.getMailsByLabel(labelId, page, MAIL_LIMIT).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<MailListResponse> call, @NonNull Response<MailListResponse> resp) {
+                    io.execute(() -> {
+                        if (resp.isSuccessful() && resp.body() != null) {
+                            // Clear stale cache for this label
+                            localData.clearByLabel(labelId);
+                            // Update with fresh data
+                            upsertServerMails(resp.body().getMails());
+                            List<MailEntity> freshData = localData.getByLabel(labelId);
+                            resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(freshData)));
+                        } else {
+                            // Network failed, fall back to cache
+                            List<MailEntity> cached = localData.getByLabel(labelId);
+                            if (!cached.isEmpty()) {
+                                resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(cached)));
+                            } else {
+                                resultLiveData.postValue(new Result.Error<>("Error: " + resp.code()));
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<MailListResponse> call, @NonNull Throwable t) {
+                    io.execute(() -> {
+                        List<MailEntity> cached = localData.getByLabel(labelId);
+                        if (!cached.isEmpty()) {
+                            resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(cached)));
+                        } else {
+                            resultLiveData.postValue(new Result.Error<>(t.getMessage()));
+                        }
+                    });
+                }
+            });
+        } else {
+            // Offline mode
+            io.execute(() -> {
+                List<MailEntity> cached = localData.getByLabel(labelId);
+                if (!cached.isEmpty()) {
+                    resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(cached)));
+                } else {
+                    resultLiveData.postValue(new Result.Error<>("No cached data available offline"));
+                }
+            });
+        }
     }
 
     /**
@@ -339,7 +389,26 @@ public class MailRepository {
      */
     public void deleteMail(int mailId, MutableLiveData<Result<Void>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-        mailApi.deleteMail(mailId).enqueue(createCallback(resultLiveData));
+
+        mailApi.deleteMail(mailId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                io.execute(() -> {
+                    if (response.isSuccessful()) {
+                        // Remove from cache immediately
+                        localData.deleteMailById(mailId);
+                        resultLiveData.postValue(new Result.Success<>(null));
+                    } else {
+                        resultLiveData.postValue(new Result.Error<>("Error: " + response.code()));
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
+            }
+        });
     }
 
     /**

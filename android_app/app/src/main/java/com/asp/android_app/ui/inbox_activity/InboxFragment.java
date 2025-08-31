@@ -36,10 +36,14 @@ import com.asp.android_app.utils.Result;
 import com.asp.android_app.viewmodel.LabelViewModel;
 import com.asp.android_app.viewmodel.MailViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.ImageView;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +67,13 @@ public class InboxFragment extends Fragment {
                     }
                 }
             });
+
+    private LinearLayout emptyStateContainer;
+    private TextView emptyStateTitle;
+    private TextView emptyStateSubtitle;
+    private ImageView emptyStateIcon;
+    private MaterialButton emptyStateActionButton;
+    private MaterialButton emptyStateRefreshButton;
 
     @Nullable
     @Override
@@ -112,6 +123,7 @@ public class InboxFragment extends Fragment {
         );
         recyclerView.setAdapter(mailAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        initializeEmptyState(view);
 
         // initialize the swiping down for refresh
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
@@ -125,6 +137,133 @@ public class InboxFragment extends Fragment {
         observeViewModel(swipeRefreshLayout);
 
         return view;
+    }
+
+    /**
+     * initializes the alternative view of an empty inbox, showing dynamic message depending on the
+     * inbox's type
+     * @param view root view object
+     */
+    private void initializeEmptyState(View view) {
+        emptyStateContainer = view.findViewById(R.id.empty_state_container);
+        emptyStateTitle = view.findViewById(R.id.empty_state_title);
+        emptyStateSubtitle = view.findViewById(R.id.empty_state_subtitle);
+        emptyStateIcon = view.findViewById(R.id.empty_state_icon);
+        emptyStateActionButton = view.findViewById(R.id.empty_state_action_button);
+        emptyStateRefreshButton = view.findViewById(R.id.empty_state_refresh_button);
+
+        // Set up refresh button click listener
+        emptyStateRefreshButton.setOnClickListener(v -> {
+            String loadInbox = inboxType;
+            if (loadInbox == null || loadInbox.isBlank()) {
+                loadInbox = "incoming";
+            }
+            mailViewModel.loadMails(loadInbox);
+        });
+
+        // Set up action button click listener (for compose)
+        emptyStateActionButton.setOnClickListener(v -> {
+            // Trigger the compose action - you might want to reference your composeLauncher here
+            // For now, we'll make it trigger the FAB click
+            Activity activity = getActivity();
+            if (activity != null) {
+                FloatingActionButton fab = activity.findViewById(R.id.fabCompose);
+                if (fab != null) {
+                    fab.performClick();
+                }
+            }
+        });
+    }
+
+    /**
+     * updates the content according to the inbox's type and state
+     * @param inboxType inbox's type
+     */
+    private void updateEmptyStateContent(String inboxType) {
+        if (emptyStateTitle == null || emptyStateSubtitle == null || emptyStateIcon == null) {
+            return;
+        }
+
+        switch (inboxType) {
+            case "incoming":
+                emptyStateTitle.setText(R.string.empty_inbox_title);
+                emptyStateSubtitle.setText(R.string.empty_inbox_subtitle);
+                emptyStateIcon.setImageResource(R.drawable.ic_mail);
+                emptyStateActionButton.setVisibility(VISIBLE);
+                emptyStateActionButton.setText(R.string.compose_new_mail);
+                break;
+
+            case "sent":
+                emptyStateTitle.setText(R.string.empty_sent_title);
+                emptyStateSubtitle.setText(R.string.empty_sent_subtitle);
+                emptyStateIcon.setImageResource(R.drawable.ic_send);
+                emptyStateActionButton.setVisibility(VISIBLE);
+                emptyStateActionButton.setText(R.string.compose_new_mail);
+                break;
+
+            case "draft":
+                emptyStateTitle.setText(R.string.empty_draft_title);
+                emptyStateSubtitle.setText(R.string.empty_draft_subtitle);
+                emptyStateIcon.setImageResource(R.drawable.ic_draft);
+                emptyStateActionButton.setVisibility(VISIBLE);
+                emptyStateActionButton.setText(R.string.compose_new_mail);
+                break;
+
+            case "star":
+                emptyStateTitle.setText(R.string.empty_starred_title);
+                emptyStateSubtitle.setText(R.string.empty_starred_subtitle);
+                emptyStateIcon.setImageResource(R.drawable.ic_star_outline);
+                emptyStateActionButton.setVisibility(GONE);
+                break;
+
+            case "trash":
+                emptyStateTitle.setText(R.string.empty_trash_title);
+                emptyStateSubtitle.setText(R.string.empty_trash_subtitle);
+                emptyStateIcon.setImageResource(R.drawable.ic_delete);
+                emptyStateActionButton.setVisibility(GONE);
+                break;
+
+            case "spam":
+                emptyStateTitle.setText(R.string.empty_spam_title);
+                emptyStateSubtitle.setText(R.string.empty_spam_subtitle);
+                emptyStateIcon.setImageResource(R.drawable.ic_report);
+                emptyStateActionButton.setVisibility(GONE);
+                break;
+
+            case "all":
+                emptyStateTitle.setText(R.string.empty_all_title);
+                emptyStateSubtitle.setText(R.string.empty_all_subtitle);
+                emptyStateIcon.setImageResource(R.drawable.ic_mail);
+                emptyStateActionButton.setVisibility(VISIBLE);
+                emptyStateActionButton.setText(R.string.compose_new_mail);
+                break;
+
+            default:
+                if (inboxType.startsWith("label:")) {
+                    emptyStateTitle.setText(R.string.empty_label_title);
+                    emptyStateSubtitle.setText(R.string.empty_label_subtitle);
+                    emptyStateIcon.setImageResource(R.drawable.ic_label);
+                    emptyStateActionButton.setVisibility(GONE);
+                } else {
+                    emptyStateTitle.setText(R.string.empty_inbox_title);
+                    emptyStateSubtitle.setText(R.string.empty_inbox_subtitle);
+                    emptyStateIcon.setImageResource(R.drawable.ic_mail);
+                    emptyStateActionButton.setVisibility(VISIBLE);
+                    emptyStateActionButton.setText(R.string.compose_new_mail);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Toggles between an empty inbox state view and the regular
+     * @param isEmpty true if should show the empty inbox UI, otherwise will show the inbox
+     */
+    private void toggleEmptyState(boolean isEmpty) {
+        if (emptyStateContainer != null) {
+            emptyStateContainer.setVisibility(isEmpty ? VISIBLE : GONE);
+            updateEmptyStateContent(inboxType);
+        }
     }
 
     private void showSnack(@androidx.annotation.StringRes int resId) {
@@ -147,15 +286,20 @@ public class InboxFragment extends Fragment {
             if (result instanceof Result.Loading) {
                 Log.i("loadMails", inboxType);
                 swipeRefreshLayout.setRefreshing(true);
+                toggleEmptyState(false);
             } else if (result instanceof Result.Success) {
                 MailListResponse mails = ((Result.Success<MailListResponse>) result).getData();
                 mailAdapter.setMailList(mails.getMails());
                 swipeRefreshLayout.setRefreshing(false);
+                // Show empty state if no mails
+                boolean isEmpty = mails.getMails() == null || mails.getMails().isEmpty();
+                toggleEmptyState(isEmpty);
             } else if (result instanceof Result.Error) {
                 swipeRefreshLayout.setRefreshing(false);
                 String msg = ((Result.Error<?>) result).getMessage();
                 Log.i("err", msg);
                 Toast.makeText(getContext(), getResources().getString(R.string.err_mails_load) + msg, Toast.LENGTH_LONG).show();
+                // Don't show empty state on error, just leave current state
             }
         });
 
@@ -173,10 +317,23 @@ public class InboxFragment extends Fragment {
         mailViewModel.getSearchData().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Loading) {
                 swipeRefreshLayout.setRefreshing(true);
+                toggleEmptyState(false);
             } else if (result instanceof Result.Success) {
                 List<Mail> mails = ((Result.Success<List<Mail>>) result).getData();
                 mailAdapter.setMailList(mails);
                 swipeRefreshLayout.setRefreshing(false);
+                // Show empty state if no search results
+                boolean isEmpty = mails == null || mails.isEmpty();
+                if (isEmpty) {
+                    // For search results, show a different empty state
+                    emptyStateTitle.setText(R.string.no_search_results);
+                    emptyStateSubtitle.setText(R.string.no_search_results_subtitle);
+                    emptyStateIcon.setImageResource(R.drawable.ic_search);
+                    emptyStateActionButton.setVisibility(GONE);
+                    emptyStateContainer.setVisibility(VISIBLE);
+                } else {
+                    toggleEmptyState(false);
+                }
             } else if (result instanceof Result.Error) {
                 swipeRefreshLayout.setRefreshing(false);
                 String msg = ((Result.Error<?>) result).getMessage();
