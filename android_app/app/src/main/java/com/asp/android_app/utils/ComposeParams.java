@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
 
-import com.asp.android_app.model.response.Attachment;
+import com.asp.android_app.model.response.File;
 import com.asp.android_app.model.response.UserInfo;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class ComposeParams implements Parcelable {
     /**
      * files to pre-fill (for Forward)
      */
-    public ArrayList<Attachment> attachments = new ArrayList<>();
+    public ArrayList<File> files = new ArrayList<>();
 
     /**
      * flags for analytics/debug if needed
@@ -49,7 +49,7 @@ public class ComposeParams implements Parcelable {
         recipients = in.createTypedArrayList(UserInfo.CREATOR);
         subject = in.readString();
         quotedHtml = in.readString();
-        attachments = in.createTypedArrayList(Attachment.CREATOR);
+        files = in.createTypedArrayList(File.CREATOR);
         isReply = in.readByte() != 0;
         isForward = in.readByte() != 0;
     }
@@ -76,7 +76,7 @@ public class ComposeParams implements Parcelable {
         dest.writeTypedList(recipients);
         dest.writeString(subject);
         dest.writeString(quotedHtml);
-        dest.writeTypedList(attachments);
+        dest.writeTypedList(files);
         dest.writeByte((byte) (isReply ? 1 : 0));
         dest.writeByte((byte) (isForward ? 1 : 0));
     }

@@ -81,6 +81,14 @@ public class User {
         return mail;
     }
 
+    public String getDateOfBirth() {
+        return this.dateOfBirth;
+    }
+
+    public String getImage() {
+        return this.image;
+    }
+
     /**
      * @param mail the email address to set
      */

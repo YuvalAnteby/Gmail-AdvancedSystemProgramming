@@ -4,7 +4,7 @@ import com.asp.android_app.caching.entities.MailEntity;
 import com.asp.android_app.caching.entities.UserLite;
 import com.asp.android_app.model.Label;
 import com.asp.android_app.model.Mail;
-import com.asp.android_app.model.response.Attachment;
+import com.asp.android_app.model.response.File;
 import com.asp.android_app.model.response.UserInfo;
 import com.google.gson.Gson;
 
@@ -26,7 +26,8 @@ public final class MailMappers {
     public static MailEntity toEntity(Mail m) {
         MailEntity e = new MailEntity();
         e.id = m.getId();
-        e.ownerId = m.getSender() != null ? m.getSender().getId() : 0; // server stores owner separately; we keep sender id for "sent" check using fromId==ownerId
+        e.ownerId = m.getSender() != null ? m.getSender().getId() : 0;
+
         // sender
         UserInfo from = m.getSender();
         e.fromId = (from != null ? from.getId() : 0);
@@ -37,20 +38,18 @@ public final class MailMappers {
         e.subject = m.getSubject();
         e.body = m.getBody();
 
-        e.sentAtRaw = m.getSentAt();           // can be null/empty
-        e.createdAtRaw = m.getSentAt() == null ? "" : m.getSentAt(); // if you also expose createdAt in model, swap here
-        // you have createdAt in Mail; let's parse both
-        e.createdAtRaw = m.getClass().getDeclaredFields() != null ? (m.getClass() != null ? m.getClass().getName() : "") : e.createdAtRaw; // noop to avoid warnings
-        // actually parse safely:
+        e.sentAtRaw = m.getSentAt();
         e.sentAtEpoch = parseIsoToEpoch(m.getSentAt());
-        // createdAt exists in Mail class:
+
+        // Handle createdAt properly
         try {
             java.lang.reflect.Method getCreatedAt = m.getClass().getMethod("getCreatedAt");
             Object raw = getCreatedAt.invoke(m);
             e.createdAtRaw = raw != null ? raw.toString() : "";
             e.createdAtEpoch = parseIsoToEpoch(e.createdAtRaw);
         } catch (Exception ignore) {
-            e.createdAtEpoch = 0L;
+            e.createdAtRaw = e.sentAtRaw; // fallback
+            e.createdAtEpoch = e.sentAtEpoch;
         }
 
         e.isDraft = m.isDraft();
@@ -68,18 +67,65 @@ public final class MailMappers {
         }
         e.recipientsJson = gson.toJson(recips);
 
-        // attachment names only
-        List<String> names = new ArrayList<>();
-        if (m.getAttachments() != null) {
-            for (Attachment a : m.getAttachments()) {
-                names.add(a.getName());
-            }
-        }
-        e.attachmentNamesJson = gson.toJson(names);
+        // FIXED: Store complete File objects instead of just names
+        e.attachmentsJson = gson.toJson(m.getAttachments() != null ? m.getAttachments() : new ArrayList<>());
 
         // default LRU timestamp now
         e.lastAccessEpoch = System.currentTimeMillis();
         return e;
+    }
+
+    /**
+     * Convert MailEntity back to Mail object with complete attachment information
+     */
+    public static Mail fromEntity(MailEntity e) {
+        Mail m = new Mail();
+        m.setId(e.id);
+
+        // Reconstruct sender
+        UserInfo sender = new UserInfo(e.fromEmail, e.fromName);
+        try {
+            java.lang.reflect.Field fId = sender.getClass().getDeclaredField("id");
+            fId.setAccessible(true);
+            fId.set(sender, e.fromId);
+            java.lang.reflect.Field fImg = sender.getClass().getDeclaredField("image");
+            fImg.setAccessible(true);
+            fImg.set(sender, e.fromImageUrl);
+        } catch (Exception ignore) {}
+
+        m.setSubject(e.subject);
+        m.setBody(e.body);
+
+        // Set dates
+        try {
+            java.lang.reflect.Field fSentAt = m.getClass().getDeclaredField("sentAt");
+            fSentAt.setAccessible(true);
+            fSentAt.set(m, e.sentAtRaw);
+            java.lang.reflect.Field fCreatedAt = m.getClass().getDeclaredField("createdAt");
+            fCreatedAt.setAccessible(true);
+            fCreatedAt.set(m, e.createdAtRaw);
+            java.lang.reflect.Field fFrom = m.getClass().getDeclaredField("from");
+            fFrom.setAccessible(true);
+            fFrom.set(m, sender);
+        } catch (Exception ignore) {}
+
+        // flags
+        m.setIsRead(e.isRead);
+        m.setStarred(e.isStarred);
+        m.setTrashed(e.isTrashed);
+        m.setSpam(e.isSpam);
+        m.setIsDraft(e.isDraft);
+
+        // FIXED: Reconstruct complete attachments from JSON
+        try {
+            java.lang.reflect.Type fileListType = new com.google.gson.reflect.TypeToken<List<File>>(){}.getType();
+            List<File> attachments = gson.fromJson(e.attachmentsJson, fileListType);
+            m.setAttachments(attachments != null ? attachments : new ArrayList<>());
+        } catch (Exception ignore) {
+            m.setAttachments(new ArrayList<>());
+        }
+
+        return m;
     }
 
     public static List<Integer> labelIds(List<Label> labels) {

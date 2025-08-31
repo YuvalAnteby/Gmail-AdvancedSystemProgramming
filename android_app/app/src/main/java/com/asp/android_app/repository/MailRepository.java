@@ -11,6 +11,7 @@ import com.asp.android_app.caching.MailLocalDataSource;
 import com.asp.android_app.caching.entities.LabelEntity;
 import com.asp.android_app.caching.entities.MailEntity;
 import com.asp.android_app.caching.entities.MailLabelCrossRef;
+import com.asp.android_app.caching.entities.UserLite;
 import com.asp.android_app.caching.utils.LabelMappers;
 import com.asp.android_app.caching.utils.MailMappers;
 import com.asp.android_app.model.Label;
@@ -22,6 +23,7 @@ import com.asp.android_app.model.response.MailListResponse;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.utils.NetworkUtil;
 import com.asp.android_app.utils.Result;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -46,6 +48,8 @@ public class MailRepository {
     private final ExecutorService io;
     private final Context context;
 
+    private final int MAIL_LIMIT = 50;
+
     public MailRepository(Context context) {
         this.context = context;
         io = Executors.newSingleThreadExecutor();
@@ -63,8 +67,8 @@ public class MailRepository {
     }
 
     /**
-     * Converts Room MailEntity to network Mail (minimal for list screen).
-     * Keeping only necessary fields: sender name+email+image, subject, body, flags, dates, id.
+     * Converts Room MailEntity to network Mail (includes attachments and recipients).
+     * Now properly reconstructs attachments from cached JSON data.
      *
      * @return list of mails in Mail object instead of cache object
      */
@@ -73,6 +77,7 @@ public class MailRepository {
         for (MailEntity e : es) {
             Mail m = new Mail();
             m.setId(e.id);
+
             // sender
             UserInfo sender = new UserInfo(e.fromEmail, e.fromName);
             try {
@@ -106,7 +111,40 @@ public class MailRepository {
             m.setTrashed(e.isTrashed);
             m.setSpam(e.isSpam);
             m.setIsDraft(e.isDraft);
-            // we skip recipients/attachments for list; detail fetch can fill them
+
+            // FIXED: Reconstruct recipients from JSON
+            try {
+                java.lang.reflect.Type userLiteListType = new com.google.gson.reflect.TypeToken<List<UserLite>>(){}.getType();
+                List<UserLite> recipients = new Gson().fromJson(e.recipientsJson, userLiteListType);
+                if (recipients != null && !recipients.isEmpty()) {
+                    List<UserInfo> sentTo = new ArrayList<>();
+                    for (UserLite lite : recipients) {
+                        UserInfo recipient = new UserInfo(lite.mail, lite.fullName);
+                        try {
+                            java.lang.reflect.Field rId = recipient.getClass().getDeclaredField("id");
+                            rId.setAccessible(true);
+                            rId.set(recipient, lite.id);
+                            java.lang.reflect.Field rImg = recipient.getClass().getDeclaredField("image");
+                            rImg.setAccessible(true);
+                            rImg.set(recipient, lite.imageUrl);
+                        } catch (Exception ignore) {}
+                        sentTo.add(recipient);
+                    }
+                    m.setSentTo(sentTo);
+                }
+            } catch (Exception ignore) {
+                m.setSentTo(new ArrayList<>());
+            }
+
+            // FIXED: Reconstruct complete attachments from JSON instead of skipping them
+            try {
+                java.lang.reflect.Type fileListType = new com.google.gson.reflect.TypeToken<List<com.asp.android_app.model.response.File>>(){}.getType();
+                List<com.asp.android_app.model.response.File> attachments = new Gson().fromJson(e.attachmentsJson, fileListType);
+                m.setAttachments(attachments != null ? attachments : new ArrayList<>());
+            } catch (Exception ignore) {
+                m.setAttachments(new ArrayList<>());
+            }
+
             out.add(m);
         }
         return out;
@@ -172,7 +210,6 @@ public class MailRepository {
      * @param resultLiveData a LiveData object to observe result (mail list)
      */
     public void getMailsByType(String inboxType, int page, MutableLiveData<Result<MailListResponse>> resultLiveData) {
-        final int MAIL_LIMIT = 50;
         if (NetworkUtil.isOnline(context)) { // online - use backend
             resultLiveData.postValue(new Result.Loading<>());
 
@@ -182,9 +219,10 @@ public class MailRepository {
                     io.execute(() -> {
                         if (resp.isSuccessful() && resp.body() != null) {
                             // Update cache with fresh network data
-                            updateCacheWithNetworkData(resp.body().getMails(), inboxType);
-                            List<MailEntity> freshData = getLocalByType(inboxType);
-                            resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(freshData)));
+                            updateCacheWithNetworkData(resp.body().getMails(), inboxType, page);
+                            resultLiveData.postValue(new Result.Success<>(resp.body()));
+                            //List<MailEntity> freshData = getLocalByType(inboxType);
+                            //resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(freshData)));
                         } else {
                             // Network failed, fall back to cache
                             handleNetworkFailureWithCacheFallback(inboxType, resultLiveData, "Error: " + resp.code());
@@ -228,16 +266,12 @@ public class MailRepository {
     /**
      * Update cache with fresh network data and handle conflicts properly
      */
-    private void updateCacheWithNetworkData(List<Mail> networkMails, String inboxType) {
-        if (networkMails == null || networkMails.isEmpty()) {
-            // If network returns empty, consider clearing stale cache for this inbox type
-            clearCacheForInboxType(inboxType);
-            return;
-        }
-
+    private void updateCacheWithNetworkData(List<Mail> networkMails, String inboxType, int page) {
+        if (networkMails == null)
+            networkMails = new ArrayList<>();
         // Clear existing cache for this inbox type to avoid stale data
-        clearCacheForInboxType(inboxType);
-
+        if (page == 1)
+            clearCacheForInboxType(inboxType);
         // Insert fresh network data
         upsertServerMails(networkMails);
     }
@@ -278,7 +312,6 @@ public class MailRepository {
      * @param resultLiveData LiveData object to observe result
      */
     public void getMailsByLabel(int labelId, int page, MutableLiveData<Result<MailListResponse>> resultLiveData) {
-        final int MAIL_LIMIT = 50;
 
         if (NetworkUtil.isOnline(context)) {
             resultLiveData.postValue(new Result.Loading<>());
@@ -289,11 +322,14 @@ public class MailRepository {
                     io.execute(() -> {
                         if (resp.isSuccessful() && resp.body() != null) {
                             // Clear stale cache for this label
-                            localData.clearByLabel(labelId);
-                            // Update with fresh data
+                            if (page == 1) localData.clearByLabel(labelId);
                             upsertServerMails(resp.body().getMails());
-                            List<MailEntity> freshData = localData.getByLabel(labelId);
-                            resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(freshData)));
+
+                            // Update with fresh data
+                            resultLiveData.postValue(new Result.Success<>(resp.body()));
+                            //upsertServerMails(resp.body().getMails());
+                            //List<MailEntity> freshData = localData.getByLabel(labelId);
+                            //resultLiveData.postValue(new Result.Success<>(mapLocalToListResponse(freshData)));
                         } else {
                             // Network failed, fall back to cache
                             List<MailEntity> cached = localData.getByLabel(labelId);

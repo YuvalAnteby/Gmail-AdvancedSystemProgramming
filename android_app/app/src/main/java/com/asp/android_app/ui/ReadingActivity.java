@@ -40,7 +40,7 @@ import com.asp.android_app.R;
 import com.asp.android_app.model.Label;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.SpamRequest;
-import com.asp.android_app.model.response.Attachment;
+import com.asp.android_app.model.response.File;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.ui.compose_activity.ComposeMailActivity;
 import com.asp.android_app.utils.ComposeNavigation;
@@ -334,8 +334,8 @@ public class ReadingActivity extends AppCompatActivity {
         }
 
         // if there are no attachments - hide the header
-        List<Attachment> attachments = mail.getAttachments();
-        if (attachments == null || attachments.isEmpty()) {
+        List<File> files = mail.getAttachments();
+        if (files == null || files.isEmpty()) {
             attachmentsContainer.setVisibility(GONE);
         } else {
             attachmentsContainer.setVisibility(View.VISIBLE);
@@ -346,22 +346,22 @@ public class ReadingActivity extends AppCompatActivity {
     /**
      * Shows mail attachments as a horizontal list
      *
-     * @param attachments list of attachments in mail
+     * @param files list of attachments in mail
      */
-    private void showAttachments(List<Attachment> attachments) {
+    private void showAttachments(List<File> files) {
         LinearLayout attachmentsLayout = findViewById(R.id.attachmentsLayout);
         attachmentsLayout.removeAllViews(); // Clear any previous ones
-        for (Attachment attachment : attachments) {
+        for (File file : files) {
             View attachmentView = getLayoutInflater().inflate(R.layout.attachment_item, attachmentsLayout, false);
             TextView fileName = attachmentView.findViewById(R.id.attachment_name);
             ImageView thumbnail = attachmentView.findViewById(R.id.attachment_thumbnail);
             // set resources
-            fileName.setText(attachment.getName());
-            int iconRes = getFileIconResource(attachment.getName());
+            fileName.setText(file.getName());
+            int iconRes = getFileIconResource(file.getName());
             thumbnail.setImageResource(iconRes);
             // cache and preview on click
             attachmentView.setOnClickListener(v -> {
-                openFile(attachment.getName(), attachment.getData());
+                openFile(file.getName(), file.getData());
             });
             attachmentsLayout.addView(attachmentView);
         }
@@ -495,7 +495,7 @@ public class ReadingActivity extends AppCompatActivity {
         params.subject = MailHtmlUtil.subjectForForward(mail.getSubject());
         params.quotedHtml = MailHtmlUtil.buildForwardQuotedHtml(mail);
         if (mail.getAttachments() != null)
-            params.attachments.addAll(mail.getAttachments());
+            params.files.addAll(mail.getAttachments());
         params.isForward = true;
 
         Intent i = ComposeMailActivity.newIntent(this, params);

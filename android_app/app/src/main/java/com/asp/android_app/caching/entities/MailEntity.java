@@ -1,3 +1,4 @@
+// Updated MailEntity.java
 package com.asp.android_app.caching.entities;
 
 import androidx.room.Entity;
@@ -8,7 +9,7 @@ import androidx.room.PrimaryKey;
  * Room cache model for a Mail.
  * - Denormalized for speed (flags directly on the row).
  * - We keep a few denormalized sender fields so lists render without joins.
- * - Recipients & attachment names are stored as JSON strings (simple & fast).
+ * - Recipients & attachment data are stored as JSON strings (simple & fast).
  * <p>
  * NOTE: We sort by sentAtEpoch (fallback to createdAtEpoch) to match backend's order.
  */
@@ -56,7 +57,7 @@ public class MailEntity {
 
     // JSON blobs to keep schema simple
     public String recipientsJson;      // List<UserLite> as JSON
-    public String attachmentNamesJson; // List<String> names only
+    public String attachmentsJson;     // CHANGED: Full File objects as JSON instead of just names
 
     // Bookkeeping for cache eviction (simple LRU)
     public long lastAccessEpoch;       // updated whenever we read/open

@@ -70,7 +70,7 @@
     <string name="logout_user">Logout</string>
 
     <!-- Strings used in mail reading page -->
-    <string name="attachments">Attachments:</string>
+    <string name="files">Attachments:</string>
     <string name="reply">Reply</string>
     <string name="forward">Forward</string>
     <string name="star_error">Failed to un/star</string>
@@ -78,7 +78,7 @@
     <string name="more_recipients">Sent to ▼</string>
     <string name="hide_recipients">Sent to ▲</string>
     <string name="no_recipients">to nobody</string>
-    <string name="attachment_desc">attachment</string>
+    <string name="attachment_desc">file</string>
     <string name="label">Label</string>
 
     <!-- Strings used in mail reading menus -->
@@ -95,10 +95,10 @@
     <string name="compose_body">Type message here</string>
     <string name="compose_send">Send</string>
     <string name="compose_save_draft">Save draft</string>
-    <string name="compose_add_attachment">Add attachment</string>
+    <string name="compose_add_attachment">Add file</string>
     <string name="compose_attachment_hint">You can pick multiple files</string>
     <string name="err_file_too_large">One of the files is too large</string>
-    <string name="err_attachment_failed">Failed to read an attachment</string>
+    <string name="err_attachment_failed">Failed to read an file</string>
     <string name="err_min_recipients">Need at least 1 recipient!</string>
     <string name="compose_saved_success">Draft saved!</string>
     <string name="compose_sent_success">Mail sent!</string>

@@ -2,7 +2,6 @@ package com.asp.android_app.repository;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -12,6 +11,7 @@ import com.asp.android_app.api.UserApi;
 import com.asp.android_app.model.User;
 import com.asp.android_app.model.request.LoginRequest;
 import com.asp.android_app.model.request.ProfileImageRequest;
+import com.asp.android_app.model.request.RegisterRequest;
 import com.asp.android_app.model.response.AuthResponse;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.model.response.UserSearchResult;
@@ -39,9 +39,10 @@ public class UserRepository {
         userApi.login(request).enqueue(createCallback(resultLiveData));
     }
 
-    public void register(User user, MutableLiveData<Result<AuthResponse>> resultLiveData) {
+    public void register(User u, MutableLiveData<Result<AuthResponse>> resultLiveData) {
         resultLiveData.postValue(new Result.Loading<>());
-        userApi.register(user).enqueue(createCallback(resultLiveData));
+        RegisterRequest req = new RegisterRequest(u);
+        userApi.register(req).enqueue(createCallback(resultLiveData));
     }
 
     public void validateToken(MutableLiveData<Result<AuthResponse>> resultLiveData) {
@@ -111,7 +112,7 @@ public class UserRepository {
                 if (response.isSuccessful()) {
                     liveData.postValue(new Result.Success<>(response.body()));
                 } else {
-                    liveData.postValue(new Result.Error<>("Error: " + response.code()));
+                    liveData.postValue(new Result.Error<>("Error: " + response.raw()));
                 }
             }
 

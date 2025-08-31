@@ -68,6 +68,10 @@ public class InboxFragment extends Fragment {
                 }
             });
 
+    private boolean isLoading = false;
+    private boolean hasMoreData = true;
+    private int PAGE_LIMIT = 50;
+
     private LinearLayout emptyStateContainer;
     private TextView emptyStateTitle;
     private TextView emptyStateSubtitle;
@@ -124,6 +128,7 @@ public class InboxFragment extends Fragment {
         recyclerView.setAdapter(mailAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         initializeEmptyState(view);
+        setupPaginationScrollListener(recyclerView);
 
         // initialize the swiping down for refresh
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
@@ -140,8 +145,54 @@ public class InboxFragment extends Fragment {
     }
 
     /**
+     * Sets up the pagination listeners to load in a 'lazy loading' way
+     *
+     * @param recyclerView the recycler view to load into
+     */
+    private void setupPaginationScrollListener(RecyclerView recyclerView) {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (layoutManager != null && !isLoading && hasMoreData && dy > 0) {
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+
+                    // Load more when we're 5 items from the bottom
+                    if ((visibleItemCount + firstVisibleItemPosition + 5) >= totalItemCount) {
+                        loadNextPage();
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Loads the next batch of mails
+     */
+    private void loadNextPage() {
+        if (isLoading || !hasMoreData) return;
+
+        isLoading = true;
+        if (inboxType.startsWith("label:")) {
+            int labelId = Integer.parseInt(inboxType.substring("label:".length()));
+            mailViewModel.nextPage("label:" + labelId);
+            mailViewModel.loadMoreMailsByLabel(labelId);
+            //mailViewModel.loadMailsByLabel(labelId);
+        } else {
+            mailViewModel.nextPage(inboxType);
+            mailViewModel.loadMoreMails(inboxType);
+            //mailViewModel.loadMails(inboxType);
+        }
+    }
+
+    /**
      * initializes the alternative view of an empty inbox, showing dynamic message depending on the
      * inbox's type
+     *
      * @param view root view object
      */
     private void initializeEmptyState(View view) {
@@ -177,6 +228,7 @@ public class InboxFragment extends Fragment {
 
     /**
      * updates the content according to the inbox's type and state
+     *
      * @param inboxType inbox's type
      */
     private void updateEmptyStateContent(String inboxType) {
@@ -257,6 +309,7 @@ public class InboxFragment extends Fragment {
 
     /**
      * Toggles between an empty inbox state view and the regular
+     *
      * @param isEmpty true if should show the empty inbox UI, otherwise will show the inbox
      */
     private void toggleEmptyState(boolean isEmpty) {
@@ -285,21 +338,46 @@ public class InboxFragment extends Fragment {
         mailViewModel.getMailsLiveData().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Loading) {
                 Log.i("loadMails", inboxType);
-                swipeRefreshLayout.setRefreshing(true);
-                toggleEmptyState(false);
+                if (!isLoading) {
+                    swipeRefreshLayout.setRefreshing(true);
+                    toggleEmptyState(false);
+                }
             } else if (result instanceof Result.Success) {
-                MailListResponse mails = ((Result.Success<MailListResponse>) result).getData();
-                mailAdapter.setMailList(mails.getMails());
+                MailListResponse response = ((Result.Success<MailListResponse>) result).getData();
+                List<Mail> newMails = response.getMails();
+                // stop loading state
+                isLoading = false;
+                mailViewModel.setLoadingMore(false);
                 swipeRefreshLayout.setRefreshing(false);
-                // Show empty state if no mails
-                boolean isEmpty = mails.getMails() == null || mails.getMails().isEmpty();
-                toggleEmptyState(isEmpty);
+
+                if (mailViewModel.getCurrentPage() == 1) {
+                    mailAdapter.setMailList(newMails);
+                    // Show empty state if no mails
+                    boolean isEmpty = newMails == null || newMails.isEmpty();
+                    toggleEmptyState(isEmpty);
+                } else {
+                    // Subsequent pages - append mails
+                    if (newMails != null && !newMails.isEmpty()) {
+                        mailAdapter.appendMails(newMails);
+                        hasMoreData = newMails.size() >= PAGE_LIMIT; // Assume no more data if less than limit
+                    } else {
+                        hasMoreData = false; // No more data available
+                    }
+                }
+
             } else if (result instanceof Result.Error) {
+                isLoading = false;
+                mailViewModel.setLoadingMore(false);
                 swipeRefreshLayout.setRefreshing(false);
+
                 String msg = ((Result.Error<?>) result).getMessage();
                 Log.i("err", msg);
                 Toast.makeText(getContext(), getResources().getString(R.string.err_mails_load) + msg, Toast.LENGTH_LONG).show();
                 // Don't show empty state on error, just leave current state
+
+                // If it was a pagination request that failed, decrement page
+                if (mailViewModel.getCurrentPage() > 1)
+                    mailViewModel.previousPage(inboxType);
             }
         });
 
@@ -410,6 +488,11 @@ public class InboxFragment extends Fragment {
         if (newInboxType == null)
             return;
         this.inboxType = newInboxType;
+        // reset pagination
+        isLoading = false;
+        hasMoreData = true;
+        mailViewModel.resetPage();
+
         if (inboxType.startsWith("label:")) {
             int labelId = Integer.parseInt(inboxType.substring("label:".length()));
             mailViewModel.loadMailsByLabel(labelId);

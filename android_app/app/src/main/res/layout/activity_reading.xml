@@ -188,7 +188,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="@string/attachments"
+                        android:text="@string/files"
                         android:textStyle="bold" />
 
                     <HorizontalScrollView
