@@ -13,7 +13,7 @@ public class InputValidation {
         if (name == null || name.trim().isEmpty())
             return false;
         // Regex: only letters, hyphens, and apostrophes (e.g., O'Connor, Anne-Marie)
-        String namePartRegex = "^[A-Za-zÀ-ÿ'-]+$";
+        String namePartRegex = "^[A-Za-zÀ-ÿ]+\\s[A-Za-zÀ-ÿ]+$";
         return name.matches(namePartRegex);
     }
 
