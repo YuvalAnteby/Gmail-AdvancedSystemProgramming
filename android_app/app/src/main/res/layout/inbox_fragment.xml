@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeRefreshLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Frame layout to overlay empty state over RecyclerView -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- RecyclerView for emails -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
+
+        <!-- Empty state view -->
+        <LinearLayout
+            android:id="@+id/empty_state_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <!-- Empty state illustration -->
+            <ImageView
+                android:id="@+id/empty_state_icon"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginBottom="24dp"
+                android:src="@drawable/ic_mail"
+                android:alpha="0.6"
+                android:contentDescription="@string/empty_inbox_icon" />
+
+            <!-- Main message -->
+            <TextView
+                android:id="@+id/empty_state_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/empty_inbox_title"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"
+                android:gravity="center"
+                android:fontFamily="sans-serif-medium" />
+
+            <!-- Subtitle message -->
+            <TextView
+                android:id="@+id/empty_state_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:text="@string/empty_inbox_subtitle"
+                android:textSize="16sp"
+                android:textColor="?android:attr/textColor"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:maxWidth="280dp" />
+
+            <!-- Action button (optional - shows only for certain inbox types) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/empty_state_action_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/compose_new_mail"
+                android:visibility="gone"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
+
+            <!-- Secondary action (refresh button) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/empty_state_refresh_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/refresh"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                app:icon="@drawable/ic_refresh"
+                app:iconGravity="textStart" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

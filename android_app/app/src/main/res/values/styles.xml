@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Login & signup screens styles -->
+    <style name="imgLogo">
+        <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+    <style name="imgAvatar">
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="tvAuth">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+    <style name="etLayoutAuth" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="boxBackgroundMode">outline</item>
+        <item name="boxStrokeColor">@color/react_blue</item>
+        <item name="hintTextColor">@color/react_blue</item>
+    </style>
+
+    <style name="btnPrimary">
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="backgroundTint">@color/react_light_blue</item>
+    </style>
+
+    <!-- Login & signup screens styles -->
+    <style name="btnSecondary">
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="elevation">0dp</item>
+        <item name="android:textColor">@color/react_light_blue</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
+    <!-- mail list styles -->
+    <style name="drawer_header_item">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <!-- mail row styles -->
+    <style name="cardMail">
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="elevation">4dp</item>
+
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="image_checkbox">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="tvSender">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+    </style>
+
+    <style name="tvSubject">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+    </style>
+
+    <style name="tvPreview">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="tvTime">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+        <item name="android:layout_marginStart">8dp</item>
+    </style>
+
+    <!-- custom toolbar styles -->
+    <style name="etSearchBar" parent="Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="boxBackgroundMode">filled</item>
+        <item name="boxCornerRadiusBottomStart">24dp</item>
+        <item name="boxCornerRadiusBottomEnd">24dp</item>
+        <item name="boxCornerRadiusTopStart">24dp</item>
+        <item name="boxCornerRadiusTopEnd">24dp</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="boxStrokeColor">@android:color/transparent</item>
+        <item name="endIconMode">custom</item>
+    </style>
+
+    <!-- reading page -->
+    <style name="tvRecipients">
+        <item name="android:autoLink">email</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:breakStrategy">simple</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+
+</resources>

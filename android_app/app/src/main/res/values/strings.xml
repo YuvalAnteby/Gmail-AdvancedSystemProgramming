@@ -1,0 +1,137 @@
+<resources>
+    <string name="app_name">Mail ASP</string>
+    <string name="base_url">http://10.0.2.2:3001/api/</string>
+    <string name="server_off">Server is down, try again later</string>
+    <string name="logo_description">Logo</string>
+    <string name="avatar_description">Profile Image</string>
+    <string name="unexpected_error">Unexpected Error, try again</string>
+    <string name="no_connection">No internet, please connect to wifi</string>
+
+    <!-- Strings used in login & signup pages -->
+    <string name="invalid_name">Invalid name</string>
+    <string name="invalid_email">Invalid email</string>
+    <string name="empty_password">No password given</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+
+    <!-- Strings used in signup page -->
+    <string name="empty_birth_date">No birth date given</string>
+    <string name="signup">Sign Up</string>
+    <string name="enter_name">Full name</string>
+    <string name="birth_date">Date of Birth (YYYY/MM/DD)</string>
+    <string name="invalid_birth_date">No way you\'re %d years old and signing up 🙄</string>
+    <!-- Strings used in login page -->
+    <string name="new_account">Create account</string>
+    <string name="wrong_input">Wrong mail or password</string>
+    <!-- Strings used in mail list page -->
+    <string name="compose_mail">Compose mail</string>
+    <string name="err_mails_load">Error loading mails</string>
+
+    <!-- Strings used in menus -->
+    <string name="hello_user">Hello %s</string>
+    <string name="menu_description">menu</string>
+    <string name="profile_image">Profile</string>
+
+    <!-- Strings used in drawer menu -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="all_mails">All Mails</string>
+    <string name="incoming_mails">Incoming</string>
+    <string name="sent_mails">Sent</string>
+    <string name="draft_mails">Drafts</string>
+    <string name="star_mails">Starred</string>
+    <string name="trash_mails">Trash</string>
+    <string name="spam_mails">Spam</string>
+    <string name="create_new_label">Create Label</string>
+
+    <!-- String related to labels -->
+    <string name="label_hint">Label name</string>
+    <string name="new_label">Create new label</string>
+    <string name="next">Next</string>
+    <string name="cancel">Cancel</string>
+    <string name="name_required_error">name is required</string>
+    <string name="create_label_as">Create as</string>
+    <string-array name="label_options">
+        <item>Root label</item>
+        <item>Choose parent</item>
+    </string-array>
+    <string name="pick_parent_label">Choose parent label</string>
+    <string name="apply">Apply</string>
+    <string name="choose_label">Choose labels</string>
+    <string name="labels_not_found">No labels found</string>
+
+    <!-- Strings used in toolbar -->
+    <string name="search_bar_hint">Search mail</string>
+    <string name="close_action_bar">Close toolbar</string>
+    <string name="mark_as_read">Mark as read</string>
+    <string name="user_settings">User settings</string>
+    <string name="change_picture">Change picture</string>
+    <string name="logout_user">Logout</string>
+
+    <!-- Strings used in mail reading page -->
+    <string name="attachments">Attachments:</string>
+    <string name="reply">Reply</string>
+    <string name="forward">Forward</string>
+    <string name="star_error">Failed to un/star</string>
+    <string name="sent_to">Sent to\n%s</string>
+    <string name="more_recipients">Sent to ▼</string>
+    <string name="hide_recipients">Sent to ▲</string>
+    <string name="no_recipients">to nobody</string>
+    <string name="attachment_desc">attachment</string>
+    <string name="label">Label</string>
+
+    <!-- Strings used in mail reading menus -->
+    <string name="delete_mail">Delete forever</string>
+    <string name="trash_mail">Trash</string>
+    <string name="restore_mail">Restore</string>
+    <string name="report_mail">Spam</string>
+    <string name="unspam_mail">Not spam</string>
+
+    <!-- Strings used in mail writing page -->
+    <string name="compose">Compose</string>
+    <string name="send_to">To</string>
+    <string name="compose_subject">Subject</string>
+    <string name="compose_body">Type message here</string>
+    <string name="compose_send">Send</string>
+    <string name="compose_save_draft">Save draft</string>
+    <string name="compose_add_attachment">Add attachment</string>
+    <string name="compose_attachment_hint">You can pick multiple files</string>
+    <string name="err_file_too_large">One of the files is too large</string>
+    <string name="err_attachment_failed">Failed to read an attachment</string>
+    <string name="err_min_recipients">Need at least 1 recipient!</string>
+    <string name="compose_saved_success">Draft saved!</string>
+    <string name="compose_sent_success">Mail sent!</string>
+
+        <!-- Empty state strings -->
+        <string name="empty_inbox_icon">Empty inbox illustration</string>
+        <string name="empty_inbox_title">Your inbox is empty</string>
+        <string name="empty_inbox_subtitle">When you receive new emails, they\'ll appear here.</string>
+
+        <string name="empty_sent_title">No sent emails</string>
+        <string name="empty_sent_subtitle">Emails you send will appear here.</string>
+
+        <string name="empty_draft_title">No drafts</string>
+        <string name="empty_draft_subtitle">Draft emails you save will be stored here.</string>
+
+        <string name="empty_starred_title">No starred emails</string>
+        <string name="empty_starred_subtitle">Star important emails to find them quickly here.</string>
+
+        <string name="empty_trash_title">Trash is empty</string>
+        <string name="empty_trash_subtitle">Deleted emails will be moved here for 30 days before permanent deletion.</string>
+
+        <string name="empty_spam_title">No spam emails</string>
+        <string name="empty_spam_subtitle">Suspicious emails are automatically moved here.</string>
+
+        <string name="empty_all_title">No emails found</string>
+        <string name="empty_all_subtitle">All your emails from all folders will appear here.</string>
+
+        <string name="empty_label_title">No labeled emails</string>
+        <string name="empty_label_subtitle">Emails with this label will appear here.</string>
+
+        <string name="no_search_results">No results found</string>
+        <string name="no_search_results_subtitle">Try adjusting your search terms or check spelling.</string>
+
+        <string name="compose_new_mail">Compose</string>
+        <string name="refresh">Refresh</string>
+</resources>

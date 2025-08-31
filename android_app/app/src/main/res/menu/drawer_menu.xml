@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/nav_group"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_all_mails"
+            android:icon="@drawable/ic_mail"
+            android:title="@string/all_mails" />
+
+        <item
+            android:id="@+id/nav_incoming"
+            android:checked="true"
+            android:icon="@drawable/ic_incoming"
+            android:title="@string/incoming_mails" />
+
+        <item
+            android:id="@+id/nav_sent"
+            android:icon="@drawable/ic_send"
+            android:title="@string/sent_mails" />
+
+        <item
+            android:id="@+id/nav_draft"
+            android:icon="@drawable/ic_draft"
+            android:title="@string/draft_mails" />
+
+        <item
+            android:id="@+id/nav_star"
+            android:icon="@drawable/ic_star_outline"
+            android:title="@string/star_mails" />
+
+        <item
+            android:id="@+id/nav_trash"
+            android:icon="@drawable/ic_delete"
+            android:title="@string/trash_mails" />
+
+        <item
+            android:id="@+id/nav_spam"
+            android:icon="@drawable/ic_report"
+            android:title="@string/spam_mails" />
+    </group>
+
+
+    <!-- This will be dynamically added to -->
+    <group android:id="@+id/nav_dynamic_labels_group" />
+
+    <item
+        android:id="@+id/nav_create_label"
+        android:icon="@drawable/ic_add"
+        android:title="@string/create_new_label" />
+
+</menu>
