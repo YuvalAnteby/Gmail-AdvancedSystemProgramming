@@ -19,13 +19,12 @@ function convertLabelsToIds(userId, labelsObjects) {
  * @param labelsIds array of labels' ids
  * @returns {*} array of labels elements
  */
-function labelsToFullElement(userId, labelsIds) {
-    if (!labelsIds)
-        return [];
-    const objects = labelsIds
-        .map(id => Labels.getLabelById(id, userId))
-        .filter(label => label);
-    return [...new Set(objects)];
+async function labelsToFullElement(userId, labelsIds) {
+    if (!labelsIds) return [];
+    const objects = await Promise.all(
+        labelsIds.map(async (id) => Labels.getLabelById(id, userId))
+    );
+    return [...new Set(objects.filter(Boolean))];
 }
 
 /**
@@ -33,11 +32,13 @@ function labelsToFullElement(userId, labelsIds) {
  * @param {Object} mail mail object
  * @returns {string[]} an array of lowercase label names for this mail.
  */
-const mailLabelNames = (userId, mail) => {
-    return (mail.labels || [])
-        .map(labelId => Labels.getLabelById(labelId, userId))
-        .filter(label => label && label.name)
-        .map(label => label.name.toLowerCase());
+const mailLabelNames = async (userId, mail) => {
+    const objs = await Promise.all(
+        (mail.labels || []).map((labelId) => Labels.getLabelById(labelId, userId))
+    );
+    return objs
+        .filter((label) => label && label.name)
+        .map((label) => label.name.toLowerCase());
 };
 
 module.exports = {convertLabelsToIds, labelsToFullElement, mailLabelNames}
