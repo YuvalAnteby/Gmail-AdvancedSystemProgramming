@@ -1,4 +1,15 @@
 services:
+  # MongoDB database
+  mongo:
+    profiles: ["web_app"]
+    image: mongo:6
+    container_name: mongo
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - gmail-net
   # React frontend
   web_front:
     profiles: ["web_app"]
@@ -26,6 +37,9 @@ services:
       - ./web_server/.env
     depends_on:
       - run_server
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/appdb
     ports:
       - "${NODE_PORT:-3001}:3001"
     networks:
@@ -91,6 +105,7 @@ services:
 
 volumes:
   app_data:
+  mongo_data:
 
 networks:
   gmail-net:
