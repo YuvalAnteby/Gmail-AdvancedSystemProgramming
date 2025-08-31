@@ -33,6 +33,7 @@ public class MailViewModel extends AndroidViewModel {
     private final MutableLiveData<Result<Void>> sendMailStatus = new MutableLiveData<>();
 
     private int currentPage = 1;
+    private boolean isLoadingMore = false;
 
     public MailViewModel(@NonNull Application application) {
         super(application);
@@ -60,17 +61,27 @@ public class MailViewModel extends AndroidViewModel {
     }
 
     /**
-     * Fetches mails for the given inbox type and current page.
+     *  Loads the first page of mails (replaces current list)
      *
      * @param inboxType the inbox type ("incoming", "sent", etc.)
      */
     public void loadMails(String inboxType) {
+        resetPage();
+        isLoadingMore = false;
+        mailRepository.getMailsByType(inboxType, currentPage, mailsListLiveData);
+    }
+
+    /**
+     * Loads more mails for pagination (appends to current list)
+     */
+    public void loadMoreMails(String inboxType) {
+        if (isLoadingMore) return;
+        isLoadingMore = true;
         mailRepository.getMailsByType(inboxType, currentPage, mailsListLiveData);
     }
 
     public void nextPage(String inboxType) {
         currentPage++;
-        loadMails(inboxType);
     }
 
     public void previousPage(String inboxType) {
@@ -84,6 +95,14 @@ public class MailViewModel extends AndroidViewModel {
 
     public void resetPage() {
         currentPage = 1;
+    }
+
+    public boolean isLoadingMore() {
+        return isLoadingMore;
+    }
+
+    public void setLoadingMore(boolean loading) {
+        isLoadingMore = loading;
     }
 
     /**
@@ -101,6 +120,16 @@ public class MailViewModel extends AndroidViewModel {
      * @param labelId the label ID
      */
     public void loadMailsByLabel(int labelId) {
+        resetPage();
+        isLoadingMore = false;
+        mailRepository.getMailsByLabel(labelId, currentPage, mailsListLiveData);    }
+
+    /**
+     * Loads more mails by label for pagination (appends to current list)
+     */
+    public void loadMoreMailsByLabel(int labelId) {
+        if (isLoadingMore) return;
+        isLoadingMore = true;
         mailRepository.getMailsByLabel(labelId, currentPage, mailsListLiveData);
     }
 

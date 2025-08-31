@@ -34,6 +34,7 @@ import com.asp.android_app.viewmodel.MailViewModel;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,11 +80,6 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
                 notifyDataSetChanged();
             }
         });
-    }
-
-    public void setMailList(List<Mail> mailList) {
-        this.mailList = mailList;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -247,6 +243,42 @@ public class MailAdapter extends RecyclerView.Adapter<MailAdapter.MailViewHolder
                 color = ContextCompat.getColor(context, R.color.star_fill);
             CompoundButtonCompat.setButtonTintList(holder.starCheckbox, ColorStateList.valueOf(color));
         });
+    }
+
+    /**
+     * Appends new mails to the existing list (for pagination)
+     */
+    public void appendMails(List<Mail> newMails) {
+        if (newMails == null || newMails.isEmpty()) {
+            return;
+        }
+
+        int startPosition = this.mailList.size();
+        this.mailList.addAll(newMails);
+        notifyItemRangeInserted(startPosition, newMails.size());
+    }
+
+    /**
+     * Clears the current mail list and sets a new one (for refresh/new inbox)
+     */
+    public void setMailList(List<Mail> mails) {
+        if (this.mailList == null)
+            this.mailList = new ArrayList<>();
+
+        this.mailList.clear();
+        clearSelection();
+
+        if (mails != null) {
+            this.mailList.addAll(mails);
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Returns the current number of mails in the adapter
+     */
+    public int getCurrentMailCount() {
+        return mailList.size();
     }
 
     @Override

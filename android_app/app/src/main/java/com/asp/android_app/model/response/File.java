@@ -5,7 +5,7 @@ import android.os.Parcelable;
 /**
  * Class to represent an attachment (file) sent in mails
  */
-public class Attachment implements Parcelable {
+public class File implements Parcelable {
 
     /**
      * File name
@@ -17,10 +17,10 @@ public class Attachment implements Parcelable {
      */
     private String data;
 
-    public Attachment() {
+    public File() {
     }
 
-    public Attachment(String name, String data) {
+    public File(String name, String data) {
         this.name = name;
         this.data = data;
     }
@@ -43,8 +43,8 @@ public class Attachment implements Parcelable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Attachment)) return false;
-        Attachment that = (Attachment) o;
+        if (!(o instanceof File)) return false;
+        File that = (File) o;
         return name != null && name.equals(that.name)
                 && data != null && data.equals(that.data);
     }
@@ -58,20 +58,20 @@ public class Attachment implements Parcelable {
 
 
     // ---- Parcelable bits ----
-    protected Attachment(android.os.Parcel in) {
+    protected File(android.os.Parcel in) {
         name = in.readString();
         data = in.readString();
     }
 
-    public static final Creator<Attachment> CREATOR = new Creator<Attachment>() {
+    public static final Creator<File> CREATOR = new Creator<File>() {
         @Override
-        public Attachment createFromParcel(android.os.Parcel in) {
-            return new Attachment(in);
+        public File createFromParcel(android.os.Parcel in) {
+            return new File(in);
         }
 
         @Override
-        public Attachment[] newArray(int size) {
-            return new Attachment[size];
+        public File[] newArray(int size) {
+            return new File[size];
         }
     };
 

@@ -29,7 +29,7 @@ import android.widget.Toast;
 import com.asp.android_app.R;
 import com.asp.android_app.model.Mail;
 import com.asp.android_app.model.request.SendMailRequest;
-import com.asp.android_app.model.response.Attachment;
+import com.asp.android_app.model.response.File;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.model.response.UserSearchResult;
 import com.asp.android_app.utils.Base64Converter;
@@ -39,7 +39,6 @@ import com.asp.android_app.viewmodel.MailViewModel;
 import com.asp.android_app.viewmodel.UserViewModel;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -79,7 +78,7 @@ public class ComposeFragment extends Fragment {
     /**
      * holds the attachments to send; reflected in chipsAttachments
      */
-    private final List<Attachment> attachments = new ArrayList<>();
+    private final List<File> files = new ArrayList<>();
 
     private SuggestionAdapter suggestionAdapter;
     private final Handler debounceHandler = new Handler(Looper.getMainLooper());
@@ -227,9 +226,9 @@ public class ComposeFragment extends Fragment {
             if (prefill.subject != null) etSubject.setText(prefill.subject);
             quotedHtml = prefill.quotedHtml;
 
-            if (prefill.attachments != null && !prefill.attachments.isEmpty())
-                for (Attachment a : prefill.attachments) {
-                    attachments.add(a);
+            if (prefill.files != null && !prefill.files.isEmpty())
+                for (File a : prefill.files) {
+                    files.add(a);
                     addAttachmentChip(a);
                 }
         }
@@ -274,9 +273,9 @@ public class ComposeFragment extends Fragment {
                 return;
             }
 
-            Attachment att = new Attachment(displayName != null ? displayName : "file", dataUri);
-            if (!attachments.contains(att)) {
-                attachments.add(att);
+            File att = new File(displayName != null ? displayName : "file", dataUri);
+            if (!files.contains(att)) {
+                files.add(att);
                 addAttachmentChip(att);
             }
         } catch (SecurityException se) {
@@ -284,9 +283,9 @@ public class ComposeFragment extends Fragment {
             String displayName = queryDisplayName(uri);
             String dataUri = Base64Converter.fileUriToBase64(uri, requireContext());
             if (!dataUri.isEmpty()) {
-                Attachment att = new Attachment(displayName != null ? displayName : "file", dataUri);
-                if (!attachments.contains(att)) {
-                    attachments.add(att);
+                File att = new File(displayName != null ? displayName : "file", dataUri);
+                if (!files.contains(att)) {
+                    files.add(att);
                     addAttachmentChip(att);
                 }
             } else {
@@ -300,7 +299,7 @@ public class ComposeFragment extends Fragment {
     /**
      * Renders a single attachment as a Material chip with an icon + close (remove).
      */
-    private void addAttachmentChip(@NonNull Attachment att) {
+    private void addAttachmentChip(@NonNull File att) {
         Chip chip = new Chip(requireContext());
         chip.setText(att.getName());
         int iconRes = Base64Converter.getFileIconResource(att.getName());
@@ -308,7 +307,7 @@ public class ComposeFragment extends Fragment {
         chip.setCloseIconVisible(true);
         chip.setOnCloseIconClickListener(v -> {
             chipsAttachments.removeView(chip);
-            attachments.remove(att);
+            files.remove(att);
         });
         chipsAttachments.addView(chip);
     }
@@ -331,10 +330,10 @@ public class ComposeFragment extends Fragment {
 
                 // If the draft already has attachments, show them
                 if (draft.getAttachments() != null && !draft.getAttachments().isEmpty()) {
-                    attachments.clear();
-                    attachments.addAll(draft.getAttachments());
+                    files.clear();
+                    files.addAll(draft.getAttachments());
                     chipsAttachments.removeAllViews();
-                    for (Attachment a : attachments) addAttachmentChip(a);
+                    for (File a : files) addAttachmentChip(a);
                 }
 
             } else if (result instanceof Result.Error) {
@@ -425,7 +424,7 @@ public class ComposeFragment extends Fragment {
         String body = com.asp.android_app.utils.MailHtmlUtil.mergeTypedWithQuote(typed, quotedHtml);
 
         // pass the attachments that were added
-        return new SendMailRequest(subject, body, sentTo, saveAsDraft, new ArrayList<>(attachments));
+        return new SendMailRequest(subject, body, sentTo, saveAsDraft, new ArrayList<>(files));
     }
 
     /**

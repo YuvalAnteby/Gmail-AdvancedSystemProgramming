@@ -1,6 +1,6 @@
 package com.asp.android_app.model.request;
 
-import com.asp.android_app.model.response.Attachment;
+import com.asp.android_app.model.response.File;
 
 import java.util.List;
 
@@ -12,9 +12,9 @@ public class SendMailRequest {
     private String body;
     private List<String> sentTo;
     private boolean saveAsDraft;
-    private List<Attachment> files;
+    private List<File> files;
 
-    public SendMailRequest(String subject, String body, List<String> sentTo, boolean saveAsDraft, List<Attachment> files) {
+    public SendMailRequest(String subject, String body, List<String> sentTo, boolean saveAsDraft, List<File> files) {
         this.subject = subject;
         this.body = body;
         this.sentTo = sentTo;

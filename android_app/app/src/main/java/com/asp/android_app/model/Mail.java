@@ -1,6 +1,6 @@
 package com.asp.android_app.model;
 
-import com.asp.android_app.model.response.Attachment;
+import com.asp.android_app.model.response.File;
 import com.asp.android_app.model.response.UserInfo;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class Mail {
     private boolean isStarred;
     private boolean isTrashed;
     private boolean isSpam;
-    private List<Attachment> files;
+    private List<File> files;
     private List<Label> labels;
 
     /**
@@ -55,6 +55,10 @@ public class Mail {
      */
     public List<UserInfo> getSentTo() {
         return sentTo;
+    }
+
+    public void setSentTo(List<UserInfo> sentTo) {
+        this.sentTo = sentTo;
     }
 
     /**
@@ -162,8 +166,12 @@ public class Mail {
     /**
      * @return list of files attached to mail
      */
-    public List<Attachment> getAttachments() {
+    public List<File> getAttachments() {
         return files;
+    }
+
+    public void setAttachments(List<File> files) {
+        this.files = files;
     }
 
     /**

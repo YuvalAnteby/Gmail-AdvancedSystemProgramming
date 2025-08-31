@@ -1,8 +1,8 @@
 package com.asp.android_app.api;
 
-import com.asp.android_app.model.User;
 import com.asp.android_app.model.request.LoginRequest;
 import com.asp.android_app.model.request.ProfileImageRequest;
+import com.asp.android_app.model.request.RegisterRequest;
 import com.asp.android_app.model.response.AuthResponse;
 import com.asp.android_app.model.response.UserInfo;
 import com.asp.android_app.model.response.UserSearchResult;
@@ -25,7 +25,7 @@ import retrofit2.http.Query;
 public interface UserApi {
 
     @POST("users")
-    Call<AuthResponse> register(@Body User user);
+    Call<AuthResponse> register(@Body RegisterRequest request);
 
     @POST("tokens")
     Call<AuthResponse> login(@Body LoginRequest loginRequest);

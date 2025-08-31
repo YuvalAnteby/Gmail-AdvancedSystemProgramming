@@ -189,7 +189,7 @@ public class SignupFragment extends Fragment {
             return;
 
         // register
-        User newUser = new User(email, password, name, birthDate, imageBase64);
+        User newUser = new User(name, email, password, birthDate, imageBase64);
         userViewModel.register(newUser);
         // wait for results
         userViewModel.getAuthResult().observe(getViewLifecycleOwner(), result -> {
@@ -197,7 +197,7 @@ public class SignupFragment extends Fragment {
                 AuthResponse auth = ((Result.Success<AuthResponse>) result).getData();
                 handleSignupSuccess(auth);
             } else if (result instanceof Result.Error) {
-                String msg = ((Result.Error<?>) result).getMessage();
+                String msg = ((Result.Error<?>) result).toString();
                 handleSignupErrors(msg, emailLayout);
             }
         });
@@ -227,7 +227,7 @@ public class SignupFragment extends Fragment {
     private void handleSignupErrors(String msg, TextInputLayout emailLayout) {
         Log.i("signup error:", msg);
         // error of already existing mail address
-        if (msg.contains("400") || msg.contains("exists")) {
+        if (msg.contains("400") && msg.contains("exists")) {
             emailLayout.setError("Email address taken");
             return;
         }
