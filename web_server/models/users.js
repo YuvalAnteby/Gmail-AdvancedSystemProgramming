@@ -162,13 +162,5 @@ const updateUser = (id, password, image) => {
     };
 }
 
-module.exports = {
-    getAllUsers,
-    getUserById,
-    getSafeUserById,
-    createUser,
-    userExist,
-    isAuthorizeUser,
-    getUserByMail,
-    updateUser
-};
+// Redirect to MongoDB-backed implementation
+module.exports = require('./users_db');
