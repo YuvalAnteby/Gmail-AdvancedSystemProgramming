@@ -1,6 +1,5 @@
 package com.asp.android_app.caching;
 
-
 import android.content.Context;
 
 import com.asp.android_app.caching.dao.LabelDao;
@@ -52,7 +51,9 @@ public class MailLocalDataSource {
      * Touch mails for LRU when presented in a list.
      */
     public void touchMails(List<Integer> ids) {
-        mailDao.touch(ids, System.currentTimeMillis());
+        if (ids != null && !ids.isEmpty()) {
+            mailDao.touch(ids, System.currentTimeMillis());
+        }
     }
 
     /**
@@ -83,12 +84,107 @@ public class MailLocalDataSource {
     }
 
     /**
+     * Delete a specific mail by ID
+     */
+    public void deleteMailById(int mailId) {
+        mailDao.deleteById(mailId);
+        // Also clear any cross-refs for this mail
+        labelDao.clearRefsForMails(List.of(mailId));
+    }
+
+    // ---- Cache clearing methods for proper invalidation ----
+
+    /**
+     * Clear all incoming mails from cache
+     */
+    public void clearIncoming() {
+        mailDao.deleteIncoming();
+    }
+
+    /**
+     * Clear all sent mails from cache
+     */
+    public void clearSent() {
+        mailDao.deleteSent();
+    }
+
+    /**
+     * Clear all starred mails from cache
+     */
+    public void clearStarred() {
+        mailDao.deleteStarred();
+    }
+
+    /**
+     * Clear all draft mails from cache
+     */
+    public void clearDrafts() {
+        mailDao.deleteDrafts();
+    }
+
+    /**
+     * Clear all spam mails from cache
+     */
+    public void clearSpam() {
+        mailDao.deleteSpam();
+    }
+
+    /**
+     * Clear all trash mails from cache
+     */
+    public void clearTrash() {
+        mailDao.deleteTrash();
+    }
+
+    /**
+     * Generic clear method for any inbox type
+     */
+    public void clearByType(String inboxType) {
+        switch ((inboxType == null ? "incoming" : inboxType).toLowerCase()) {
+            case "sent":
+                clearSent();
+                break;
+            case "star":
+            case "starred":
+                clearStarred();
+                break;
+            case "draft":
+                clearDrafts();
+                break;
+            case "spam":
+                clearSpam();
+                break;
+            case "trash":
+                clearTrash();
+                break;
+            case "incoming":
+            case "all":
+            default:
+                clearIncoming();
+                break;
+        }
+    }
+
+    /**
      * Label-based list using cross-refs.
      */
     public List<MailEntity> getByLabel(int labelId) {
         List<Integer> ids = labelDao.getMailIdsForLabel(labelId);
         if (ids.isEmpty()) return new ArrayList<>();
         return mailDao.getByIdsOrdered(ids);
+    }
+
+    /**
+     * Clear mails for a specific label (useful for label-based cache invalidation)
+     */
+    public void clearByLabel(int labelId) {
+        List<Integer> mailIds = labelDao.getMailIdsForLabel(labelId);
+        if (!mailIds.isEmpty()) {
+            for (int mailId : mailIds) {
+                mailDao.deleteById(mailId);
+            }
+            labelDao.clearRefsForLabel(labelId);
+        }
     }
 
     /**
@@ -113,6 +209,9 @@ public class MailLocalDataSource {
         labelDao.upsertLabels(labels);
     }
 
+    /**
+     * Prune cache if it exceeds capacity
+     */
     private void pruneIfNeeded() {
         int count = mailDao.countAll();
         if (count > CACHE_CAP) {
