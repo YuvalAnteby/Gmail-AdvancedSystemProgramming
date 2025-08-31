@@ -30,7 +30,7 @@ function buildInboxMatch(owner, inboxType) {
         // inbox aliases
         case 'incoming':
         case 'inbox':
-            return { ...base, isDraft: { $ne: true }, isTrashed: { $ne: true }, isSpam: { $ne: true }, from: { $eq: owner } };
+            return { ...base, isDraft: { $ne: true }, isTrashed: { $ne: true }, isSpam: { $ne: true }, from: { $ne: owner } };
         case 'all':
         default:
             return { ...base, isDraft: { $ne: true } };
@@ -163,3 +163,5 @@ module.exports = {
     deleteMail,
     searchInInbox,
 };
+
+
