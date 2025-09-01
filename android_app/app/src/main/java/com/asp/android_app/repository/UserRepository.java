@@ -1,0 +1,125 @@
+package com.asp.android_app.repository;
+
+import android.content.Context;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+
+import com.asp.android_app.api.ApiClient;
+import com.asp.android_app.api.UserApi;
+import com.asp.android_app.model.User;
+import com.asp.android_app.model.request.LoginRequest;
+import com.asp.android_app.model.request.ProfileImageRequest;
+import com.asp.android_app.model.request.RegisterRequest;
+import com.asp.android_app.model.response.AuthResponse;
+import com.asp.android_app.model.response.UserInfo;
+import com.asp.android_app.model.response.UserSearchResult;
+import com.asp.android_app.utils.Result;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * Repository class for user related operations such as login, registration, and profile fetch.
+ */
+public class UserRepository {
+
+    private final UserApi userApi;
+
+    public UserRepository(Context context) {
+        userApi = ApiClient.getClient(context).create(UserApi.class);
+    }
+
+    public void login(LoginRequest request, MutableLiveData<Result<AuthResponse>> resultLiveData) {
+        resultLiveData.postValue(new Result.Loading<>());
+        userApi.login(request).enqueue(createCallback(resultLiveData));
+    }
+
+    public void register(User u, MutableLiveData<Result<AuthResponse>> resultLiveData) {
+        resultLiveData.postValue(new Result.Loading<>());
+        RegisterRequest req = new RegisterRequest(u);
+        userApi.register(req).enqueue(createCallback(resultLiveData));
+    }
+
+    public void validateToken(MutableLiveData<Result<AuthResponse>> resultLiveData) {
+        resultLiveData.postValue(new Result.Loading<>());
+        userApi.validateToken().enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<AuthResponse> call, @NonNull Response<AuthResponse> resp) {
+                if (resp.isSuccessful() && resp.body() != null) {
+                    resultLiveData.postValue(new Result.Success<>(resp.body()));
+                } else if (resp.code() == 401) {
+                    // special case: token invalid/expired
+                    resultLiveData.postValue(new Result.Error<>("UNAUTHORIZED"));
+                } else {
+                    resultLiveData.postValue(new Result.Error<>("Error: " + resp.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<AuthResponse> call, @NonNull Throwable t) {
+                resultLiveData.postValue(new Result.Error<>(t.getMessage()));
+            }
+        });
+    }
+
+    public void fetchUserInfo(int userId, MutableLiveData<Result<UserInfo>> resultLiveData) {
+        resultLiveData.postValue(new Result.Loading<>());
+        userApi.fetchUserInfo(userId).enqueue(createCallback(resultLiveData));
+    }
+
+    public void changeProfileImage(int userId, ProfileImageRequest request,
+                                   MutableLiveData<Result<UserInfo>> resultLiveData) {
+        resultLiveData.postValue(new Result.Loading<>());
+        userApi.changeProfileImage(userId, request).enqueue(createCallback(resultLiveData));
+    }
+
+    public void searchUsers(String q, MutableLiveData<Result<List<UserSearchResult>>> result) {
+        result.postValue(new Result.Loading<>());
+        userApi.searchByEmail(q).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<List<UserSearchResult>> call, @NonNull Response<List<UserSearchResult>> resp) {
+                if (resp.isSuccessful()) result.postValue(new Result.Success<>(resp.body()));
+                else result.postValue(new Result.Error<>("Search error: " + resp.code()));
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<UserSearchResult>> call, @NonNull Throwable t) {
+                result.postValue(new Result.Error<>(t.getMessage()));
+            }
+        });
+    }
+
+
+    /**
+     * Helper class to centralize callback creation
+     *
+     * @param liveData result live data to show
+     * @return callback of type T
+     */
+    private <T> Callback<T> createCallback(MutableLiveData<Result<T>> liveData) {
+        return new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<T> call, @NonNull Response<T> response) {
+                try {
+                    Log.i("UserRepo", "" + response.raw());
+                } catch (Exception ignored) {
+                }
+                if (response.isSuccessful()) {
+                    liveData.postValue(new Result.Success<>(response.body()));
+                } else {
+                    liveData.postValue(new Result.Error<>("Error: " + response.raw()));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<T> call, @NonNull Throwable t) {
+                liveData.postValue(new Result.Error<>(t.getMessage()));
+            }
+        };
+    }
+}

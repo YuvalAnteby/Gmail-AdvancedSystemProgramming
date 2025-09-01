@@ -417,13 +417,5 @@ const searchInInbox = (query, userId) => {
         });
 }
 
-module.exports = {
-    getUserMails,
-    saveDraft,
-    sendNewMail,
-    getMail,
-    editSentMail,
-    updateDraft,
-    deleteMail,
-    searchInInbox,
-};
+// Redirect to MongoDB-backed implementation
+module.exports = require('./mails_db');
