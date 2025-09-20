@@ -1,13 +1,30 @@
 # Gmail-AdvancedSystemProgramming
-Daily meeting summaries are uploaded to `Issues` tab
-Roee's miluim service documents are uploaded to `Issues` tab if needed, Tzvika was informed about it.
 
-## Dear TA please check main-Ex5 for the final version of Ex5
-## Dear TA please check main-Ex4 for the final version of Ex4
+This is a full-stack Gmail-like system built as part of an advanced programming university course.</br>
+It includes a Node.js + Express backend, React frontend, Android mobile client, and a custom C++ Bloom filter for spam detection.</br>
+The project was built following TDD and Agile methodologies, adhering to SOLID principles.
+
+<p align="center"> 
+    <img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white" alt="NodeJs">
+    <img src="https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB" alt="Express.js">
+    <img src="https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB">
+    <img src="https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="C++">
+</p>
+
+<p align="center">
+    <img src="https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React">
+    <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android">
+</p>
+<p align="center">
+    <img src="https://img.shields.io/badge/License-MIT-brightgreen.svg" alt="License: MIT">
+</p>
 
 ---
 
 ## Table of Contents
+- [Tech Stack](#tech-stack)
+  - [Project Architecture](#project-architecture)
+  - [DB schemas](#db-schemas)
 - [Running server and client](#testing-and-running)
   - [Getting started](#getting-started)
   - [Testing bloom filter server and python client](#to-test-the-python-client-and-bloom-filter-server) 
@@ -19,6 +36,112 @@ Roee's miluim service documents are uploaded to `Issues` tab if needed, Tzvika w
   - [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/tree/main-Exe/server_cpp) 
   - [Python client README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/python_client/README.md)
   - [JavaScript server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex3/web_server/README.md)
+- [Teammates](#teammates)
+
+---
+
+## Tech Stack
+- Backend: Node.js with Express for handling IO between users and backend.</br>
+C++ for handling the Bloom Filter in spam detection.
+- Frontend: React.js for web, Android using Java + XML for mobile.
+- Database: MongoDB 
+- DevOps: Dockerized using docker compose and implemented CI using GitHub Actions to run tests before approving PRs 
+
+### Project Architecture
+<details>
+<summary>Click to view project's architecture </summary>
+
+```mermaid
+flowchart LR
+  %% === Groups ===
+  subgraph Clients
+    user([User])
+    react[React Web App]
+    android[Android App]
+  end
+
+  subgraph Backend
+    node[Node.js + Express]
+    cpp[C++ Bloom Filter]
+    mongo[(MongoDB)]
+  end
+
+  subgraph Infrastructure
+    docker[Docker / Docker Compose]
+    actions[GitHub Actions]
+  end
+
+  %% === Edges ===
+  user --> react
+  user --> android
+  react <--> node
+  android <--> node
+  node <--> |TCP| cpp
+  node <--> |Mongoose| mongo
+  node -.build/run.-> docker
+  docker -.CI pipeline.-> actions
+```
+
+</details>
+
+### DB schemas
+<details>
+<summary>Click to view DB schemas</summary>
+
+```mermaid
+erDiagram
+  USER {
+    number id
+    string fullName
+    string mail
+    string password
+    string dateOfBirth
+    string image
+    date createdAt
+    date updatedAt
+  }
+
+  LABEL {
+    number id
+    string name
+    number owner
+    number parent
+    date createdAt
+    date updatedAt
+  }
+
+  FILE {
+    string name
+    string data
+    number size
+    string type
+  }
+
+  MAIL {
+    number id
+    number owner
+    number from
+    string subject
+    string body
+    boolean isRead
+    boolean isStarred
+    boolean isTrashed
+    boolean isSpam
+    boolean isDraft
+    date createdAt
+    date updatedAt
+  }
+
+  USER  ||--o{ LABEL : owns
+  LABEL o|--o{ LABEL : parent_of
+  USER  ||--o{ MAIL  : owns
+  USER  ||--o{ MAIL  : sends
+  MAIL  ||--o{ FILE  : has
+  MAIL  ||--o{ USER : has
+  MAIL  ||--o{ LABEL : has
+```
+
+</details>
 
 ---
 
@@ -35,7 +158,7 @@ and docker compose.**
 ### To test the python client and bloom filter server
 This will build and run only the test related containers (CPP server, gtest, python test)
 ```bash
-  docker-compose --profile tests up --build
+  docker compose --profile tests up --build
 ```
 
 ### Running the entire web app
@@ -51,10 +174,10 @@ In a real world application these wouldn't be uploaded, we did it for easier set
 ### Running the python client
 **NOTE: The instructions didn't ask to run the python client and express server together using the same command**
 ```bash
-  docker-compose run client --build
+  docker compose run client --build
 ```
 
-- Remainder, to exit the container gracefully use
+- Reminder, to exit the container gracefully use
 ```bash
 control+c
 ```
@@ -97,5 +220,12 @@ For more screenshots [click here](https://github.com/YuvalAnteby/Gmail-AdvancedS
 - [CPP server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex4/server_cpp)
 - [JavaScript server README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex4/web_server/README.md)
 - [React frontend README](https://github.com/YuvalAnteby/Gmail-AdvancedSystemProgramming/blob/main-Ex4/frontend/README.md)
+
+---
+
+## Teammates
+- [Yuval Anteby](https://github.com/YuvalAnteby)
+- [Roee Chaim](https://github.com/RoeeHaim)
+- [Dor Darmon](https://github.com/dor-darmon)
 
 ---
